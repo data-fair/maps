@@ -1,0 +1,49 @@
+{
+  "name": "@data-fair/maps",
+  "version": "0.0.0",
+  "description": "",
+  "author": "Tom Banchereau <banchereau.tom@gmail.com>",
+  "license": "AGPL-3.0-only",
+  "homepage": "https://github.com/data-fair/maps#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/data-fair/maps.git"
+  },
+  "bugs": {
+    "url": "https://github.com/data-fair/maps/issues"
+  },
+  "main": "server/index.js",
+  "scripts": {
+    "test": "NODE_ENV=test mocha --exit --bail --timeout 20000 test/",
+    "lint": "eslint --ext js,vue --ignore-path .gitignore .",
+    "lint-fix": "eslint --ext js,vue --ignore-path .gitignore --fix .",
+    "dev-server": "NODE_ENV=development DEBUG=renderer:* DISPLAY=:99.0 xvfb-run -s \":99\" nodemon server",
+    "dev-client": "NODE_ENV=development nuxt",
+    "build": "nuxt build",
+    "start": "node server",
+    "analyze": "nuxt build --analyze",
+    "upgrade": "node upgrade"
+  },
+  "dependencies": {
+    "@koumoul/nuxt-config-inject": "^0.4.10",
+    "@koumoul/sd-express": "^1.0.0",
+    "@koumoul/sd-vue": "^1.2.1",
+    "@nuxtjs/axios": "^5.13.6",
+    "@nuxtjs/vuetify": "^1.12.1",
+    "config": "^3.3.6",
+    "cookie-universal-nuxt": "^2.1.5",
+    "debug": "^4.3.2",
+    "express": "^4.17.1",
+    "mongodb": "^4.1.3",
+    "nodemon": "^2.0.13",
+    "nuxt": "^2.15.8"
+  },
+  "devDependencies": {
+    "@babel/eslint-parser": "^7.15.8",
+    "eslint": "^7.32.0",
+    "eslint-config-vuetify": "^0.6.1",
+    "eslint-plugin-no-only-tests": "^2.6.0",
+    "http-proxy-middleware": "^2.0.1",
+    "mocha": "^9.1.2"
+  }
+}
