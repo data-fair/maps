@@ -1,13 +1,13 @@
 
 async function start() {
   const db = await require('./mongodb').start()
-  // const render = await require('./renderer').start()
-  await require('./http').start({ db })
+  const renderer = await require('./renderer').start({ db })
+  await require('./http').start({ db, renderer })
 }
 
 async function stop() {
   await require('./http').stop()
-  // await require('./renderer').stop()
+  await require('./renderer').stop()
   await require('./mongodb').stop()
 }
 

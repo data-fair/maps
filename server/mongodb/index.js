@@ -16,7 +16,7 @@ module.exports.start = async () => {
 
   await ensureIndexes(db)
 
-  if (process.env.NODE_ENV === 'development') await db.collection('styles').replaceOne({ _id: 'default' }, { ...require('../../public/assets/style'), _id: 'default' }, { upsert: true })
+  // if (process.env.NODE_ENV === 'development') await db.collection('styles').replaceOne({ _id: 'default' }, { ...require('../../public/assets/style'), _id: 'default' }, { upsert: true })
   return db
 }
 
