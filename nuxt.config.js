@@ -77,7 +77,7 @@ module.exports = {
     },
   },
   env: {
-    // mainPublicUrl: config.publicUrl,
+    publicUrl: config.publicUrl,
     // basePath: config.basePath,
     // directoryUrl: config.directoryUrl,
     // adminRole: config.adminRole,
