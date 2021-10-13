@@ -1,12 +1,18 @@
 const express = require('express')
 const eventToPromise = require('event-to-promise')
 const config = require('config')
+const sd = require('@koumoul/sd-express')({ directoryUrl: config.directoryUrl, privateDirectoryUrl: config.privateDirectoryUrl })
 
 const app = express()
 const nuxt = require('./nuxt')
 
+if (process.env.NODE_ENV === 'development') {
+  app.use('/simple-directory', require('http-proxy-middleware').createProxyMiddleware({ target: config.privateDirectoryUrl, pathRewrite: { '^/simple-directory': '' } }))
+}
+
 app.use(require('body-parser').json())
 app.use(require('./middlewares/public-url'))
+app.use(sd.auth)
 
 app.use('/tiles', require('./routers/tiles'))
 // app.use('/fonts', require('./routers/fonts'))

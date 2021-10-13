@@ -29,7 +29,7 @@ module.exports = {
   },
   loading: { color: '#1e88e5' }, // Customize the progress bar color
   plugins: [
-    // { src: '~plugins/session' },
+    { src: '~plugins/session' },
     // { src: '~plugins/global-components' },
     // { src: '~plugins/ws', ssr: false },
     // { src: '~plugins/moment' },
@@ -79,7 +79,7 @@ module.exports = {
   env: {
     publicUrl: config.publicUrl,
     // basePath: config.basePath,
-    // directoryUrl: config.directoryUrl,
+    directoryUrl: config.directoryUrl,
     // adminRole: config.adminRole,
     // contribRole: config.contribRole,
     // map: config.map,
