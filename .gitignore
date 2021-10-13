@@ -3,3 +3,5 @@
 /.nuxt/
 /dist/
 /nuxt-dist
+/lib
+/mbtiles
