@@ -17,7 +17,8 @@ router.get('/:style/:z/:x/:y.png', async (req, res) => {
   const z = req.params.z | 0
   const x = req.params.x | 0
   const y = req.params.y | 0
-  const width = (z === 0 ? 2 : 1) * 256
+  const size = 256
+  const width = (z === 0 ? 2 : 1) * size
   const height = width
   const [lon, lat] = mercator.ll([(x + 0.5) * 256, (y + 0.5) * 256], z)
 
@@ -41,7 +42,7 @@ router.get('/:style/:z/:x/:y.png', async (req, res) => {
       channels: 4,
     },
   })
-  if (z === 0) image.resize(256, 256)
+  if (z === 0) image.resize(width / 2, height / 2)
   image.png({ adaptiveFiltering: false })
   image.toBuffer((err, buffer, info) => {
     if (err) return res.status(500).send(err.message)
