@@ -22,16 +22,32 @@ function createRequester({ db, resource }) {
 
       //
     } else if (req.kind === resourceType.Tile) {
-      if (!req.url.match('^maps://tiles/[\\w\\-]*/\\d*/\\d*/\\d*\\.(pbf)|(png)$')) return callback(new Error(req))
+      if (!req.url.match('^maps://tiles/[\\w\\-]*/\\d*/\\d*/\\d*\\.(pbf)|(png)$')) return callback(new Error(req.url))
+
       const args = req.url.split('/')
-      const query = {
-        ts: args[3],
-        z: parseInt(args[4]),
-        x: parseInt(args[5]),
-        y: parseInt(args[6].split('.')[0]),
+      const x = parseInt(args[5])
+      const y = parseInt(args[6].split('.')[0])
+      const z = parseInt(args[4])
+      const query = { ts: args[3], z, x, y }
+      const cachingSize = Math.max(resource.cachingSize || 0, 0)
+
+      // if (true === true) {
+      if (!resource.cache[`${z}/${x}/${y}`]) {
+        query.x = { $gte: x - cachingSize, $lte: x + cachingSize }
+        const promise = db.collection('tiles').find(query).toArray()
+        for (let index = -cachingSize; index <= cachingSize; index++) {
+          resource.cache[`${z}/${x + index}/${y}`] = promise.then((tiles) => {
+            return tiles.find((t) => t.x === x + index)
+          })
+        }
       }
-      const tile = await db.collection('tiles').findOne(query)
+
+      const tile = await resource.cache[`${z}/${x}/${y}`]
       return callback(null, { data: zlib.unzipSync(tile.d.buffer) })
+      // } else {
+      //   const tile = await db.collection('tiles').findOne(query)
+      //   return callback(null, { data: zlib.unzipSync(tile.d.buffer) })
+      // }
 
       //
     } else if (req.kind === resourceType.Glyphs) {
