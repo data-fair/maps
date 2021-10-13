@@ -9,6 +9,6 @@ module.exports = async (req, res, next) => {
   }
 
   req.style = await getCachedStyle(req.params.style)
-  if (!req.style) { return res.sendStatus(404) }
+  if (!req.style) { return res.status(404).send('Style not found') }
   next()
 }
