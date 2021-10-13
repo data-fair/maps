@@ -1,9 +1,9 @@
 module.exports = {
-  port: 8080,
-  publicUrl: 'http://localhost:8080',
+  port: 7400,
+  publicUrl: 'http://localhost:7400',
   sessionDomain: null,
-  directoryUrl: 'http://localhost:8080',
-  privateDirectoryUrl: '',
+  directoryUrl: 'http://localhost:7400/simple-directory',
+  privateDirectoryUrl: 'http://localhost:8080',
   openapiViewerUrl: 'https://koumoul.com/openapi-viewer/',
   mongoUrl: 'mongodb://localhost:27017/data-fair-maps-' + (process.env.NODE_ENV || 'development'),
   info: {
