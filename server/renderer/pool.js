@@ -1,18 +1,40 @@
 const { createPool } = require('generic-pool')
+const debugPool = require('debug')('renderer:pool')
+const maplibre = require('../utils/maplibre-gl-native')
+
+//
+
+//
+
+//
 
 module.exports = {
-  createPool: (factory, options) => {
-    const pool = createPool(factory, options)
-    const use = pool.use.bind(pool)
-
-    pool.use = async function(callback) {
-      return await use(async (resource) => {
-        const ret = await callback(resource)
-        await factory.clean(resource)
-        return ret
-      })
-    }
-
-    return pool
+  createPool: (db) => {
+    return createPool(createFactory(db), { min: 1, max: 1 })
   },
+}
+
+function createFactory(db) {
+  return {
+    create: async() => {
+      debugPool('creating a new map')
+      const resource = {
+        cache: {},
+      }
+      try {
+        resource.map = maplibre.Map({
+          request: require('./request')({ resource, db }),
+        })
+      } catch (error) {
+        console.error(error.message)
+        process.exit(1)
+      }
+      debugPool('map created')
+      return resource
+    },
+    destroy: async(resource) => {
+      debugPool('destroy called')
+      resource.map.release()
+    },
+  }
 }
