@@ -1,15 +1,4 @@
-
-async function start() {
-  const db = await require('./mongodb').start()
-  const renderer = await require('./renderer').start({ db })
-  await require('./http').start({ db, renderer })
-}
-
-async function stop() {
-  await require('./http').stop()
-  await require('./renderer').stop()
-  await require('./mongodb').stop()
-}
+const { start, stop } = require('./app')
 
 start().catch((err) => {
   console.error('Failure', err)
