@@ -1,27 +1,5 @@
 const geojsonBounds = require('geojson-bounds')
 const mercator = new (require('@mapbox/sphericalmercator'))()
-// const z = calcZForBBox(bbox, w, h, req.query),
-
-// const calcZForBBox = (bbox, w, h, query) => {
-//   let z = 25;
-
-//   const padding = query.padding !== undefined ?
-//     parseFloat(query.padding) : 0.1;
-
-//   const minCorner = mercator.px([bbox[0], bbox[3]], z),
-//     maxCorner = mercator.px([bbox[2], bbox[1]], z);
-//   const w_ = w / (1 + 2 * padding);
-//   const h_ = h / (1 + 2 * padding);
-
-//   z -= Math.max(
-//     Math.log((maxCorner[0] - minCorner[0]) / w_),
-//     Math.log((maxCorner[1] - minCorner[1]) / h_)
-//   ) / Math.LN2;
-
-//   z = Math.max(Math.log(Math.max(w, h) / 256) / Math.LN2, Math.min(25, z));
-
-//   return z;
-// };
 
 module.exports = {
   getBBoxFromGeojsonStyleSource(sources) {
