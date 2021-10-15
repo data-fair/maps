@@ -58,7 +58,7 @@ async function getOrPost(req, res) {
   //   // return res.send(req.style)
   // }
   try {
-    const { buffer, info } = await req.app.get('renderer').render(req.style, mapOptions, { format: 'png' }, { cookie: req.headers.cookie })
+    const { buffer, info } = await req.app.get('renderer').render(req.style, mapOptions, { format: 'png' }, { cookie: req.headers.cookie, publicBaseUrl: req.publicBaseUrl })
 
     if (!buffer) return res.status(404).send('Not found')
     res.set({
