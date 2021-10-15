@@ -25,7 +25,7 @@ var Map = function(options) {
             var responded = false
             var callback = function() {
                 var args = arguments
-                if (args[1] && !args[1].data) {
+                if (args[1] && (!args[1].data || !Buffer.isBuffer(args[1].data))) {
                     throw new Error()
                 }
                 if (!responded) {
