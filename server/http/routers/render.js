@@ -1,5 +1,6 @@
 
 const bboxUtils = require('../../utils/bbox')
+
 const router = module.exports = require('express').Router()
 router.param('style', require('../params/style'))
 
@@ -69,5 +70,6 @@ async function getOrPost(req, res) {
     if (error.message.match('Request failed with status code')) {
       return res.status(error.message.split(' ').pop()).send()
     }
+    return res.status(500).send()
   }
 }
