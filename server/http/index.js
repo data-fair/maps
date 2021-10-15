@@ -6,8 +6,8 @@ const sd = require('@koumoul/sd-express')({ directoryUrl: config.directoryUrl, p
 const app = express()
 const nuxt = require('./nuxt')
 
-if (process.env.NODE_ENV === 'development') {
-  app.use('/simple-directory', require('http-proxy-middleware').createProxyMiddleware({ target: config.privateDirectoryUrl, pathRewrite: { '^/simple-directory': '' } }))
+if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
+  app.use(require('http-proxy-middleware').createProxyMiddleware('/simple-directory', { target: config.privateDirectoryUrl, pathRewrite: { '^/simple-directory': '' } }))
 }
 
 app.use(require('body-parser').json())
@@ -15,7 +15,7 @@ app.use(require('./middlewares/public-url'))
 app.use(sd.auth)
 
 app.use('/tiles', require('./routers/tiles'))
-// app.use('/fonts', require('./routers/fonts'))
+app.use('/fonts', require('./routers/fonts'))
 app.use('/styles', require('./routers/styles'))
 app.use('/rendered-tiles', require('./routers/rendered-tiles'))
 app.use('/render', require('./routers/render'))
