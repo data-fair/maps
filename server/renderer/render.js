@@ -1,12 +1,12 @@
 const sharp = require('sharp')
 
 module.exports = (pool) => ({
-  async render(style, mapOptions, imageProperties) {
+  async render(style, mapOptions, imageProperties, context = {}) {
     const imageBuffer = await pool.use((resource) => new Promise((resolve, reject) => {
+      resource.context = context
       resource.map.load(style)
       resource.map.render(mapOptions, (err, buffer) => {
-        Object.keys(resource.cache).forEach(k => { delete resource.cache[k] })
-        delete resource.cachingSize
+        delete resource.context
 
         if (err) reject(err)
         else resolve(buffer)
