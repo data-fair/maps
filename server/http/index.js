@@ -7,6 +7,7 @@ const app = express()
 const nuxt = require('./nuxt')
 
 if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
+  app.use(require('cors')())
   app.use(require('http-proxy-middleware').createProxyMiddleware('/simple-directory', { target: config.privateDirectoryUrl, pathRewrite: { '^/simple-directory': '' } }))
 }
 
@@ -19,6 +20,12 @@ app.use('/fonts', require('./routers/fonts'))
 app.use('/styles', require('./routers/styles'))
 app.use('/rendered-tiles', require('./routers/rendered-tiles'))
 app.use('/render', require('./routers/render'))
+
+app.get('/api-docs.json', (req, res, next) => {
+  const docs = JSON.parse(JSON.stringify(require('./api-docs')))
+  docs.servers = [{ url: req.publicBaseUrl }]
+  res.send(docs)
+})
 
 const server = require('http').createServer(app)
 let server2

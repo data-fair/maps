@@ -1,5 +1,12 @@
 const memoizee = require('memoizee')
 
+require('../api-docs').components.parameters.style = {
+  name: 'style',
+  in: 'path',
+  description: 'id of the style',
+  required: true,
+}
+
 let getCachedStyle
 module.exports = async (req, res, next) => {
   if (!getCachedStyle) {

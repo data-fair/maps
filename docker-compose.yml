@@ -6,6 +6,12 @@ services:
       - 27017:27017
     volumes:
       - mongo-data:/data/db
+
+  openapi-viewer:
+    image: koumoul/openapi-viewer:1
+    ports:
+      - 5680:8080
+
   sd:
     image: koumoul/simple-directory:multi-domain
     network_mode: host
