@@ -119,6 +119,15 @@
   }
 },
 {
+  "id": "tomban",
+  "firstName": "Tom",
+  "lastName": "Banchereau",
+  "email": "banchereau.tom@gmail.com",
+  "password": {
+    "clear": "passwd"
+  }
+},
+{
   "id": "superadmin",
   "firstName": "Super",
   "lastName": "Admin",

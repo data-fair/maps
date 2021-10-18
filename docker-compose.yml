@@ -10,7 +10,7 @@ services:
     image: koumoul/simple-directory:multi-domain
     network_mode: host
     environment:
-      - ADMINS=["superadmin@test.com"]
+      - ADMINS=["superadmin@test.com","banchereau.tom@gmail.com","alban.mouton@koumoul.com"]
       - PUBLIC_URL=http://localhost:7400/simple-directory
       - MAILDEV_ACTIVE=true
       - STORAGE_TYPE=file
