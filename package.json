@@ -17,7 +17,7 @@
     "test": "NODE_ENV=test mocha --exit --bail --timeout 20000 test/",
     "lint": "eslint --ext js,vue --ignore-path .gitignore .",
     "lint-fix": "eslint --ext js,vue --ignore-path .gitignore --fix .",
-    "dev-server": "NODE_ENV=development DEBUG=renderer:* DISPLAY=:99.0 xvfb-run -s \":99\" nodemon server",
+    "dev-server": "NODE_ENV=development DEBUG=renderer:*,mbtiles DISPLAY=:99.0 xvfb-run -s \":99\" nodemon server",
     "dev-client": "NODE_ENV=development nuxt",
     "build": "nuxt build",
     "start": "node server",
@@ -32,8 +32,10 @@
     "@mapbox/mbtiles": "^0.12.1",
     "@mapbox/sphericalmercator": "^1.2.0",
     "@mapbox/tiletype": "^0.3.1",
+    "@maplibre/maplibre-gl-style-spec": "^14.0.2",
     "@nuxtjs/axios": "^5.13.6",
     "@nuxtjs/vuetify": "^1.12.1",
+    "ajv": "^8.6.3",
     "axios": "^0.23.0",
     "body-parser": "^1.19.0",
     "config": "^3.3.6",
@@ -59,6 +61,7 @@
     "eslint": "^7.32.0",
     "eslint-config-vuetify": "^0.6.1",
     "eslint-plugin-no-only-tests": "^2.6.0",
+    "eslint-plugin-vue": "^7.19.1",
     "http-proxy-middleware": "^2.0.1",
     "mocha": "^9.1.2"
   }
