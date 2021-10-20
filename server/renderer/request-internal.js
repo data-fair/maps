@@ -14,20 +14,21 @@ module.exports = async (req, { db, context }) => {
 
     //
   } else if (req.kind === resourceType.Source) {
-    if (!req.url.match('^maps://tiles/[\\w\\-]*\\.json$')) throw new Error(req.url)
+    if (!req.url.match('^maps://api/tiles/[\\w\\-]*\\.json$')) throw new Error(req.url)
     const tileInfo = await db.collection('tilesets').findOne({ _id: req.url.split('/').pop().split('.')[0] })
-    tileInfo.tiles = ['maps://tiles/' + tileInfo._id + '/{z}/{x}/{y}.' + tileInfo.format]
+    tileInfo.tiles = ['maps://api/tiles/' + tileInfo._id + '/{z}/{x}/{y}.' + tileInfo.format]
     return { data: Buffer.from(JSON.stringify(tileInfo)) }// callback(null, { data:  })
 
     //
   } else if (req.kind === resourceType.Tile) {
-    if (!req.url.match('^maps://tiles/[\\w\\-]*/\\d*/\\d*/\\d*\\.(pbf)|(png)$')) throw new Error(req.url)
+    if (!req.url.match('^maps://api/tiles/[\\w\\-]*/\\d*/\\d*/\\d*\\.(pbf)|(png)|(jpg)$')) throw new Error(req.url)
 
     const args = req.url.split('/')
-    const x = parseInt(args[5])
-    const y = parseInt(args[6].split('.')[0])
-    const z = parseInt(args[4])
-    const query = { ts: args[3], z, x, y }
+    const x = parseInt(args[6])
+    const y = parseInt(args[7].split('.')[0])
+    const z = parseInt(args[5])
+    const format = req.url.split('.').pop()
+    const query = { ts: args[4], z, x, y }
     context.cachingSize = Math.max(context.cachingSize || 0, 0)
 
     // if (true === true) {
@@ -42,7 +43,12 @@ module.exports = async (req, { db, context }) => {
     }
 
     const tile = await context.cache[`${z}/${x}/${y}`]
-    return { data: zlib.unzipSync(tile.d.buffer) }
+
+    if (format === 'pbf') {
+      return { data: zlib.unzipSync(tile.d.buffer) }
+    } else {
+      return { data: tile.d.buffer }
+    }
     // } else {
     //   const tile = await db.collection('tiles').findOne(query)
     //   return callback(null, { data: zlib.unzipSync(tile.d.buffer) })
@@ -50,7 +56,7 @@ module.exports = async (req, { db, context }) => {
 
     //
   } else if (req.kind === resourceType.Glyphs) {
-    if (!req.url.match('^maps://fonts/.*/\\d+\\-\\d+.pbf$')) throw new Error(req.url)
+    if (!req.url.match('^maps://api/fonts/.*/\\d+\\-\\d+.pbf$')) throw new Error(req.url)
     const args = req.url.split('/')
     const fontStack = decodeURI(args[3])
     const range = args[4].split('.')[0]

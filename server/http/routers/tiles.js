@@ -1,5 +1,6 @@
 const tiletype = require('@mapbox/tiletype')
-
+const fs = require('fs/promises')
+const { nanoid } = require('nanoid')
 const router = module.exports = require('express').Router()
 
 //
@@ -8,6 +9,7 @@ router.param('tileset', require('../params/tileset'))
 router.param('z', require('../params/xyz').z)
 router.param('x', require('../params/xyz').x)
 router.param('y', require('../params/xyz').y)
+router.param('tileFormat', require('../params/tile-format'))
 
 //
 
@@ -41,6 +43,31 @@ router.get('', async (req, res) => {
 
 //
 
+require('../api-docs').paths['/tiles'].post = {
+  tags: ['Tiles'],
+  parameters: [],
+  responses: {
+    // 200: {
+    //   description: 'List of all available TileJSONs',
+    //   content: { 'application/json': {} },
+    // },
+  },
+}
+
+router.post('', async (req, res) => {
+  const _id = nanoid(10)
+  const filename = `${_id}.mbtiles`
+
+  await fs.writeFile(filename, req.body)
+  await require('../../utils/import-mbtiles')(req.app.get('db'), filename, _id)
+  await fs.unlink(filename)
+  return res.sendStatus(200)
+})
+
+//
+
+//
+
 require('../api-docs').paths['/tiles/{tileset}.json'] = {
   get: {
     tags: ['Tiles'],
@@ -61,7 +88,7 @@ require('../api-docs').paths['/tiles/{tileset}.json'] = {
 
 router.get('/:tileset.json', async (req, res) => {
   req.tilesetInfo.tiles = [
-    `${req.publicBaseUrl}/tiles/${req.params.tileset}/{z}/{x}/{y}.pbf`,
+    `${req.publicBaseUrl}/api/tiles/${req.params.tileset}/{z}/{x}/{y}.${req.tilesetInfo.format}`,
   ]
   res.send(req.tilesetInfo)
 })
@@ -70,7 +97,35 @@ router.get('/:tileset.json', async (req, res) => {
 
 //
 
-require('../api-docs').paths['/tiles/{tileset}/{z}/{x}/{y}.pbf'] = {
+require('../api-docs').paths['/tiles/{tileset}'] = {
+  delete: {
+    tags: ['Tiles'],
+    parameters: [
+      { $ref: '#/components/parameters/tileset' },
+    ],
+    responses: {
+      200: {
+        description: 'The TileJSON of the corresponding tileset',
+        content: { 'application/json': {} },
+      },
+      404: {
+        description: 'The tileset does not exist',
+      },
+    },
+  },
+}
+
+router.delete('/:tileset', async (req, res) => {
+  await req.app.get('db').collection('tilesets').deleteOne({ _id: req.params.tileset })
+  await req.app.get('db').collection('tiles').deleteMany({ ts: req.params.tileset })
+  res.sendStatus(204)
+})
+
+//
+
+//
+
+require('../api-docs').paths['/tiles/{tileset}/{z}/{x}/{y}.{tileFormat}'] = {
   get: {
     tags: ['Tiles'],
     parameters: [
@@ -78,6 +133,7 @@ require('../api-docs').paths['/tiles/{tileset}/{z}/{x}/{y}.pbf'] = {
       { $ref: '#/components/parameters/z' },
       { $ref: '#/components/parameters/x' },
       { $ref: '#/components/parameters/y' },
+      { $ref: '#/components/parameters/tileFormat' },
     ],
     responses: {
       200: {
@@ -91,7 +147,7 @@ require('../api-docs').paths['/tiles/{tileset}/{z}/{x}/{y}.pbf'] = {
   },
 }
 
-router.get('/:tileset/:z/:x/:y.pbf', async (req, res) => {
+router.get('/:tileset/:z/:x/:y.:tileFormat', async (req, res) => {
   const query = {
     ts: req.params.tileset,
     x: req.params.x,

@@ -16,7 +16,7 @@ function createRequester({ db, resource }) {
         return callback(new Error(`unsupported protocol: ${protocol}`), null)
       }
     } catch (error) {
-      console.error(error.message)
+      console.error(error.stack)
       return callback(error, null)
     }
   }

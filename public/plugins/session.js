@@ -1,6 +1,12 @@
 export default async ({ store, app, env, $vuetify, route, i18n }) => {
-  let publicUrl = window.location.origin + env.basePath
+  const basePath = new URL(env.publicUrl).pathname
+  let publicUrl = window.location.origin + basePath
   if (publicUrl.endsWith('/')) publicUrl = publicUrl.substr(0, publicUrl.length - 1)
+
+  const baseDirectoryPath = new URL(env.directoryUrl).pathname
+  let directoryUrl = window.location.origin + baseDirectoryPath
+  if (directoryUrl.endsWith('/')) directoryUrl = directoryUrl.substr(0, directoryUrl.length - 1)
+
   store.commit('setAny', {
     env: {
       ...env,
@@ -11,7 +17,7 @@ export default async ({ store, app, env, $vuetify, route, i18n }) => {
 
   store.dispatch('session/init', {
     cookies: app.$cookies,
-    directoryUrl: env.directoryUrl,
+    directoryUrl: directoryUrl,
   })
 
   // support opening with active account defined in URL
