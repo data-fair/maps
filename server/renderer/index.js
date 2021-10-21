@@ -11,7 +11,7 @@ maplibre.on('message', require('debug')('renderer:maplibre-gl-native'))
 let pool
 
 module.exports.start = async ({ db }) => {
-  pool = createPool(db, { min: 1, max: 1 })
+  pool = createPool(db, { min: 0, max: 10 })
   await pool.ready()
   return require('./render')(pool)
 }

@@ -1,13 +1,17 @@
 const sharp = require('sharp')
-
+const debug = require('debug')('renderer:render')
+const { nanoid } = require('nanoid')
 module.exports = (pool) => ({
   async render(style, mapOptions, imageProperties, context = {}) {
+    const renderId = nanoid()
     const imageBuffer = await pool.use((resource) => new Promise((resolve, reject) => {
+      debug('start render ', renderId)
       resource.context = context
       resource.map.load(style)
       resource.map.render(mapOptions, (err, buffer) => {
         delete resource.context
 
+        debug('end render ', renderId)
         if (err) reject(err)
         else resolve(buffer)
       })
@@ -36,6 +40,7 @@ module.exports = (pool) => ({
         else resolve({ buffer, info })
       })
     })
+    debug('image ready ', renderId)
     return { buffer, info }
   },
 })

@@ -16,6 +16,7 @@ module.exports = async (req, { db, context }) => {
   } else if (req.kind === resourceType.Source) {
     if (!req.url.match('^maps://api/tiles/[\\w\\-]*\\.json$')) throw new Error(req.url)
     const tileInfo = await db.collection('tilesets').findOne({ _id: req.url.split('/').pop().split('.')[0] })
+    if (!tileInfo) throw new Error('Tileset does not exist' + req.url)
     tileInfo.tiles = ['maps://api/tiles/' + tileInfo._id + '/{z}/{x}/{y}.' + tileInfo.format]
     return { data: Buffer.from(JSON.stringify(tileInfo)) }// callback(null, { data:  })
 

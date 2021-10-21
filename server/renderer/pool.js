@@ -9,8 +9,8 @@ const maplibre = require('../utils/maplibre-gl-native')
 //
 
 module.exports = {
-  createPool: (db) => {
-    return createPool(createFactory(db), { min: 1, max: 1 })
+  createPool: (db, options) => {
+    return createPool(createFactory(db), options)
   },
 }
 
