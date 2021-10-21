@@ -92,23 +92,23 @@ router.get('/:style.json', async (req, res) => {
 //
 
 require('../api-docs').paths['/styles/{style}.json'].put = {
-    tags: ['Styles'],
-    parameters: [
-      { $ref: '#/components/parameters/style' },
-    ],
-    responses: {
-      200: {
-        description: 'The style has been updated',
-        content: { 'application/json': {} },
-      },
-      400: {
-        description: 'Bad format',
-        content: { 'application/json': {} },
-      },
-      404: {
-        description: 'The style does not exist',
-      },
+  tags: ['Styles'],
+  parameters: [
+    { $ref: '#/components/parameters/style' },
+  ],
+  responses: {
+    200: {
+      description: 'The style has been updated',
+      content: { 'application/json': {} },
     },
+    400: {
+      description: 'Bad format',
+      content: { 'application/json': {} },
+    },
+    404: {
+      description: 'The style does not exist',
+    },
+  },
 }
 
 router.put('/:style.json', async (req, res) => {
