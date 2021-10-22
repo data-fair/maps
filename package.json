@@ -14,7 +14,10 @@
   },
   "main": "server/index.js",
   "scripts": {
-    "test": "NODE_ENV=test mocha --exit --bail --timeout 20000 test/",
+    "test-cover": "nyc npm test",
+    "coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "report": "nyc report --reporter=html",
+    "test": "NODE_ENV=test DISPLAY=:99.0 xvfb-run -s \":99\" mocha --exit --bail --timeout 20000 test/",
     "lint": "eslint --ext js,vue --ignore-path .gitignore .",
     "lint-fix": "eslint --ext js,vue --ignore-path .gitignore --fix .",
     "dev-server": "NODE_ENV=development DEBUG=renderer:render,renderer:pool,mbtiles DISPLAY=:99.0 xvfb-run -s \":99\" nodemon server",
@@ -58,6 +61,8 @@
     "wkx": "^0.5.0"
   },
   "devDependencies": {
+    "coveralls": "^3.1.0",
+    "nyc": "^15.1.0",
     "@babel/eslint-parser": "^7.15.8",
     "cors": "^2.8.5",
     "eslint": "^7.32.0",
