@@ -13,13 +13,14 @@ module.exports = {
       return acc
     })
   },
-  getZoom({ bbox, width, height, padding = 0.1 }) {
+  getZoom({ bbox, width, height, padding }) {
+    const padding_ = padding || 0.1
     let z = 25
 
     const minCorner = mercator.px([bbox[0], bbox[3]], z)
     const maxCorner = mercator.px([bbox[2], bbox[1]], z)
-    const w_ = width / (1 + 2 * padding)
-    const h_ = height / (1 + 2 * padding)
+    const w_ = width / (1 + 2 * padding_)
+    const h_ = height / (1 + 2 * padding_)
 
     z -= Math.log(Math.max(
       (maxCorner[0] - minCorner[0]) / w_,
