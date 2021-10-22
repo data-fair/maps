@@ -1,7 +1,7 @@
 const config = require('config')
 
 module.exports = {
-  version: 0,
+  version: 8,
   name: 'public-url-style',
   sources: {
     domain1Source: {
@@ -19,4 +19,5 @@ module.exports = {
   },
   sprite: config.publicUrl2 + '/sprites/test',
   glyphs: 'maps://fonts/{fontstack}/{range}.pbf',
+  layers: [],
 }
