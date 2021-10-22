@@ -17,7 +17,7 @@
     "test": "NODE_ENV=test mocha --exit --bail --timeout 20000 test/",
     "lint": "eslint --ext js,vue --ignore-path .gitignore .",
     "lint-fix": "eslint --ext js,vue --ignore-path .gitignore --fix .",
-    "dev-server": "NODE_ENV=development DEBUG=renderer:*,mbtiles DISPLAY=:99.0 xvfb-run -s \":99\" nodemon server",
+    "dev-server": "NODE_ENV=development DEBUG=renderer:render,renderer:pool,mbtiles DISPLAY=:99.0 xvfb-run -s \":99\" nodemon server",
     "dev-client": "NODE_ENV=development nuxt",
     "build": "nuxt build",
     "start": "node server",
@@ -53,7 +53,9 @@
     "nuxt": "^2.15.8",
     "original-url": "^1.2.3",
     "sharp": "^0.29.1",
-    "sqlite3": "^5.0.2"
+    "sqlite3": "^5.0.2",
+    "v-jsoneditor": "^1.4.5",
+    "wkx": "^0.5.0"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.15.8",
