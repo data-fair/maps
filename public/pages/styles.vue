@@ -22,9 +22,9 @@
               />
               <v-card-title class="pa-2" v-text="item.name" />
               <v-card-actions class="justify-end">
-                <import-dialog :value="item" @change="$fetch" />
-                <edit-dialog :value="item" @change="$fetch" />
-                <delete-dialog :value="item" @change="$fetch" />
+                <import-dialog :value="item.style" @change="$fetch" />
+                <edit-dialog :value="item.style" @change="$fetch" />
+                <delete-dialog :value="item.style" @change="$fetch" />
               </v-card-actions>
             </v-card>
           </v-col>
@@ -54,12 +54,19 @@
       items: [],
     }),
     async fetch() {
-      this.items = await this.$axios.$get(this.env.publicUrl + '/api/styles')
-      this.items.forEach(style => {
+      this.items = (await this.$axios.$get(this.env.publicUrl + '/api/styles')).map(style => {
         if (style.center && style.zoom) {
-          style.preview = `${this.env.publicUrl}/api/render/${style._id}/640x360.png?lon=${style.center[0]}&lat=${style.center[1]}&zoom=${style.zoom}`
+          return {
+          ...style,
+          style,
+          preview: `${this.env.publicUrl}/api/render/${style._id}/640x360.png?lon=${style.center[0]}&lat=${style.center[1]}&zoom=${style.zoom}`,
+          }
         } else {
-          style.preview = `${this.env.publicUrl}/api/render/${style._id}/640x360.png?lat=${0}&lon=${0}&zoom=${0}`
+          return {
+          ...style,
+          style,
+          preview: `${this.env.publicUrl}/api/render/${style._id}/640x360.png?lat=${0}&lon=${0}&zoom=${0}`,
+          }
         }
       })
     },

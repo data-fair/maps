@@ -1,8 +1,7 @@
 <template>
-  <v-container class="pa-0">
+  <v-container>
     <!-- outlined -->
     <v-card
-      tile
       elevation="5"
     >
       <v-card-title>
