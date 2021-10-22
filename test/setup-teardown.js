@@ -55,5 +55,5 @@ before('clean mongo', async () => {
 })
 
 after('stop app', async () => {
-  // await require('../server/app').stop()
+  await require('../server/app').stop()
 })

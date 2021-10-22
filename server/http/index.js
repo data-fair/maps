@@ -59,9 +59,9 @@ module.exports.start = async ({ db, renderer }) => {
 
 module.exports.stop = async () => {
   server.close()
-  await eventToPromise(server, 'closed')
+  await eventToPromise(server, 'close')
   if (server2) {
     server2.close()
-    await eventToPromise(server2, 'closed')
+    await eventToPromise(server2, 'close')
   }
 }
