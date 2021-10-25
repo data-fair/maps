@@ -31,7 +31,9 @@ module.exports = (pool) => ({
     }
 
     if (imageProperties.format === 'png') {
-      image.png({ adaptiveFiltering: false })
+      image.png()
+    } else if (imageProperties.format === 'jpeg') {
+      image.jpeg()
     }
 
     const { buffer, info } = await new Promise((resolve, reject) => {
