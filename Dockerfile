@@ -19,4 +19,4 @@ COPY package-lock.json .
 RUN npm i --production
 RUN npm run build
 
-CMD ["xvfb-run -s \":99\"","node","server"]
+CMD xvfb-run -s ":99" node server
