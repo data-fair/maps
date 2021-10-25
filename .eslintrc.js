@@ -1,6 +1,9 @@
 module.exports = {
   root: true,
-  extends: 'vuetify',
+  extends: [
+    'plugin:vue/recommended',
+    'vuetify',
+  ],
   plugins: ['no-only-tests'],
   rules: {
     // This rule is required because atom vue-format package remove the space
@@ -8,6 +11,9 @@ module.exports = {
     // TODO: we need to remove the following rules and fix the resulting errors on of these days
     'node/no-deprecated-api': 'off',
     'vue/require-prop-types': 'off',
+    'vue/valid-v-slot': ['error', {
+      allowModifiers: false,
+    }],
     'no-new': 'off',
     'vue/max-attributes-per-line': ['error', {
       singleline: 2,
