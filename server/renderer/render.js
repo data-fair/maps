@@ -1,10 +1,15 @@
 const sharp = require('sharp')
 const debug = require('debug')('renderer:render')
 const { nanoid } = require('nanoid')
+
+const events = new (require('events').EventEmitter)()
+
 module.exports = (pool) => ({
+  events,
   async render(style, mapOptions, imageProperties, context = {}) {
     const renderId = nanoid()
     const imageBuffer = await pool.use((resource) => new Promise((resolve, reject) => {
+      events.emit('render', { style, mapOptions, imageProperties, context })
       debug('start render ', renderId)
       resource.context = context
       resource.map.load(style)
