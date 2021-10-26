@@ -40,7 +40,6 @@ app.use('/api', function (err, req, res, next) {
 })
 
 const server = require('http').createServer(app)
-let server2
 
 module.exports.start = async ({ db, renderer }) => {
   app.use(await nuxt())
@@ -49,19 +48,9 @@ module.exports.start = async ({ db, renderer }) => {
   server.listen(config.port)
   await eventToPromise(server, 'listening')
   console.log(`http server listening on ${config.publicUrl}`)
-  server2 = require('http').createServer(app)
-  if ((process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test')) {
-    server2.listen(config.port2)
-    await eventToPromise(server2, 'listening')
-    console.log(`http server listening on ${config.publicUrl2}`)
-  }
 }
 
 module.exports.stop = async () => {
   server.close()
   await eventToPromise(server, 'close')
-  if (server2) {
-    server2.close()
-    await eventToPromise(server2, 'close')
-  }
 }
