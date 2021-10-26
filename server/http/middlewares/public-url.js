@@ -1,11 +1,12 @@
 const config = require('config')
 const originalUrl = require('original-url')
+const asyncWrap = require('../../utils/async-wrap')
 const { format: formatUrl } = require('url')
 
 let basePath = new URL(config.publicUrl).pathname
 if (!basePath.endsWith('/')) basePath += '/'
 
-module.exports = (req, res, next) => {
+module.exports = asyncWrap((req, res, next) => {
   const decomposedUrl = originalUrl(req)
   // console.log(decomposedUrl)
   const urlParts = { protocol: decomposedUrl.protocol, hostname: decomposedUrl.hostname, pathname: basePath.slice(0, -1) }
@@ -18,4 +19,4 @@ module.exports = (req, res, next) => {
   // req.publicBasePath = basePath
   // debugDomain('req.publicBasePath', req.publicBasePath)
   next()
-}
+})

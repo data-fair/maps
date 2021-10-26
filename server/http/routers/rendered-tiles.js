@@ -1,6 +1,10 @@
 const mercator = new (require('@mapbox/sphericalmercator'))()
+const asyncWrap = require('../../utils/async-wrap')
 
 const router = module.exports = require('express').Router()
+
+//
+
 router.param('style', require('../params/style'))
 
 //
@@ -9,11 +13,11 @@ router.param('style', require('../params/style'))
 
 //
 
-router.get('/:style', async (req, res) => {
-  res.send(req.style)
-})
+// router.get('/:style', asyncWrap(async (req, res) => {
+//   res.send(req.style)
+// }))
 
-router.get('/:style/:z/:x/:y.png', async (req, res) => {
+router.get('/:style/:z/:x/:y.png', asyncWrap(async (req, res) => {
   const z = req.params.z | 0
   const x = req.params.x | 0
   const y = req.params.y | 0
@@ -47,4 +51,4 @@ router.get('/:style/:z/:x/:y.png', async (req, res) => {
     }
     return res.status(500).send()
   }
-})
+}))

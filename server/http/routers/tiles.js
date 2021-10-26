@@ -1,6 +1,8 @@
 const tiletype = require('@mapbox/tiletype')
 const fs = require('fs/promises')
 const { nanoid } = require('nanoid')
+const asyncWrap = require('../../utils/async-wrap')
+
 const router = module.exports = require('express').Router()
 
 //
@@ -31,13 +33,13 @@ require('../api-docs').paths['/tiles'] = {
   },
 }
 
-router.get('', async (req, res) => {
+router.get('', asyncWrap(async (req, res) => {
   const tilesetInfos = await req.app.get('db').collection('tilesets').find({}).toArray()
   res.send(tilesetInfos.map((tilesetInfo) => {
     tilesetInfo.tiles = [`${req.publicBaseUrl}/tiles/${tilesetInfo._id}/{z}/{x}/{y}.pbf`]
     return tilesetInfo
   }))
-})
+}))
 
 //
 
@@ -54,7 +56,7 @@ require('../api-docs').paths['/tiles'].post = {
   },
 }
 
-router.post('', async (req, res) => {
+router.post('', asyncWrap(async (req, res) => {
   const _id = nanoid(10)
   const filename = `${_id}.mbtiles`
 
@@ -62,7 +64,7 @@ router.post('', async (req, res) => {
   await require('../../utils/import-mbtiles')(req.app.get('db'), filename, _id)
   await fs.unlink(filename)
   return res.sendStatus(200)
-})
+}))
 
 //
 
@@ -86,12 +88,12 @@ require('../api-docs').paths['/tiles/{tileset}.json'] = {
   },
 }
 
-router.get('/:tileset.json', async (req, res) => {
+router.get('/:tileset.json', asyncWrap(async (req, res) => {
   req.tilesetInfo.tiles = [
     `${req.publicBaseUrl}/api/tiles/${req.params.tileset}/{z}/{x}/{y}.${req.tilesetInfo.format}`,
   ]
   res.send(req.tilesetInfo)
-})
+}))
 
 //
 
@@ -115,11 +117,11 @@ require('../api-docs').paths['/tiles/{tileset}'] = {
   },
 }
 
-router.delete('/:tileset', async (req, res) => {
+router.delete('/:tileset', asyncWrap(async (req, res) => {
   await req.app.get('db').collection('tilesets').deleteOne({ _id: req.params.tileset })
   await req.app.get('db').collection('tiles').deleteMany({ ts: req.params.tileset })
   res.sendStatus(204)
-})
+}))
 
 //
 
@@ -147,7 +149,7 @@ require('../api-docs').paths['/tiles/{tileset}/{z}/{x}/{y}.{tileFormat}'] = {
   },
 }
 
-router.get('/:tileset/:z/:x/:y.:tileFormat', async (req, res) => {
+router.get('/:tileset/:z/:x/:y.:tileFormat', asyncWrap(async (req, res) => {
   const query = {
     ts: req.params.tileset,
     x: req.params.x,
@@ -163,4 +165,4 @@ router.get('/:tileset/:z/:x/:y.:tileFormat', async (req, res) => {
 
   res.set(headers)
   res.send(tile.d.buffer)
-})
+}))

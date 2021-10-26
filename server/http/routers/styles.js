@@ -1,7 +1,9 @@
 const { escapePublicUrl, injectPublicUrl } = require('../../utils/style')
 const { nanoid } = require('nanoid')
-const router = module.exports = require('express').Router()
 const maplibreStyle = require('@maplibre/maplibre-gl-style-spec')
+const asyncWrap = require('../../utils/async-wrap')
+
+const router = module.exports = require('express').Router()
 
 //
 
@@ -27,9 +29,9 @@ require('../api-docs').paths['/styles'] = {
   },
 }
 
-router.get('', async (req, res) => {
+router.get('', asyncWrap(async (req, res) => {
   res.send((await req.app.get('db').collection('styles').find().toArray()).map(s => injectPublicUrl(s, req.publicBaseUrl)))
-})
+}))
 
 //
 
@@ -51,14 +53,14 @@ require('../api-docs').paths['/styles'].post = {
   },
 }
 
-router.post('', async (req, res) => {
+router.post('', asyncWrap(async (req, res) => {
   const errors = maplibreStyle.validate(req.body)
   if (errors.length) { return res.status(400).send(errors) }
   const style = escapePublicUrl(req.body, req.publicBaseUrl)
   style._id = nanoid()
   await req.app.get('db').collection('styles').insertOne(style)
   res.send(injectPublicUrl(style, req.publicBaseUrl))
-})
+}))
 
 //
 
@@ -82,10 +84,10 @@ require('../api-docs').paths['/styles/{style}.json'] = {
   },
 }
 
-router.get('/:style.json', async (req, res) => {
+router.get('/:style.json', asyncWrap(async (req, res) => {
   const style = injectPublicUrl(req.style, req.publicBaseUrl)
   res.send(style)
-})
+}))
 
 //
 
@@ -111,7 +113,7 @@ require('../api-docs').paths['/styles/{style}.json'].put = {
   },
 }
 
-router.put('/:style.json', async (req, res) => {
+router.put('/:style.json', asyncWrap(async (req, res) => {
   const errors = maplibreStyle.validate(req.body)
   if (errors.length) { return res.status(400).send(errors) }
 
@@ -119,7 +121,7 @@ router.put('/:style.json', async (req, res) => {
   style._id = req.params.style
   await req.app.get('db').collection('styles').replaceOne({ _id: style._id }, style)
   res.send(injectPublicUrl(style, req.publicBaseUrl))
-})
+}))
 
 //
 
@@ -140,7 +142,7 @@ require('../api-docs').paths['/styles/{style}.json'].delete = {
   },
 }
 
-router.delete('/:style.json', async (req, res) => {
+router.delete('/:style.json', asyncWrap(async (req, res) => {
   await req.app.get('db').collection('styles').deleteOne({ _id: req.params.style })
   res.sendStatus(204)
-})
+}))

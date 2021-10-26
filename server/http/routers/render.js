@@ -1,7 +1,12 @@
 
 const bboxUtils = require('../../utils/bbox')
 const wkx = require('wkx')
+const asyncWrap = require('../../utils/async-wrap')
+
 const router = module.exports = require('express').Router()
+
+//
+
 router.param('style', require('../params/style'))
 
 //
@@ -111,8 +116,8 @@ require('../api-docs').paths['/render/{style}/{width}x{height}.{format}'] = {
     },
   },
 }
-router.get('/:style/:width(\\d+)x:height(\\d+).:format', getOrPost)
-router.post('/:style/:width(\\d+)x:height(\\d+).:format', getOrPost)
+router.get('/:style/:width(\\d+)x:height(\\d+).:format', asyncWrap(getOrPost))
+router.post('/:style/:width(\\d+)x:height(\\d+).:format', asyncWrap(getOrPost))
 
 async function getOrPost(req, res) {
   //
@@ -224,9 +229,7 @@ async function getOrPost(req, res) {
     const { buffer/*, info */ } = await req.app.get('renderer').render(req.style, mapOptions, imageProperties, { cookie: req.headers.cookie, publicBaseUrl: req.publicBaseUrl })
 
     if (!buffer) return res.status(404).send('Not found')
-    res.set({
-      'Content-Type': `image/${imageProperties.format}`,
-    })
+    res.set({ 'Content-Type': `image/${imageProperties.format}` })
     return res.status(200).send(buffer)
   } catch (error) {
     if (error.message.match('Request failed with status code')) {

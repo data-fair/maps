@@ -1,5 +1,5 @@
 const memoizee = require('memoizee')
-
+const asyncWrap = require('../../utils/async-wrap')
 require('../api-docs').components.parameters.style = {
   name: 'style',
   in: 'path',
@@ -8,7 +8,7 @@ require('../api-docs').components.parameters.style = {
 }
 
 let getCachedStyle
-module.exports = async (req, res, next) => {
+module.exports = asyncWrap(async (req, res, next) => {
   if (!getCachedStyle) {
     getCachedStyle = memoizee(async (style) => {
       return await req.app.get('db').collection('styles').findOne({ _id: style })
@@ -20,4 +20,4 @@ module.exports = async (req, res, next) => {
   if (req.method === 'PUT') getCachedStyle.delete(req.params.style)
   // req.style = await req.app.get('db').collection('styles').findOne({ _id: req.params.style })
   next()
-}
+})
