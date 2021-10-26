@@ -55,21 +55,21 @@
     "nodemon": "^2.0.13",
     "nuxt": "^2.15.8",
     "original-url": "^1.2.3",
-    "sharp": "^0.29.1",
+    "sharp": "^0.29.2",
     "sqlite3": "^5.0.2",
     "v-jsoneditor": "^1.4.5",
     "wkx": "^0.5.0"
   },
   "devDependencies": {
-    "coveralls": "^3.1.0",
-    "nyc": "^15.1.0",
     "@babel/eslint-parser": "^7.15.8",
     "cors": "^2.8.5",
+    "coveralls": "^3.1.0",
     "eslint": "^7.32.0",
     "eslint-config-vuetify": "^0.6.1",
     "eslint-plugin-no-only-tests": "^2.6.0",
     "eslint-plugin-vue": "^7.19.1",
     "http-proxy-middleware": "^2.0.1",
-    "mocha": "^9.1.2"
+    "mocha": "^9.1.2",
+    "nyc": "^15.1.0"
   }
 }

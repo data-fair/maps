@@ -226,16 +226,16 @@ async function getOrPost(req, res) {
   }
 
   try {
-    const { buffer/*, info */ } = await req.app.get('renderer').render(req.style, mapOptions, imageProperties, { cookie: req.headers.cookie, publicBaseUrl: req.publicBaseUrl })
+    const { buffer/*, info */ } = await req.app.get('renderer').render(req.style, mapOptions, imageProperties, { cookie: req.headers.cookie, publicBaseUrl: req.publicBaseUrl, cachingSize: 2 })
 
     if (!buffer) return res.status(404).send('Not found')
     res.set({ 'Content-Type': `image/${imageProperties.format}` })
     return res.status(200).send(buffer)
   } catch (error) {
-    if (error.message.match('Request failed with status code')) {
-      return res.status(error.message.split(' ').pop()).send()
-    }
+    // if (error.message.match('Request failed with status code')) {
+    //   return res.status(error.message.split(' ').pop()).send()
+    // }
     console.error(error.stack)
-    return res.status(500).send()
+    return res.status(500).send(error.message)
   }
 }
