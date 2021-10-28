@@ -1,6 +1,5 @@
 const config = require('config')
 const { Nuxt, Builder } = require('nuxt')
-const { createProxyMiddleware } = require('http-proxy-middleware')
 
 const nuxtConfig = require('../../nuxt.config.js')
 
@@ -10,7 +9,7 @@ module.exports = async () => {
     return (req, res, next) => next()
   } else if (process.env.NODE_ENV === 'development') {
     // in dev mode the nuxt dev server is already running, we re-expose it
-    return createProxyMiddleware({ target: 'http://localhost:3000', logLevel: 'silent' })
+    return require('http-proxy-middleware').createProxyMiddleware({ target: 'http://localhost:3000', logLevel: 'silent' })
   } else if (process.env.NODE_ENV === 'test') {
     // try to make this as fast as possible
     nuxtConfig.dev = true
