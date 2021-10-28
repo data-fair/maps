@@ -6,18 +6,17 @@ module.exports = {
   sources: {
     domain1Source: {
       type: 'vector',
-      url: config.publicUrl + '/tiles/test.json',
+      url: config.publicUrl + '/tilesets/test.json',
     },
     domain2Source: {
       type: 'vector',
-      url: config.publicUrl2 + '/tiles/test.json',
+      url: config.publicUrl2 + '/tilesets/test.json',
     },
     externalSource: {
       type: 'vector',
-      url: 'http://test.com/tiles/test.json',
+      url: 'http://test.com/tilesets/test.json',
     },
   },
-  sprite: config.publicUrl2 + '/sprites/test',
   glyphs: 'maps://fonts/{fontstack}/{range}.pbf',
   layers: [],
 }

@@ -51,7 +51,7 @@ before('init axios', async () => {
 })
 
 before('clean mongo', async () => {
-  // await global.app.db.drop()
+  await global.app.db.collection('styles').deleteMany({})
 })
 
 after('stop app', async () => {
