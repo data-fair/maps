@@ -16,18 +16,18 @@ module.exports = async (req, { db, context }) => {
   } else if (req.kind === resourceType.Source) {
     if (!req.url.match('^maps://api/tilesets/[\\w\\-]*\\.json$')) throw new Error(req.url)
     const tileInfo = await db.collection('tilesets').findOne({ _id: req.url.split('/').pop().split('.')[0] })
-    if (!tileInfo) throw new Error('Tileset does not exist' + req.url)
-    tileInfo.tiles = ['maps://api/tilesets/' + tileInfo._id + '/{z}/{x}/{y}.' + tileInfo.format]
+    if (!tileInfo) throw new Error('Tileset does not exist : ' + req.url)
+    tileInfo.tiles = ['maps://api/tilesets/' + tileInfo._id + '/tiles/{z}/{x}/{y}.' + tileInfo.format]
     return { data: Buffer.from(JSON.stringify(tileInfo)) }// callback(null, { data:  })
 
     //
   } else if (req.kind === resourceType.Tile) {
-    if (!req.url.match('^maps://api/tiles/[\\w\\-]*/\\d*/\\d*/\\d*\\.(pbf)|(png)|(jpg)$')) throw new Error(req.url)
+    if (!req.url.match('^maps://api/tilesets/[\\w\\-]*/tiles/\\d*/\\d*/\\d*\\.(pbf)|(png)|(jpg)$')) throw new Error(req.url)
 
     const args = req.url.split('/')
-    const x = parseInt(args[6])
-    const y = parseInt(args[7].split('.')[0])
-    const z = parseInt(args[5])
+    const x = parseInt(args[7])
+    const y = parseInt(args[8].split('.')[0])
+    const z = parseInt(args[6])
     const format = req.url.split('.').pop()
     const query = { ts: args[4], z, x, y }
     context.cachingSize = Math.max(context.cachingSize || 0, 0)
@@ -45,6 +45,9 @@ module.exports = async (req, { db, context }) => {
 
     const tile = await context.cache[`${z}/${x}/${y}`]
 
+    if (!tile) {
+      throw new Error('tile not found : ' + req.url)
+    }
     if (format === 'pbf') {
       return { data: zlib.unzipSync(tile.d.buffer) }
     } else {
@@ -65,13 +68,9 @@ module.exports = async (req, { db, context }) => {
 
     //
   } else if (req.kind === resourceType.SpriteImage) {
-    // return callback(null, { data: Buffer.from('') })
-
-    //
+    if (context.spritePng) return { data: Buffer.from(context.spritePng) }
   } else if (req.kind === resourceType.SpriteJSON) {
-    // return callback(null, { data: Buffer.from('') })
-
-    //
+    if (context.spriteJson) return { data: Buffer.from(JSON.stringify(context.spriteJson)) }
   }
-  throw new Error('resource not found : ' + req.url)
+  throw new Error('resource not found : ' + req.url + ' ' + req.kind)
 }

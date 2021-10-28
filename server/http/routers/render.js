@@ -224,7 +224,15 @@ async function getOrPost(req, res) {
   }
 
   try {
-    const { buffer/*, info */ } = await req.app.get('renderer').render(req.style.style, mapOptions, imageProperties, { cookie: req.headers.cookie, publicBaseUrl: req.publicBaseUrl, cachingSize: 0 })
+    const context = {
+      cookie: req.headers.cookie,
+      publicBaseUrl: req.publicBaseUrl,
+      cachingSize: 0,
+    }
+
+    if (req.style.sprite_png) context.spritePng = req.style.sprite_png.buffer
+    if (req.style.sprite_json) context.spriteJson = req.style.sprite_json
+    const { buffer/*, info */ } = await req.app.get('renderer').render(req.style.style, mapOptions, imageProperties, context)
 
     if (!buffer) return res.status(404).send('Not found')
     res.set({ 'Content-Type': `image/${imageProperties.format}` })

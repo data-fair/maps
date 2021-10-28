@@ -31,7 +31,6 @@ module.exports = (pool) => ({
     })
 
     if ((mapOptions.width !== imageProperties.width || mapOptions.height !== imageProperties.height) && imageProperties.width && imageProperties.height) {
-      console.log('resize')
       image.resize(imageProperties.width, imageProperties.height)
     }
 
