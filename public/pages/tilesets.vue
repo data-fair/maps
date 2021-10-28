@@ -20,13 +20,39 @@
           :items="items"
           item-key="_id"
           :loading="$fetchState.pending"
+          show-expand
         >
           <!-- show-expand -->
-          <!-- <template #expanded-item="{ headers, item }">
-            <td :colspan="headers.length">
-
+          <template #expanded-item="{ headers, item }">
+            <td :colspan="headers.length" class="pa-0">
+              <!-- More info about {{ item.name }} -->
+              <v-simple-table>
+                <thead>
+                  <tr>
+                    <th class="text-left">
+                      Id
+                    </th>
+                    <th class="text-left">
+                      Description
+                    </th>
+                    <th class="text-left">
+                      Fields
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="layer in item.vector_layers"
+                    :key="layer.id"
+                  >
+                    <td>{{ layer.id }}</td>
+                    <td>{{ layer.description }}</td>
+                    <td>{{ layer.fields }}</td>
+                  </tr>
+                </tbody>
+              </v-simple-table>
             </td>
-          </template> -->
+          </template>
           <template #item.actions="{ item }">
             <!-- <v-icon
               small
@@ -100,11 +126,13 @@
         { text: 'Tile count', value: 'tileCount' },
         { text: 'Vector layer count', value: 'vector_layers.length' },
         { text: 'Actions', value: 'actions', sortable: false },
+        { text: 'Vector layers', value: 'data-table-expand', sortable: false },
+
       ],
       items: [],
     }),
     async fetch() {
-      this.items = await this.$axios.$get(this.env.publicUrl + '/api/tiles')
+      this.items = await this.$axios.$get(this.env.publicUrl + '/api/tilesets')
     },
     computed: {
       ...mapState(['env']),

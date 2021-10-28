@@ -19,9 +19,9 @@ router.param('tileFormat', require('../params/tile-format'))
 
 //
 
-require('../api-docs').paths['/tiles'] = {
+require('../api-docs').paths['/tilesets'] = {
   get: {
-    tags: ['Tiles'],
+    tags: ['Tilesests'],
     parameters: [
     ],
     responses: {
@@ -45,8 +45,8 @@ router.get('', asyncWrap(async (req, res) => {
 
 //
 
-require('../api-docs').paths['/tiles'].post = {
-  tags: ['Tiles'],
+require('../api-docs').paths['/tilesets'].post = {
+  tags: ['Tilesets'],
   parameters: [],
   responses: {
     // 200: {
@@ -70,9 +70,9 @@ router.post('', asyncWrap(async (req, res) => {
 
 //
 
-require('../api-docs').paths['/tiles/{tileset}.json'] = {
+require('../api-docs').paths['/tilesets/{tileset}.json'] = {
   get: {
-    tags: ['Tiles'],
+    tags: ['Tilesets'],
     parameters: [
       { $ref: '#/components/parameters/tileset' },
     ],
@@ -99,9 +99,9 @@ router.get('/:tileset.json', asyncWrap(async (req, res) => {
 
 //
 
-require('../api-docs').paths['/tiles/{tileset}'] = {
+require('../api-docs').paths['/tilesets/{tileset}'] = {
   delete: {
-    tags: ['Tiles'],
+    tags: ['Tilesets'],
     parameters: [
       { $ref: '#/components/parameters/tileset' },
     ],
@@ -127,9 +127,9 @@ router.delete('/:tileset', asyncWrap(async (req, res) => {
 
 //
 
-require('../api-docs').paths['/tiles/{tileset}/{z}/{x}/{y}.{tileFormat}'] = {
+require('../api-docs').paths['/tilesets/{tileset}/{z}/{x}/{y}.{tileFormat}'] = {
   get: {
-    tags: ['Tiles'],
+    tags: ['Tilesets'],
     parameters: [
       { $ref: '#/components/parameters/tileset' },
       { $ref: '#/components/parameters/z' },
