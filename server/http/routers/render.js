@@ -81,7 +81,7 @@ require('../api-docs').paths['/render/{style}/{width}x{height}.{format}'] = {
       {
         name: 'padding',
         in: 'query',
-        description: 'Padding around the specified bbox or data (wkb-sources or POST body), incompatible with "zoom"',
+        description: 'Padding around the specified bbox or data (wkb or POST body), incompatible with "zoom"',
         required: false,
         schema: {
           type: 'number',
@@ -95,7 +95,7 @@ require('../api-docs').paths['/render/{style}/{width}x{height}.{format}'] = {
       },
       //
       {
-        name: 'wkb-sources',
+        name: 'wkb',
         in: 'query',
         description: '',
         required: false,
@@ -178,19 +178,16 @@ async function getOrPost(req, res) {
   //
 
   // geojson sources from wkb
-  if (req.query['wkb-sources']) {
-    for (const sourceName of req.query['wkb-sources'].split(',')) {
-      if (!req.query[sourceName]) return res.status(400).send(`Query parameter "${sourceName}" is specified in "wkb-sources" but not present in query`)
-      const base64urlBuffer = Buffer.from(req.query[sourceName], 'base64url')
-      try {
-        const geojson = wkx.Geometry.parse(base64urlBuffer).toGeoJSON()
-        additionalSources[sourceName] = {
-          type: 'geojson',
-          data: geojson,
-        }
-      } catch (error) {
-        return res.status(400).send(`Query parameter "${sourceName}" has to be a valid wkb`)
+  if (req.query.wkb) {
+    const base64urlBuffer = Buffer.from(req.query.wkb, 'base64url')
+    try {
+      const geojson = wkx.Geometry.parse(base64urlBuffer).toGeoJSON()
+      additionalSources.wkb = {
+        type: 'geojson',
+        data: geojson,
       }
+    } catch (error) {
+      return res.status(400).send('Query parameter "wkb" has to be a valid wkb')
     }
   }
   //
