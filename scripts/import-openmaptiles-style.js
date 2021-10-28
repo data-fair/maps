@@ -6,7 +6,7 @@ const styles = { // from https://openmaptiles.org/styles
   'openmaptiles-positron': 'https://github.com/openmaptiles/positron-gl-style/releases/download/v1.8/v1.8.zip',
   'openmaptiles-dark-matter': 'https://github.com/openmaptiles/dark-matter-gl-style/releases/download/v1.8/v1.8.zip',
   // 'openmaptiles-maptiler-3d': '',
-  'openmaptiles-maptiler-terrain': 'https://github.com/openmaptiles/maptiler-terrain-gl-style/releases/download/v1.7/v1.7.zip',
+  // 'openmaptiles-maptiler-terrain': 'https://github.com/openmaptiles/maptiler-terrain-gl-style/releases/download/v1.7/v1.7.zip',
   'openmaptiles-fiord-color': 'https://github.com/openmaptiles/fiord-color-gl-style/releases/download/v1.5/v1.5.zip',
   // 'openmaptiles-toner': '',
   // 'openmaptiles-osm-liberty': '',
@@ -22,7 +22,6 @@ const styles = { // from https://openmaptiles.org/styles
         await importStyle(db, data, _id, tileset)
       })(),
     ),
-
   )
   process.exit()
 })()

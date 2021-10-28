@@ -39,34 +39,12 @@ describe('Render routes mapOptions', () => {
     }
     const wkb = wkx.Geometry.parseGeoJSON(geojson).toWkb().toString('base64url')
     const promise = eventToPromise(global.app.renderer.events, 'render')
-    await global.ax.superadmin.get('/api/render/' + style._id + '/200x200.png?wkb-sources=geojson&geojson=' + wkb)
+    await global.ax.superadmin.get('/api/render/' + style._id + '/200x200.png?wkb=' + wkb)
     const { mapOptions, style: style2 } = await promise
     assert.equal(mapOptions.center[0], 0.5)
     assert.equal(mapOptions.center[1], 0.5)
     assert.equal(mapOptions.zoom, 6.872601626926404)
-    assert.deepEqual(style2.sources.geojson.data, geojson)
-  })
-
-  it('Should get mapOptions from multiple geojson in query parameters', async () => {
-    const style = (await global.ax.superadmin.post('/api/styles', { version: 8, sources: {}, layers: [] })).data
-    const geojson = {
-      type: 'MultiPoint',
-      coordinates: [[0, 0], [1, 1]],
-    }
-    const geojson2 = {
-      type: 'MultiPoint',
-      coordinates: [[2, 2], [1, 1]],
-    }
-    const wkb = wkx.Geometry.parseGeoJSON(geojson).toWkb().toString('base64url')
-    const wkb2 = wkx.Geometry.parseGeoJSON(geojson2).toWkb().toString('base64url')
-    const promise = eventToPromise(global.app.renderer.events, 'render')
-    await global.ax.superadmin.get('/api/render/' + style._id + '/200x200.png?wkb-sources=geojson,geojson2&geojson=' + wkb + '&geojson2=' + wkb2)
-    const { mapOptions, style: style2 } = await promise
-    assert.equal(mapOptions.center[0], 1)
-    assert.equal(mapOptions.center[1], 1)
-    assert.equal(mapOptions.zoom, 5.8723818428626515)
-    assert.deepEqual(style2.sources.geojson.data, geojson)
-    assert.deepEqual(style2.sources.geojson2.data, geojson2)
+    assert.deepEqual(style2.sources.wkb.data, geojson)
   })
 
   it('Should get mapOptions from geojson in body', async () => {

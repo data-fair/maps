@@ -10,6 +10,7 @@ const router = module.exports = require('express').Router()
 //
 
 router.param('style', require('../params/style'))
+const resourcesRouter = require('./styles-resources')
 
 //
 
@@ -32,7 +33,7 @@ require('../api-docs').paths['/styles'] = {
 }
 
 router.get('', asyncWrap(async (req, res) => {
-  res.send((await req.app.get('db').collection('styles').find().toArray()).map(s => injectPublicUrl(s.style, req.publicBaseUrl)))
+  res.send((await req.app.get('db').collection('styles').find().toArray()).map(document => ({ _id: document._id, ...injectPublicUrl(document.style, req.publicBaseUrl) })))
 }))
 
 //
@@ -155,3 +156,5 @@ router.delete('/:style.json', asyncWrap(async (req, res) => {
   await req.app.get('db').collection('styles').deleteOne({ _id: req.params.style })
   res.sendStatus(204)
 }))
+
+router.use('/:style', resourcesRouter)

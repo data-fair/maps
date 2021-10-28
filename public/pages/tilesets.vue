@@ -142,7 +142,7 @@
     },
     methods: {
       async deleteTileset(item) {
-        await this.$axios.$delete(this.env.publicUrl + '/api/tiles/' + item._id)
+        await this.$axios.$delete(this.env.publicUrl + '/api/tilesets/' + item._id)
         await this.$fetch()
       },
     },
