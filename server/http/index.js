@@ -15,11 +15,13 @@ app.use(require('body-parser').json())
 app.use(require('body-parser').raw({ type: 'application/octet-stream', limit: '10gb' }))
 app.use(require('./middlewares/public-url'))
 app.use(sd.auth)
+// app.use()
 
-app.use('/api/tiles', require('./routers/tiles'))
-app.use('/api/fonts', require('./routers/fonts'))
-app.use('/api/styles', require('./routers/styles'))
-app.use('/api/rendered-tiles', require('./routers/rendered-tiles'))
+app.use('/api/tilesets', require('./middlewares/super-admin-except-get'), require('./routers/tilesets'))
+app.use('/api/fonts', require('./middlewares/super-admin-except-get'), require('./routers/fonts'))
+app.use('/api/styles', require('./middlewares/super-admin-except-get'), require('./routers/styles'))
+app.use('/api/styles/:style', require('./middlewares/super-admin-except-get'), require('./routers/sprites'))
+// app.use('/api/rendered-tiles', require('./middlewares/super-admin-except-get'), require('./routers/rendered-tiles'))
 app.use('/api/render', require('./routers/render'))
 
 app.get('/api/api-docs.json', (req, res, next) => {
