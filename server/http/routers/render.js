@@ -107,6 +107,7 @@ require('../api-docs').paths['/render/{style}/{width}x{height}.{format}'] = {
         content: {
           'image/png': {},
           'image/jpeg': {},
+          'image/webp': {},
           // 'image/': {} ,
         },
       },
@@ -138,7 +139,7 @@ async function getOrPost(req, res) {
 
   // Image format
   const format = req.params.format
-  if (!['png', 'jpg', 'jpeg'].includes(format)) return res.status(400).send('Unsupported image format')
+  if (!['png', 'jpg', 'jpeg', 'webp'].includes(format)) return res.status(400).send('Unsupported image format')
   Object.assign(imageProperties, { format: format === 'jpg' ? 'jpeg' : format })
   //
 
@@ -220,13 +221,13 @@ async function getOrPost(req, res) {
 
   // update style
   if (Object.keys(additionalSources).length || additionalLayers.length) {
-    req.style = JSON.parse(JSON.stringify(req.style))
-    Object.assign(req.style.sources, additionalSources || {})
-    req.style.layers = req.style.layers.concat(additionalLayers.flat())
+    req.style.style = JSON.parse(JSON.stringify(req.style.style))
+    Object.assign(req.style.style.sources, additionalSources || {})
+    req.style.style.layers = req.style.style.layers.concat(additionalLayers.flat())
   }
 
   try {
-    const { buffer/*, info */ } = await req.app.get('renderer').render(req.style, mapOptions, imageProperties, { cookie: req.headers.cookie, publicBaseUrl: req.publicBaseUrl, cachingSize: 2 })
+    const { buffer/*, info */ } = await req.app.get('renderer').render(req.style.style, mapOptions, imageProperties, { cookie: req.headers.cookie, publicBaseUrl: req.publicBaseUrl, cachingSize: 0 })
 
     if (!buffer) return res.status(404).send('Not found')
     res.set({ 'Content-Type': `image/${imageProperties.format}` })

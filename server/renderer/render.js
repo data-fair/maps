@@ -39,6 +39,8 @@ module.exports = (pool) => ({
       image.png()
     } else if (imageProperties.format === 'jpeg') {
       image.jpeg()
+    } else if (imageProperties.format === 'webp') {
+      image.webp()
     }
 
     const { buffer, info } = await new Promise((resolve, reject) => {

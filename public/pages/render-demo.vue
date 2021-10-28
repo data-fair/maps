@@ -73,7 +73,7 @@
       })
       this.items = sourcesList.map((sources) => {
         const dataSources = Object.keys(sources)
-        return `${this.env.publicUrl}/api/render/default/500x500.${['png', 'jpg'].at(Math.random() * 2)}?wkb-sources=${dataSources.join(',')}&${dataSources.map(name => {
+        return `${this.env.publicUrl}/api/render/default/500x500.${['png', 'jpg', 'jpeg', 'webp'].at(Math.random() * 4)}?wkb-sources=${dataSources.join(',')}&${dataSources.map(name => {
           return `${name}=${wkx.Geometry.parseGeoJSON(sources[name]).toWkb().toString('base64').split('+').join('-').split('/').join('_')}`
         }).join('&')}`
       })
