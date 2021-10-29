@@ -38,7 +38,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: .
-        file: {context}/maplibre-base.Dockerfile
+        file: ./maplibre-base.Dockerfile
         push: true
         tags: ${{ github.repository }}-maplibre-base
         labels: ${{ steps.docker_meta.outputs.labels }}
