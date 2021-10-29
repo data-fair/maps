@@ -1,8 +1,8 @@
-FROM maplibre-gl-native-node
+FROM ghcr.io/koumoul-dev/docker-maplibre-gl-native
 
-WORKDIR /app
+WORKDIR /webapp
 
-RUN mv /maplibre-gl-native/lib /app/lib
+RUN mv /maplibre-gl-native/lib /webapp/lib
 
 ENV NODE_ENV production
 
@@ -16,7 +16,7 @@ COPY scripts scripts
 COPY package.json .
 COPY package-lock.json .
 
-RUN npm i --production
+RUN npm ci --production
 RUN npm run build
 
 CMD xvfb-run -s ":99" node server
