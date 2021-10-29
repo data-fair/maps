@@ -1,4 +1,4 @@
-FROM ghcr.io/koumoul-dev/docker-maplibre-gl-native
+FROM ghcr.io/koumoul-dev/docker-maplibre-gl-native:master
 
 WORKDIR /webapp
 
