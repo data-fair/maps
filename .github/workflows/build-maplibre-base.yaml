@@ -1,4 +1,4 @@
-name: Build CI
+name: Build maplibre-gl-native-node base image
 
 on: workflow_dispatch
 
@@ -30,7 +30,7 @@ jobs:
       uses: docker/login-action@v1
       with:
         registry: ghcr.io
-        username: ${{ github.actor }}
+        username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build and push docker images
@@ -40,7 +40,7 @@ jobs:
         context: .
         file: ./maplibre-base.Dockerfile
         push: true
-        tags: ${{ github.repository }}-maplibre-base
+        tags: ${{ github.repository }}-maplibre-base:latest
         labels: ${{ steps.docker_meta.outputs.labels }}
         no-cache: true
 
