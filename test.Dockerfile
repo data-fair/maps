@@ -4,21 +4,20 @@ WORKDIR /webapp
 
 RUN mv /maplibre-gl-native/lib /webapp/lib
 
-ENV NODE_ENV production
+ENV NODE_ENV test
 
 COPY package.json .
 COPY package-lock.json .
 
-RUN npm ci --production
+RUN npm i
 
-
-COPY public public
-COPY nuxt.config.js .
-RUN npm run build
-
+COPY .eslintrc.js .
+COPY .gitignore .
 COPY server server
+COPY test test
 COPY config config
 COPY scripts scripts
+COPY .nycrc .
 
 
-CMD xvfb-run -s ":99" node server
+CMD npm run lint && npm run test
