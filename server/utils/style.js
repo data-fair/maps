@@ -2,8 +2,7 @@ module.exports = {
   escapePublicUrl(style, publicBaseUrl) {
     return JSON.parse(JSON.stringify(style)
       .split('maps://').join('maps://maps://')
-      .replace(publicBaseUrl + '/', 'maps://'),
-    )
+      .split(publicBaseUrl + '/').join('maps://'))
   },
   injectPublicUrl(style, publicBaseUrl) {
     return JSON.parse(JSON.stringify(style)
