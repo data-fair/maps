@@ -5,6 +5,8 @@ module.exports = {
   privateDirectoryUrl: 'PRIVATE_DIRECTORY_URL',
   openapiViewerUrl: 'OPENAPI_VIEWER_URL',
   mongoUrl: 'MONGO_URL',
+  maplibrePool: 'MAPLIBRE_POOL',
+  imageSizeLimit: 'IMAGE_SIZE_LIMIT',
   theme: {
     dark: {
       __name: 'THEME_DARK',

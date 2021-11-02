@@ -2,6 +2,7 @@
 const bboxUtils = require('../../utils/bbox')
 const wkx = require('wkx')
 const asyncWrap = require('../../utils/async-wrap')
+const config = require('config')
 
 const router = module.exports = require('express').Router()
 
@@ -134,7 +135,7 @@ async function getOrPost(req, res) {
   const width = parseInt(req.params.width)
   if (isNaN(height)) return res.status(400).send('Invalid image height')
   if (isNaN(width)) return res.status(400).send('Invalid image width')
-  if (width * height > 1000000) return res.status(400).send('Image size over limit')
+  if (width * height > config.imageSizeLimit) return res.status(400).send('Image size over limit')
   Object.assign(mapOptions, { width, height })
   //
 
