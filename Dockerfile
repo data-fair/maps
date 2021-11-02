@@ -12,12 +12,12 @@ COPY package-lock.json .
 RUN npm ci --production
 
 
+COPY config config
 COPY public public
 COPY nuxt.config.js .
 RUN npm run build
 
 COPY server server
-COPY config config
 COPY scripts scripts
 
 

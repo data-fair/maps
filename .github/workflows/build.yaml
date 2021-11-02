@@ -28,8 +28,9 @@ jobs:
         push: false
         cache-from: type=gha
         cache-to: type=gha,mode=max
+        tags: ${{ github.repository }}-test
     - name: Run docker test image
-      run: docker run ${{ steps.docker_build.outputs.digest }}
+      run: docker run ${{ github.repository }}-test
       
   build:
     runs-on: ubuntu-latest
