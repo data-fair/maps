@@ -39,7 +39,7 @@ describe('Render routes mapOptions', () => {
     }
     const wkb = wkx.Geometry.parseGeoJSON(geojson).toWkb().toString('base64url')
     const promise = eventToPromise(global.app.renderer.events, 'render')
-    await global.ax.superadmin.get('/api/render/' + style._id + '/200x200.png?wkb=' + wkb)
+    await global.ax.superadmin.get('/api/render/' + style._id + '/200x200.png?wkb-type=line&wkb=' + wkb)
     const { mapOptions, style: style2 } = await promise
     assert.equal(mapOptions.center[0], 0.5)
     assert.equal(mapOptions.center[1], 0.5)

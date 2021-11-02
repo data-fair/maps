@@ -13,6 +13,7 @@ RUN npm i
 
 COPY .eslintrc.js .
 COPY .gitignore .
+COPY public public
 COPY server server
 COPY test test
 COPY config config

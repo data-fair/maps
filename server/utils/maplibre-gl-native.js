@@ -10,6 +10,7 @@ var Map = function(options) {
         throw TypeError('Requires an options object as first argument')
     }
 
+    // eslint-disable-next-line no-prototype-builtins
     if (!options.hasOwnProperty('request') || !(options.request instanceof Function)) {
         throw TypeError("Options object must have a 'request' method")
     }

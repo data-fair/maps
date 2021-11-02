@@ -23,7 +23,7 @@
           show-expand
         >
           <!-- show-expand -->
-          <template #expanded-item="{ headers, item }">
+          <template #expanded-item="{ item }">
             <td :colspan="headers.length" class="pa-0">
               <!-- More info about {{ item.name }} -->
               <v-simple-table>
@@ -65,7 +65,7 @@
               transition="dialog-bottom-transition"
               max-width="600"
             >
-              <template #activator="{ on, attrs }">
+              <template #activator="{ on }">
                 <v-icon
                   small
                   color="error"

@@ -12,7 +12,7 @@ module.exports = {
     'node/no-deprecated-api': 'off',
     'vue/require-prop-types': 'off',
     'vue/valid-v-slot': ['error', {
-      allowModifiers: false,
+      allowModifiers: true,
     }],
     'no-new': 'off',
     'vue/max-attributes-per-line': ['error', {

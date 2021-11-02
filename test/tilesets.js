@@ -1,4 +1,4 @@
-const assert = require('assert')
+// const assert = require('assert')
 
 describe('Tilesets', () => {
   it.skip('Should import a tileset from a mbtiles', async () => {})
