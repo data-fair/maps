@@ -19,6 +19,7 @@ COPY test test
 COPY config config
 COPY scripts scripts
 COPY .nycrc .
+COPY nuxt.config.js .
 
 
 CMD npm run lint && npm run test
