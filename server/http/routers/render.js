@@ -126,6 +126,7 @@ async function getOrPost(req, res) {
   const additionalSources = {}
   const additionalLayers = []
   const imageProperties = {}
+  let style = req.style.style
   //
 
   // Image size
@@ -189,6 +190,38 @@ async function getOrPost(req, res) {
     } catch (error) {
       return res.status(400).send('Query parameter "wkb" has to be a valid wkb')
     }
+    if (!['fill', 'line', 'symbol', 'circle'].includes(req.query['wkb-type'])) return res.status(400).send('Query parameter "wkb-type" is not a valid layer type, it should be one of "fill", "line", "symbol" or "circle"')
+    const wkbLayer = {
+      id: 'wkb-layer',
+      source: 'wkb',
+      type: req.query['wkb-type'],
+      paint: {},
+      layout: {
+        visibility: 'visible',
+      },
+    }
+    if (req.query['wkb-type'] === 'fill') {
+      wkbLayer.paint = {
+        'fill-color': req.query['wkb-color'] || '#000000',
+        'fill-opacity': 0.5,
+      }
+    } else if (req.query['wkb-type'] === 'line') {
+      wkbLayer.paint = {
+        'line-color': req.query['wkb-color'] || '#000000',
+        'line-opacity': 1,
+        'line-width': parseInt(req.query['wkb-width']) || 1,
+      }
+    } else if (req.query['wkb-type'] === 'circle') {
+      wkbLayer.paint = {
+        'circle-stroke-color': req.query['wkb-color'] || '#000000',
+        'circle-color': req.query['wkb-color'] || '#000000',
+        'circle-opacity': 0.5,
+        'circle-stroke-opacity': 1,
+        'circle-radius': parseInt(req.query['wkb-width']) || 5,
+      }
+    }
+
+    additionalLayers.push(wkbLayer)
   }
   //
 
@@ -218,9 +251,9 @@ async function getOrPost(req, res) {
 
   // update style
   if (Object.keys(additionalSources).length || additionalLayers.length) {
-    req.style.style = JSON.parse(JSON.stringify(req.style.style))
-    Object.assign(req.style.style.sources, additionalSources || {})
-    req.style.style.layers = req.style.style.layers.concat(additionalLayers.flat())
+    style = JSON.parse(JSON.stringify(req.style.style))
+    Object.assign(style.sources, additionalSources || {})
+    style.layers = style.layers.concat(additionalLayers.flat())
   }
 
   try {
@@ -232,7 +265,8 @@ async function getOrPost(req, res) {
 
     if (req.style.sprite_png) context.spritePng = req.style.sprite_png.buffer
     if (req.style.sprite_json) context.spriteJson = req.style.sprite_json
-    const { buffer/*, info */ } = await req.app.get('renderer').render(req.style.style, mapOptions, imageProperties, context)
+
+    const { buffer/*, info */ } = await req.app.get('renderer').render(style, mapOptions, imageProperties, context)
 
     if (!buffer) return res.status(404).send('Not found')
     res.set({ 'Content-Type': `image/${imageProperties.format}` })

@@ -65,17 +65,12 @@
       })
       const sourcesList = data.filter(j => j.trackEvents && j.trackEvents.length).map((journey) => {
         return {
-          'journey-points': {
-            type: 'MultiPoint',
-            coordinates: (journey.trackEvents || []).filter((e) => e.gps && e.gps.lon).map(e => [e.gps.lon, e.gps.lat]),
-          },
+          type: 'MultiPoint',
+          coordinates: (journey.trackEvents || []).filter((e) => e.gps && e.gps.lon).map(e => [e.gps.lon, e.gps.lat]),
         }
       })
-      this.items = sourcesList.map((sources) => {
-        const dataSources = Object.keys(sources)
-        return `${this.env.publicUrl}/api/render/default/500x500.${['png', 'jpg', 'jpeg', 'webp'].at(Math.random() * 4)}?wkb-sources=${dataSources.join(',')}&${dataSources.map(name => {
-          return `${name}=${wkx.Geometry.parseGeoJSON(sources[name]).toWkb().toString('base64').split('+').join('-').split('/').join('_')}`
-        }).join('&')}`
+      this.items = sourcesList.map((source) => {
+        return `${this.env.publicUrl}/api/render/openmaptiles-maptiler-basic/500x500.${['png', 'jpg', 'jpeg', 'webp'].at(Math.random() * 4)}?wkb=${wkx.Geometry.parseGeoJSON(source).toWkb().toString('base64').split('+').join('-').split('/').join('_')}&wkb-type=line&wkb-width=5`
       })
     },
     computed: {

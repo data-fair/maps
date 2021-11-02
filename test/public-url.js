@@ -2,7 +2,7 @@ const assert = require('assert')
 const publicUrlStyle = require('./resources/public-url-style')
 
 describe('public-url', () => {
-  it('should replace public urls inside style.json for multi domain support', async () => {
+  it('Should replace public urls inside style.json for multi domain support', async () => {
     let _id
     let style
     _id = (await global.ax.superadmin.post('/api/styles', publicUrlStyle)).data._id
@@ -31,6 +31,5 @@ describe('public-url', () => {
     assert.equal(style.sources.domain2Source.url, publicUrlStyle.sources.domain1Source.url)
     assert.equal(style.sources.externalSource.url, publicUrlStyle.sources.externalSource.url)
   })
-  it.skip('should replace public urls inside tile.json for multi domain support', async () => {
-  })
+  it.skip('Should replace public urls inside tile.json for multi domain support', async () => {})
 })

@@ -5,7 +5,7 @@ const FormData = require('form-data')
 const config = require('config')
 
 describe('Styles', () => {
-  it('should be able to import json styles', async () => {
+  it('Should import json styles', async () => {
     let style
 
     const _id = (await global.ax.superadmin.post('/api/styles', publicUrlStyle)).data._id
@@ -35,7 +35,7 @@ describe('Styles', () => {
     }
   })
 
-  it('should be able to import zipped open-map-tile style with sprite', async () => {
+  it('Should import zipped open-map-tile style with sprite', async () => {
     const formData = new FormData()
     formData.append('style.zip', fs.createReadStream('./test/resources/styles/openmaptiles-maptiler-basic.zip'))
     formData.append('tileset', 'openmaptiles-world')

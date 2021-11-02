@@ -62,8 +62,8 @@ module.exports = async (req, { db, context }) => {
   } else if (req.kind === resourceType.Glyphs) {
     if (!req.url.match('^maps://api/fonts/.*/\\d+\\-\\d+.pbf$')) throw new Error(req.url)
     const args = req.url.split('/')
-    const fontStack = decodeURI(args[3])
-    const range = args[4].split('.')[0]
+    const fontStack = decodeURI(args[4])
+    const range = args[5].split('.')[0]
     return { data: await getFonts(fontStack, range) }
 
     //
