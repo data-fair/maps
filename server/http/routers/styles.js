@@ -10,7 +10,6 @@ const router = module.exports = require('express').Router()
 //
 
 router.param('style', require('../params/style'))
-const resourcesRouter = require('./styles-resources')
 
 //
 
@@ -129,7 +128,7 @@ router.put('/:style.json', asyncWrap(async (req, res) => {
   const errors = maplibreStyle.validate(req.body)
   if (errors.length) { return res.status(400).send(errors) }
   const style = escapePublicUrl(req.body, req.publicBaseUrl)
-  await req.app.get('db').collection('styles').updateOne({ _id: req.params.style }, { style })
+  await req.app.get('db').collection('styles').updateOne({ _id: req.params.style }, { $set: { style } })
   res.send(injectPublicUrl(style, req.publicBaseUrl))
 }))
 
@@ -137,6 +136,41 @@ router.put('/:style.json', asyncWrap(async (req, res) => {
 
 //
 
+require('../api-docs').paths['/styles/{style}'] = {
+  put: {
+    tags: ['Styles'],
+    parameters: [
+      { $ref: '#/components/parameters/style' },
+    ],
+    responses: {
+      200: {
+        description: 'The style has been updated',
+        content: { 'application/json': {} },
+      },
+      400: {
+        description: 'Bad format',
+      },
+      404: {
+        description: 'The style does not exist',
+      },
+    },
+  },
+}
+
+router.put('/:style', asyncWrap(async (req, res) => {
+  if (req.headers['content-type'].match('multipart/form-data')) {
+    styleZip(req, res, async (err) => {
+      if (err) return res.status(500).send(err.message)
+      res.send(await importZippedStyle(req.app.get('db'), req.file.buffer, req.params.style, req.body.tileset))
+    })
+  } else {
+    res.status(400).send('Content-type ' + req.headers['content-type'] + 'not supported')
+  }
+}))
+
+//
+
+//
 require('../api-docs').paths['/styles/{style}.json'].delete = {
   tags: ['Styles'],
   parameters: [
@@ -157,4 +191,14 @@ router.delete('/:style.json', asyncWrap(async (req, res) => {
   res.sendStatus(204)
 }))
 
-router.use('/:style', resourcesRouter)
+router.get('/:style/sprite.json', (req, res) => {
+  if (req.style.sprite_json) res.send(req.style.sprite_json)
+  else res.sendStatus(404)
+})
+
+router.get('/:style/sprite.png', (req, res) => {
+  if (req.style.sprite_png) {
+    res.set({ 'Content-Type': 'image/png' })
+    res.send(req.style.sprite_png)
+  } else res.sendStatus(404)
+})

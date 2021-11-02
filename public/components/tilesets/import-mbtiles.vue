@@ -54,7 +54,7 @@
     async mounted() {
       this.reader.onprogress = console.log
       this.reader.onload = async() => {
-        await this.$axios.$post(this.env.publicUrl + '/api/tiles', this.reader.result, { headers: { 'Content-type': 'application/octet-stream' } })
+        await this.$axios.$post(this.env.publicUrl + '/api/tilesets', this.reader.result, { headers: { 'Content-type': 'application/octet-stream' } })
         this.uploading = false
         this.dialog = false
         this.file = undefined

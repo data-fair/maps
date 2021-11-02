@@ -50,6 +50,7 @@
 
 <script>
   import { mapState } from 'vuex'
+  import eventBus from '~/assets/event-bus'
   import VJsoneditor from 'v-jsoneditor'
 
   const maplibreStyle = require('@maplibre/maplibre-gl-style-spec')
@@ -81,12 +82,16 @@
         return errors
       },
       async save() {
-        if (this.newStyle) {
-          await this.$axios.$post(`${this.env.publicUrl}/api/styles`, this.jsonStyle)
-        } else {
-          await this.$axios.$put(`${this.env.publicUrl}/api/styles/${this.value._id}.json`, this.jsonStyle)
+        try {
+          if (this.newStyle) {
+            await this.$axios.$post(`${this.env.publicUrl}/api/styles`, this.jsonStyle)
+          } else {
+            await this.$axios.$put(`${this.env.publicUrl}/api/styles/${this.value._id}.json`, this.jsonStyle)
+          }
+          this.$emit('change')
+        } catch (error) {
+          eventBus.$emit('error', error)
         }
-        this.$emit('change')
       },
     },
   }

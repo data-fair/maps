@@ -4,8 +4,9 @@
       <v-card-title>
         Styles
         <v-spacer />
-        <import-dialog @change="$fetch" />
-        <edit-dialog @change="$fetch" />
+        <import-dialog format="json" @change="$fetch" />
+        <import-dialog format="zip" @change="$fetch" />
+        <!-- <edit-dialog @change="$fetch" /> -->
       </v-card-title>
       <v-card-text v-if="!$fetchState.pending">
         <v-row>
@@ -21,11 +22,27 @@
                 width="426"
               />
               <v-card-title class="pa-2" v-text="item.name" />
-              <v-card-actions class="justify-end">
-                <import-dialog :value="item.style" @change="$fetch" />
-                <edit-dialog :value="item.style" @change="$fetch" />
-                <delete-dialog :value="item.style" @change="$fetch" />
-              </v-card-actions>
+              <v-row class="ma-0 pa-0">
+                <v-card-subtitle
+                  class="px-2 py-0"
+                  v-text="item._id"
+                />
+                <v-spacer />
+                <v-card-actions class="justify-end">
+                  <import-dialog
+                    format="json"
+                    :value="item"
+                    @change="$fetch"
+                  />
+                  <import-dialog
+                    format="zip"
+                    :value="item"
+                    @change="$fetch"
+                  />
+                  <edit-dialog :value="item.style" @change="$fetch" />
+                  <delete-dialog :value="item.style" @change="$fetch" />
+                </v-card-actions>
+              </v-row>
             </v-card>
           </v-col>
         </v-row>
@@ -38,6 +55,7 @@
   import editDialog from '~/components/style/edit-dialog'
   import deleteDialog from '~/components/style/delete-dialog'
   import importDialog from '~/components/style/import-dialog'
+
   import { mapState } from 'vuex'
   export default {
     components: {

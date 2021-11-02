@@ -15,14 +15,16 @@
           Render-demo
         </v-btn>
       </v-app-bar>
+      <events />
       <nuxt />
     </v-main>
   </v-app>
 </template>
 
 <script>
+  import events from '~/components/events'
   export default {
-
+    components: { events },
   }
 </script>
 

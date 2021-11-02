@@ -15,7 +15,9 @@ module.exports = asyncWrap(async (req, res, next) => {
     }, { maxAge: 10000, promise: true })
   }
   req.style = await getCachedStyle(req.params.style)
-  if (!req.style) { return res.status(404).send('Style not found') }
+
+  const adminPut = req.method === 'PUT' && req.user.adminMode
+  if (!req.style && !adminPut) { return res.status(404).send('Style not found') }
   if (req.method === 'PUT' || req.method === 'DELETE') getCachedStyle.delete(req.params.style)
   // req.style = await req.app.get('db').collection('styles').findOne({ _id: req.params.style })
   next()

@@ -1,7 +1,7 @@
 const debug = require('debug')('import-zipped-style')
 const Zip = require('node-zip')
 
-module.exports = async(db, zippedBuffer, _id, openmaptilesTileset) => {
+module.exports = async(db, zippedBuffer, _id, openmaptilesTileset = 'openmaptiles') => {
   debug('starting importation of: ' + _id)
   const mongoDocument = { _id }
   const { files } = new Zip(zippedBuffer, { base64: false, checkCRC: true })

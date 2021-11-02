@@ -43,6 +43,8 @@
 </template>
 
 <script>
+  import eventBus from '~/assets/event-bus'
+
   import { mapState } from 'vuex'
   export default {
 
@@ -54,8 +56,12 @@
     },
     methods: {
       async deleteStyle() {
-        await this.$axios.$delete(`${this.env.publicUrl}/api/styles/${this.value._id}.json`)
-        this.$emit('change')
+        try {
+          await this.$axios.$delete(`${this.env.publicUrl}/api/styles/${this.value._id}.json`)
+          this.$emit('change')
+        } catch (error) {
+          eventBus.$emit('error', error)
+        }
       },
     },
   }
