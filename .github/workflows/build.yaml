@@ -30,6 +30,8 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
         tags: ${{ github.repository }}-test
+    - name: Run docker deps
+      run: docker-compose up -d
     - name: Run docker test image
       run: docker run ${{ github.repository }}-test
       
