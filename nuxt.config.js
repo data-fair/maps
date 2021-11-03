@@ -13,6 +13,7 @@ if (process.env.NODE_ENV === 'production') {
 
 const webpack = require('webpack')
 
+console.log(config.basePath + '_nuxt/')
 module.exports = {
   ssr: false,
   components: true,
@@ -20,7 +21,7 @@ module.exports = {
   buildDir: 'nuxt-dist',
   build: {
     // cache: true,
-    publicPath: config.basePath + '_nuxt/',
+    publicPath: config.publicUrl + '_nuxt/',
     transpile: [/@koumoul/], // Necessary for "à la carte" import of vuetify components
     extend (config, { isServer, isDev, isClient }) {
       // Ignore all locale files of moment.js, those we want are loaded in plugins/moment.js
