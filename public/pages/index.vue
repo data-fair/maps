@@ -5,11 +5,11 @@
 </template>
 
 <script>
-  import maplibre from '~/components/maplibre'
+  // import maplibre from '~/components/maplibre'
   import { mapState } from 'vuex'
   export default {
     components: {
-      maplibre,
+      // maplibre,
     },
     middleware: 'auth',
     data: () => ({}),
