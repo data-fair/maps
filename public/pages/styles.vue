@@ -63,6 +63,12 @@
             </v-card>
           </v-col>
         </v-row>
+        <v-pagination
+          v-if="pageCount > 1"
+          v-model="page"
+          :length="pageCount"
+          @input="$fetch"
+        />
       </v-card-text>
     </v-card>
   </v-container>
@@ -79,12 +85,19 @@
       editDialog, deleteDialog, importDialog,
     },
     data: () => ({
+      page: 1,
+      itemCount: undefined,
       items: [],
     }),
     async fetch() {
-      this.items = (await this.$axios.$get(this.env.publicUrl + '/api/styles'))
+      const { results, count } = await this.$axios.$get(this.env.publicUrl + '/api/styles?size=12&page=' + this.page)
+      this.items = results
+      this.itemCount = count
     },
     computed: {
+      pageCount() {
+        return Math.ceil((this.itemCount || 0) / 12)
+      },
       ...mapState(['env']),
       ...mapState(['session']),
       isAdmin() {

@@ -31,8 +31,15 @@ require('../api-docs').paths['/styles'] = {
   },
 }
 
-router.get('', asyncWrap(async (req, res) => {
-  res.send((await req.app.get('db').collection('styles').find().toArray()).map(document => ({ _id: document._id, ...injectPublicUrl(document.style, req.publicBaseUrl) })))
+router.get('', require('../middlewares/pagination')(), asyncWrap(async (req, res) => {
+  const query = {}
+  const [styles, count] = await Promise.all([
+    req.pagination.size > 0
+      ? req.app.get('db').collection('styles').find(query).limit(req.pagination.size).skip(req.pagination.skip).toArray()
+      : Promise.resolve([]),
+    req.app.get('db').collection('styles').countDocuments(query),
+  ])
+  res.send({ count, results: styles.map(document => ({ _id: document._id, ...injectPublicUrl(document.style, req.publicBaseUrl) })) })
 }))
 
 //
