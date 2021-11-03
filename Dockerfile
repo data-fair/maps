@@ -2,7 +2,7 @@ FROM ghcr.io/koumoul-dev/docker-maplibre-gl-native:master
 
 WORKDIR /webapp
 
-RUN mv /maplibre-gl-native/lib /webapp/lib
+RUN ln -s /maplibre-gl-native/lib /webapp/lib
 
 ENV NODE_ENV production
 
