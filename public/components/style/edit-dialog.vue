@@ -4,22 +4,18 @@
     max-width="600"
     fullscreen
   >
-    <template #activator="{ on }">
-      <v-icon
-        v-if="newStyle"
-
-        v-on="on"
-      >
-        mdi-plus
-      </v-icon>
-      <v-icon
-        v-else
-        small
-        class="mr-2"
-        v-on="on"
-      >
-        mdi-pencil
-      </v-icon>
+    <template #activator="{ on:dialog,attrs }">
+      <v-tooltip bottom>
+        <template #activator="{ on:tooltip }">
+          <v-icon
+            v-bind="attrs"
+            class="mx-1"
+            v-on="{...dialog,...tooltip}"
+            v-text="'mdi-pencil'"
+          />
+        </template>
+        <span v-text="'Edit Style'" />
+      </v-tooltip>
     </template>
     <template #default="dialog">
       <v-card>
@@ -60,20 +56,19 @@
       VJsoneditor,
     },
     props: {
-      value: { type: Object, default: () => ({}) },
+      value: { type: Object, required: true },
     },
     data () {
+      const jsonStyle = JSON.parse(JSON.stringify(this.value))
+      delete jsonStyle._id
       return {
-        jsonStyle: JSON.parse(JSON.stringify(this.value)),
+        jsonStyle,
       }
     },
     computed: {
       ...mapState(['env']),
       valid() {
         return this.validate(this.jsonStyle).length === 0
-      },
-      newStyle() {
-        return !this.value._id
       },
     },
     methods: {
@@ -83,11 +78,8 @@
       },
       async save() {
         try {
-          if (this.newStyle) {
-            await this.$axios.$post(`${this.env.publicUrl}/api/styles`, this.jsonStyle)
-          } else {
-            await this.$axios.$put(`${this.env.publicUrl}/api/styles/${this.value._id}.json`, this.jsonStyle)
-          }
+          await this.$axios.$put(`${this.env.publicUrl}/api/styles/${this.value._id}.json`, this.jsonStyle)
+
           this.$emit('change')
         } catch (error) {
           eventBus.$emit('error', error)

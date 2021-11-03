@@ -1,18 +1,26 @@
 <template>
   <v-dialog max-width="600">
-    <template #activator="{on}">
-      <v-icon
-        v-if="format === 'json'"
-        class="mr-2"
-        v-on="on"
-        v-text="'mdi-file-upload-outline'"
-      />
-      <v-icon
-        v-if="format === 'zip'"
-        class="mr-2"
-        v-on="on"
-        v-text="'mdi-folder-upload-outline'"
-      />
+    <template #activator="{on:dialog,attrs}">
+      <v-tooltip bottom>
+        <template #activator="{ on:tooltip }">
+          <v-icon
+            v-if="format === 'json'"
+            v-bind="attrs"
+            class="mx-1"
+            v-on="{...dialog,...tooltip}"
+            v-text="'mdi-file-upload-outline'"
+          />
+          <v-icon
+            v-if="format === 'zip'"
+            v-bind="attrs"
+            class="mx-1"
+            v-on="{...tooltip,...dialog}"
+            v-text="'mdi-folder-upload-outline'"
+          />
+        </template>
+        <span v-if="format === 'json'" v-text="'Import Style from json file'" />
+        <span v-if="format === 'zip'" v-text="'Import Style and sprite from zipped files'" />
+      </v-tooltip>
     </template>
     <template #default="dialog">
       <v-card>

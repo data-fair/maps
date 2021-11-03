@@ -5,8 +5,8 @@
   >
     <template #activator="{ on }">
       <v-icon
-        small
         color="error"
+        class="mx-1"
         v-on="on"
       >
         mdi-delete

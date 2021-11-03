@@ -13,7 +13,6 @@ if (process.env.NODE_ENV === 'production') {
 
 const webpack = require('webpack')
 
-console.log(config.basePath + '_nuxt/')
 module.exports = {
   ssr: false,
   components: true,
@@ -31,6 +30,7 @@ module.exports = {
   loading: { color: '#1e88e5' }, // Customize the progress bar color
   plugins: [
     { src: '~plugins/session' },
+    { src: '@/plugins/vue-clipboard2', ssr: false },
     // { src: '~plugins/global-components' },
     // { src: '~plugins/ws', ssr: false },
     // { src: '~plugins/moment' },

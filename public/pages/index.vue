@@ -1,6 +1,6 @@
 <template>
   <div>
-    <maplibre :map-style="`${env.publicUrl}/api/styles/default.json`" />
+    <!-- <maplibre :map-style="`${env.publicUrl}/api/styles/default.json`" /> -->
   </div>
 </template>
 
