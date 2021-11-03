@@ -22,4 +22,4 @@ COPY .nycrc .
 COPY nuxt.config.js .
 
 
-CMD npm run lint && npm run test
+CMD npm run lint && npm run test-cover
