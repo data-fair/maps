@@ -1,3 +1,4 @@
+const asyncMBTiles = require('../../utils/async-MBTiles')
 const fs = require('fs/promises')
 const { nanoid } = require('nanoid')
 const asyncWrap = require('../../utils/async-wrap')
@@ -54,12 +55,21 @@ require('../api-docs').paths['/tilesets'].post = {
 
 router.post('', asyncWrap(async (req, res) => {
   const _id = nanoid(10)
-  const filename = `${_id}.mbtiles`
-
+  const filename = `./mbtiles/${_id}.mbtiles`
   await fs.writeFile(filename, req.body)
-  await require('../../utils/import-mbtiles')(req.app.get('db'), filename, _id)
-  await fs.unlink(filename)
-  return res.sendStatus(200)
+  const MBTiles = await asyncMBTiles(filename)
+  const info = await MBTiles.getInfo()
+  delete info.basename
+  delete info.filesize
+  info._id = _id
+  info.tileCount = 0
+  await req.app.get('db').collection('tilesets').insertOne(info)
+  await req.app.get('db').collection('import-mbtiles').insertOne({
+    tileset: _id,
+    filename,
+    status: 'pending',
+  })
+  return res.send(info)
 }))
 
 //

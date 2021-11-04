@@ -21,6 +21,9 @@ require('../api-docs').paths['/styles'] = {
   get: {
     tags: ['Styles'],
     parameters: [
+      { $ref: '#/components/parameters/size' },
+      { $ref: '#/components/parameters/skip' },
+      { $ref: '#/components/parameters/page' },
     ],
     responses: {
       200: {
@@ -178,6 +181,7 @@ router.put('/:style', asyncWrap(async (req, res) => {
 //
 
 //
+
 require('../api-docs').paths['/styles/{style}.json'].delete = {
   tags: ['Styles'],
   parameters: [

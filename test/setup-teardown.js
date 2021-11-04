@@ -52,6 +52,9 @@ before('init axios', async () => {
 
 before('clean mongo', async () => {
   await global.app.db.collection('styles').deleteMany({})
+  await global.app.db.collection('tilesets').deleteMany({})
+  await global.app.db.collection('import-mbtiles').deleteMany({})
+  await global.app.db.collection('tiles').deleteMany({})
 })
 
 after('stop app', async () => {
