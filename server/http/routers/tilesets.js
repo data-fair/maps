@@ -30,12 +30,22 @@ require('../api-docs').paths['/tilesets'] = {
   },
 }
 
-router.get('', asyncWrap(async (req, res) => {
-  const tilesetInfos = await req.app.get('db').collection('tilesets').find({}).toArray()
-  res.send(tilesetInfos.map((tilesetInfo) => {
-    tilesetInfo.tiles = [`${req.publicBaseUrl}/tilesets/${tilesetInfo._id}/tiles/{z}/{x}/{y}.pbf`]
-    return tilesetInfo
-  }))
+router.get('', require('../middlewares/pagination')(), asyncWrap(async (req, res) => {
+  const query = {}
+  const [tilesets, count] = await Promise.all([
+    req.pagination.size > 0
+      ? req.app.get('db').collection('tilesets').find(query).limit(req.pagination.size).skip(req.pagination.skip).toArray()
+      : Promise.resolve([]),
+    req.app.get('db').collection('tilesets').countDocuments(query),
+  ])
+
+  res.send({
+    count,
+    results: tilesets.map((tileset) => {
+      tileset.tiles = [`${req.publicBaseUrl}/tilesets/${tileset._id}/tiles/{z}/{x}/{y}.pbf`]
+      return tileset
+    }),
+  })
 }))
 
 //

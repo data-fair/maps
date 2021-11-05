@@ -21,12 +21,16 @@
           item-key="_id"
           :loading="$fetchState.pending"
           show-expand
+          :page.sync="page"
+          :items-per-page.sync="itemPerPage"
+          :server-items-length="itemCount"
+          @pagination="$fetch"
         >
           <!-- show-expand -->
           <template #expanded-item="{ item }">
             <td :colspan="headers.length" class="pa-0">
               <!-- More info about {{ item.name }} -->
-              <v-simple-table>
+              <v-simple-table tile dense>
                 <thead>
                   <tr>
                     <th class="text-left">
@@ -117,6 +121,9 @@
       importMbtiles,
     },
     data: () => ({
+      itemPerPage: 5,
+      itemCount: undefined,
+      page: 1,
       headers: [
         { text: 'id', value: '_id' },
         { text: 'Name', value: 'name' },
@@ -127,14 +134,18 @@
         { text: 'Vector layer count', value: 'vector_layers.length' },
         { text: 'Actions', value: 'actions', sortable: false },
         { text: 'Vector layers', value: 'data-table-expand', sortable: false },
-
       ],
       items: [],
     }),
     async fetch() {
-      this.items = await this.$axios.$get(this.env.publicUrl + '/api/tilesets')
+      const { results, count } = await this.$axios.$get(this.env.publicUrl + '/api/tilesets?size=' + this.itemPerPage + '&page=' + this.page)
+      this.items = results
+      this.itemCount = count
     },
     computed: {
+      pageCount() {
+        return Math.ceil((this.itemCount || 0) / this.itemPerPage)
+      },
       ...mapState(['env']),
     },
     async mounted() {
