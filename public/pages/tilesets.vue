@@ -6,6 +6,7 @@
       <v-card-title>
         Tilesets
         <v-spacer />
+        <v-icon @click="$fetch" v-text="'mdi-refresh'" />
         <import-mbtiles @change="$fetch" />
       </v-card-title>
       <!-- <v-card-subtitle> -->
@@ -26,6 +27,10 @@
           :footer-props="{'items-per-page-options':[5,10,20,50]}"
           @pagination="$fetch"
         >
+          <template #item.format_icon="{item}">
+            <v-icon v-if="item.format==='jpg'" v-text="'mdi-image'" />
+            <v-icon v-if="item.format==='pbf'" v-text="'mdi-vector-square'" />
+          </template>
           <!-- show-expand -->
           <template #expanded-item="{ item }">
             <td :colspan="headers.length" class="pa-0">
@@ -61,9 +66,12 @@
             <v-row class="justify-end">
               <v-icon
                 v-if="item.vector_layers"
+                class="mx-1"
                 @click="expand(!isExpanded)"
                 v-text="'mdi-layers-search'"
               />
+              <import-mbtiles :value="item" @change="$fetch" />
+
               <!-- <v-icon
               small
               class="mr-2"
@@ -132,6 +140,7 @@
       itemCount: undefined,
       page: 1,
       headers: [
+        { text: '', value: 'format_icon' },
         { text: 'id', value: '_id' },
         { text: 'Name', value: 'name' },
         { text: 'Min Zoom', value: 'minzoom' },
@@ -139,7 +148,7 @@
         { text: 'Tile format', value: 'format' },
         { text: 'Tile count', value: 'tileCount' },
         { text: 'Vector layer count', value: 'vector_layers.length' },
-        { text: 'Actions', value: 'data-table-expand', sortable: false },
+        { text: 'Actions', value: 'data-table-expand', sortable: false, width: '110px' },
       ],
       items: [],
     }),

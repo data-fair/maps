@@ -122,17 +122,12 @@ router.get('/:tileset.json', asyncWrap(async (req, res) => {
 require('../api-docs').paths['/tilesets/{tileset}'] = {
   put: {
     tags: ['Tilesets'],
-    parameters: [
-      { $ref: '#/components/parameters/tileset' },
-    ],
+    parameters: [],
     responses: {
-      200: {
-        description: 'The TileJSON of the corresponding tileset',
-        content: { 'application/json': {} },
-      },
-      404: {
-        description: 'The tileset does not exist',
-      },
+      // 200: {
+      //   description: 'List of all available TileJSONs',
+      //   content: { 'application/json': {} },
+      // },
     },
   },
 }
@@ -157,6 +152,35 @@ router.put('/:tileset', asyncWrap(async (req, res) => {
     status: 'pending',
   })
   return res.send(info)
+}))
+
+//
+
+//
+
+require('../api-docs').paths['/tilesets/{tileset}'] = {
+  patch: {
+    tags: ['Tilesets'],
+    parameters: [],
+    responses: {
+      // 200: {
+      //   description: 'List of all available TileJSONs',
+      //   content: { 'application/json': {} },
+      // },
+    },
+  },
+}
+
+router.patch('/:tileset', asyncWrap(async (req, res) => {
+  const filename = `./mbtiles/${nanoid()}.mbtiles`
+  await fs.writeFile(filename, req.body)
+  await req.app.get('db').collection('task').insertOne({
+    type: 'import-mbtiles',
+    tileset: req.params.tileset,
+    filename,
+    status: 'pending',
+  })
+  return res.send(req.tileset)
 }))
 
 //

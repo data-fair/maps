@@ -7,12 +7,11 @@
             class="mx-1"
             v-bind="attrs"
             v-on="{...dialog,...tooltip}"
-            v-text="'mdi-upload'"
+            v-text="newTileset?'mdi-plus':'mdi-upload'"
           />
         </template>
-        <span>
-          Import MBTiles
-        </span>
+        <span v-if="newTileset" v-text="'Import Tileset from MBTiles'" />
+        <span v-else v-text="'Import tiles from MBTiles'" />
       </v-tooltip>
     </template>
     <template #default="dialog">
@@ -85,7 +84,15 @@
       async importMBTiles() {
         const reader = new FileReader()
         reader.onload = async() => {
-          await this.$axios.$post(this.env.publicUrl + '/api/tilesets', reader.result, { headers: { 'Content-type': 'application/octet-stream' } })
+          if (!this.saveId) {
+            await this.$axios.$post(this.env.publicUrl + '/api/tilesets', reader.result, { headers: { 'Content-type': 'application/octet-stream' } })
+          } else {
+            if (this.newTileset) {
+              await this.$axios.$put(this.env.publicUrl + '/api/tilesets/' + this.saveId, reader.result, { headers: { 'Content-type': 'application/octet-stream' } })
+            } else {
+              await this.$axios.$patch(this.env.publicUrl + '/api/tilesets/' + this.saveId, reader.result, { headers: { 'Content-type': 'application/octet-stream' } })
+            }
+          }
 
           this.$emit('change')
         }
