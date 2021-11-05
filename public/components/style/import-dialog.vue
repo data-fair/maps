@@ -8,14 +8,14 @@
             v-bind="attrs"
             class="mx-1"
             v-on="{...dialog,...tooltip}"
-            v-text="'mdi-file-upload-outline'"
+            v-text="'mdi-file-upload'"
           />
           <v-icon
             v-if="format === 'zip'"
             v-bind="attrs"
             class="mx-1"
             v-on="{...tooltip,...dialog}"
-            v-text="'mdi-folder-upload-outline'"
+            v-text="'mdi-folder-upload'"
           />
         </template>
         <span v-if="format === 'json'" v-text="'Import Style from json file'" />

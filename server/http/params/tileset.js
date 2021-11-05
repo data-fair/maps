@@ -16,6 +16,8 @@ module.exports = asyncWrap(async (req, res, next) => {
   }
 
   req.tilesetInfo = await getCachedTilesetInfo(req.params.tileset)
-  if (!req.tilesetInfo) { return res.sendStatus(404) }
+  const adminPut = req.method === 'PUT' && req.user.adminMode
+  if (!req.tilesetInfo && !adminPut) { return res.status(404).send('Tileset not found') }
+  if (req.method === 'PUT' || req.method === 'DELETE') getCachedTilesetInfo.delete(req.params.tileset)
   next()
 })

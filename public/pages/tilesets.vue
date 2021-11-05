@@ -1,13 +1,12 @@
 <template>
   <v-container>
-    <!-- outlined -->
     <v-card
       elevation="5"
     >
       <v-card-title>
         Tilesets
         <v-spacer />
-        <import-mbtiles @uploaded="$fetch" />
+        <import-mbtiles @change="$fetch" />
       </v-card-title>
       <!-- <v-card-subtitle> -->
       <!--  -->
@@ -24,6 +23,7 @@
           :page.sync="page"
           :items-per-page.sync="itemPerPage"
           :server-items-length="itemCount"
+          :footer-props="{'items-per-page-options':[5,10,20,50]}"
           @pagination="$fetch"
         >
           <!-- show-expand -->
@@ -57,55 +57,62 @@
               </v-simple-table>
             </td>
           </template>
-          <template #item.actions="{ item }">
-            <!-- <v-icon
+          <template #item.data-table-expand="{ expand, isExpanded, item }">
+            <v-row class="justify-end">
+              <v-icon
+                v-if="item.vector_layers"
+                @click="expand(!isExpanded)"
+                v-text="'mdi-layers-search'"
+              />
+              <!-- <v-icon
               small
               class="mr-2"
               @click="editItem(item)"
             >
               mdi-pencil
             </v-icon> -->
-            <v-dialog
-              transition="dialog-bottom-transition"
-              max-width="600"
-            >
-              <template #activator="{ on }">
-                <v-icon
-                  small
-                  color="error"
-                  v-on="on"
-                >
-                  mdi-delete
-                </v-icon>
-              </template>
-              <template #default="dialog">
-                <v-card>
-                  <v-card-title>
-                    Delete {{ item.name }}
-                  </v-card-title>
-                  <v-card-text>
-                    <p>Are you sure you want to delete this tileset</p>
-                    <p class="font-weight-bold">
-                      This action cannot be undone
-                    </p>
-                  </v-card-text>
-                  <v-card-actions class="justify-end">
-                    <v-btn
-                      color="warning"
-                      @click="dialog.value = false"
-                    >
-                      Cancel
-                    </v-btn>
-                    <v-btn
-                      color="error"
-                      @click="dialog.value = false;deleteTileset(item)"
-                    >
-                      Delete
-                    </v-btn>
-                  </v-card-actions>
-                </v-card>
-              </template>
-            </v-dialog>
+              <v-dialog
+                transition="dialog-bottom-transition"
+                max-width="600"
+              >
+                <template #activator="{ on }">
+                  <v-icon
+                    color="error"
+                    class="mx-1"
+                    v-on="on"
+                  >
+                    mdi-delete
+                  </v-icon>
+                </template>
+                <template #default="dialog">
+                  <v-card>
+                    <v-card-title>
+                      Delete {{ item.name }}
+                    </v-card-title>
+                    <v-card-text>
+                      <p>Are you sure you want to delete this tileset</p>
+                      <p class="font-weight-bold">
+                        This action cannot be undone
+                      </p>
+                    </v-card-text>
+                    <v-card-actions class="justify-end">
+                      <v-btn
+                        color="warning"
+                        @click="dialog.value = false"
+                      >
+                        Cancel
+                      </v-btn>
+                      <v-btn
+                        color="error"
+                        @click="dialog.value = false;deleteTileset(item)"
+                      >
+                        Delete
+                      </v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </template>
+              </v-dialog>
+            </v-row>
           </template>
         </v-data-table>
       </v-card-text>
@@ -114,14 +121,14 @@
 </template>
 
 <script>
-  import importMbtiles from '~/components/tilesets/import-mbtiles'
+  import importMbtiles from '~/components/tileset/import-mbtiles'
   import { mapState } from 'vuex'
   export default {
     components: {
       importMbtiles,
     },
     data: () => ({
-      itemPerPage: 5,
+      itemPerPage: 10,
       itemCount: undefined,
       page: 1,
       headers: [
@@ -132,8 +139,7 @@
         { text: 'Tile format', value: 'format' },
         { text: 'Tile count', value: 'tileCount' },
         { text: 'Vector layer count', value: 'vector_layers.length' },
-        { text: 'Actions', value: 'actions', sortable: false },
-        { text: 'Vector layers', value: 'data-table-expand', sortable: false },
+        { text: 'Actions', value: 'data-table-expand', sortable: false },
       ],
       items: [],
     }),

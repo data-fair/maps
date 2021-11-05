@@ -20,6 +20,9 @@ require('../api-docs').paths['/tilesets'] = {
   get: {
     tags: ['Tilesests'],
     parameters: [
+      { $ref: '#/components/parameters/size' },
+      { $ref: '#/components/parameters/skip' },
+      { $ref: '#/components/parameters/page' },
     ],
     responses: {
       200: {
@@ -74,7 +77,8 @@ router.post('', asyncWrap(async (req, res) => {
   info._id = _id
   info.tileCount = 0
   await req.app.get('db').collection('tilesets').insertOne(info)
-  await req.app.get('db').collection('import-mbtiles').insertOne({
+  await req.app.get('db').collection('task').insertOne({
+    type: 'import-mbtiles',
     tileset: _id,
     filename,
     status: 'pending',
@@ -109,6 +113,50 @@ router.get('/:tileset.json', asyncWrap(async (req, res) => {
     `${req.publicBaseUrl}/api/tiles/${req.params.tileset}/{z}/{x}/{y}.${req.tilesetInfo.format}`,
   ]
   res.send(req.tilesetInfo)
+}))
+
+//
+
+//
+
+require('../api-docs').paths['/tilesets/{tileset}'] = {
+  put: {
+    tags: ['Tilesets'],
+    parameters: [
+      { $ref: '#/components/parameters/tileset' },
+    ],
+    responses: {
+      200: {
+        description: 'The TileJSON of the corresponding tileset',
+        content: { 'application/json': {} },
+      },
+      404: {
+        description: 'The tileset does not exist',
+      },
+    },
+  },
+}
+
+router.put('/:tileset', asyncWrap(async (req, res) => {
+  const _id = req.params.tileset
+  const tileset = await req.app.get('db').collection('tilesets').findOne({ _id })
+  if (tileset) return res.status(400).send('This tileset already exist')
+  const filename = `./mbtiles/${_id}.mbtiles`
+  await fs.writeFile(filename, req.body)
+  const MBTiles = await asyncMBTiles(filename)
+  const info = await MBTiles.getInfo()
+  delete info.basename
+  delete info.filesize
+  info._id = _id
+  info.tileCount = 0
+  await req.app.get('db').collection('tilesets').insertOne(info)
+  await req.app.get('db').collection('task').insertOne({
+    type: 'import-mbtiles',
+    tileset: _id,
+    filename,
+    status: 'pending',
+  })
+  return res.send(info)
 }))
 
 //
