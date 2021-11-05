@@ -11,6 +11,7 @@ COPY package-lock.json .
 
 RUN npm i
 
+RUN mkdir mbtiles
 COPY .eslintrc.js .
 COPY .gitignore .
 COPY public public

@@ -11,7 +11,7 @@ COPY package-lock.json .
 
 RUN npm ci --production
 
-
+RUN mkdir mbtiles
 COPY config config
 COPY public public
 COPY nuxt.config.js .

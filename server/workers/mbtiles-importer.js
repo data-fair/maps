@@ -39,7 +39,7 @@ const loop = async({ db }) => {
         })()))).reduce((a, b) => a + b)
 
         skip += batchSize
-        console.log(insertedCount)
+
         await db.collection('tilesets').updateOne({ _id: ts }, { $inc: { tileCount: insertedCount } })
       }
       if (stopped) await db.collection('import-mbtiles').updateOne({ _id: importTask._id, status: 'importing' }, { $set: { status: 'pending', tileImported: skip } })
