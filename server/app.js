@@ -1,6 +1,8 @@
+const config = require('config')
 
 module.exports = {
   start: async function () {
+    if (config.prometheus) await require('./prometheus').start()
     const db = await require('./mongodb').start()
     const renderer = await require('./renderer').start({ db })
     const workers = await require('./workers').start({ db, renderer })
@@ -12,5 +14,6 @@ module.exports = {
     await require('./workers').stop()
     await require('./renderer').stop()
     await require('./mongodb').stop()
+    if (config.prometheus) await require('./prometheus').stop()
   },
 }

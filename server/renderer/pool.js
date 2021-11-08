@@ -1,6 +1,7 @@
 const { createPool } = require('generic-pool')
 const debugPool = require('debug')('renderer:pool')
 const maplibre = require('../utils/maplibre-gl-native')
+const prometheus = require('../prometheus')
 
 //
 
@@ -17,6 +18,7 @@ module.exports = {
 function createFactory(db) {
   return {
     create: async() => {
+      prometheus.maplibre_pool_size.inc(1)
       debugPool('creating a new map')
       const resource = {
         cache: {},
@@ -33,6 +35,7 @@ function createFactory(db) {
       return resource
     },
     destroy: async(resource) => {
+      prometheus.maplibre_pool_size.dec(1)
       debugPool('destroy called')
       resource.map.release()
     },
