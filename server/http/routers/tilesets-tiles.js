@@ -17,7 +17,7 @@ router.param('tileFormat', require('../params/tile-format'))
 
 //
 
-require('../api-docs').paths['/tilesets/{tileset}/tiles/{z}/{x}/{y}.{tileFormat}'] = {
+require('../api-docs').paths['/tilesets/{tileset}/tiles/{z}/{x}/{y}.{format}'] = {
   get: {
     tags: ['Tilesets'],
     parameters: [
@@ -30,7 +30,10 @@ require('../api-docs').paths['/tilesets/{tileset}/tiles/{z}/{x}/{y}.{tileFormat}
     responses: {
       200: {
         description: 'The corresponding tile',
-        content: { 'application/x-protobuf': {} },
+        content: {
+          'application/x-protobuf': {},
+          'image/jpg': {},
+        },
       },
       404: {
         description: 'The tileset does not exist',

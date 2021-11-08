@@ -8,6 +8,9 @@ const router = module.exports = require('express').Router()
 //
 
 router.param('tileset', require('../params/tileset'))
+require('../api-docs').paths['/tilesets'] = { get: {}, post: {} }
+require('../api-docs').paths['/tilesets/{tileset}.json'] = { get: {} }
+require('../api-docs').paths['/tilesets/{tileset}'] = { put: {}, patch: {}, delete: {} }
 router.use('/:tileset/tiles', require('./tilesets-tiles'))
 
 //
@@ -16,18 +19,36 @@ router.use('/:tileset/tiles', require('./tilesets-tiles'))
 
 //
 
-require('../api-docs').paths['/tilesets'] = {
-  get: {
-    tags: ['Tilesests'],
-    parameters: [
-      { $ref: '#/components/parameters/size' },
-      { $ref: '#/components/parameters/skip' },
-      { $ref: '#/components/parameters/page' },
-    ],
-    responses: {
-      200: {
-        description: 'List of all available TileJSONs',
-        content: { 'application/json': {} },
+require('../api-docs').paths['/tilesets'].get = {
+  tags: ['Tilesets'],
+  summary: 'List Tilesets',
+  parameters: [
+    { $ref: '#/components/parameters/size' },
+    { $ref: '#/components/parameters/skip' },
+    { $ref: '#/components/parameters/page' },
+  ],
+  responses: {
+    200: {
+      description: 'List of available TileJSONs describing tilesets',
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            properties: {
+              count: {
+                type: 'number',
+                description: 'Total number of tilesets',
+              },
+              results: {
+                type: 'array',
+                description: 'List of TileJSONs',
+                // items: {
+                //   $ref: '#/components/schemas/',
+                // },
+              },
+            },
+          },
+        },
       },
     },
   },
@@ -57,12 +78,22 @@ router.get('', require('../middlewares/pagination')(), asyncWrap(async (req, res
 
 require('../api-docs').paths['/tilesets'].post = {
   tags: ['Tilesets'],
+  summary: 'Create a Tileset from a mbtiles',
   parameters: [],
   responses: {
-    // 200: {
-    //   description: 'List of all available TileJSONs',
-    //   content: { 'application/json': {} },
-    // },
+    200: {
+      description: 'The tilejson describing the new tileset',
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            description: 'https://github.com/mapbox/tilejson-spec',
+            // properties: {
+            // },
+          },
+        },
+      },
+    },
   },
 }
 
@@ -90,20 +121,24 @@ router.post('', asyncWrap(async (req, res) => {
 
 //
 
-require('../api-docs').paths['/tilesets/{tileset}.json'] = {
-  get: {
-    tags: ['Tilesets'],
-    parameters: [
-      { $ref: '#/components/parameters/tileset' },
-    ],
-    responses: {
-      200: {
-        description: 'The TileJSON of the corresponding tileset',
-        content: { 'application/json': {} },
+require('../api-docs').paths['/tilesets/{tileset}.json'].get = {
+  tags: ['Tilesets'],
+  summary: 'Get a TileJSON',
+  parameters: [
+    { $ref: '#/components/parameters/tileset' },
+  ],
+  responses: {
+    200: {
+      description: 'The TileJSON of the corresponding tileset',
+      content: {
+        'application/json': {
+          description: 'https://github.com/mapbox/tilejson-spec',
+          type: 'object',
+        },
       },
-      404: {
-        description: 'The tileset does not exist',
-      },
+    },
+    404: {
+      description: 'The tileset does not exist',
     },
   },
 }
@@ -119,15 +154,25 @@ router.get('/:tileset.json', asyncWrap(async (req, res) => {
 
 //
 
-require('../api-docs').paths['/tilesets/{tileset}'] = {
-  put: {
-    tags: ['Tilesets'],
-    parameters: [],
-    responses: {
-      // 200: {
-      //   description: 'List of all available TileJSONs',
-      //   content: { 'application/json': {} },
-      // },
+require('../api-docs').paths['/tilesets/{tileset}'].put = {
+  tags: ['Tilesets'],
+  summary: 'Create a Tileset with an id from a mbtiles',
+  parameters: [
+    { $ref: '#/components/parameters/tileset' },
+  ],
+  responses: {
+    200: {
+      description: 'The tilejson describing the new tileset',
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            description: 'https://github.com/mapbox/tilejson-spec',
+            // properties: {
+            // },
+          },
+        },
+      },
     },
   },
 }
@@ -158,15 +203,25 @@ router.put('/:tileset', asyncWrap(async (req, res) => {
 
 //
 
-require('../api-docs').paths['/tilesets/{tileset}'] = {
-  patch: {
-    tags: ['Tilesets'],
-    parameters: [],
-    responses: {
-      // 200: {
-      //   description: 'List of all available TileJSONs',
-      //   content: { 'application/json': {} },
-      // },
+require('../api-docs').paths['/tilesets/{tileset}'].patch = {
+  tags: ['Tilesets'],
+  summary: 'Patch a Tileset with a mbtiles diff',
+  parameters: [
+    { $ref: '#/components/parameters/tileset' },
+  ],
+  responses: {
+    200: {
+      description: 'The tilejson describing the updated tileset',
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            description: 'https://github.com/mapbox/tilejson-spec',
+            // properties: {
+            // },
+          },
+        },
+      },
     },
   },
 }
@@ -187,20 +242,18 @@ router.patch('/:tileset', asyncWrap(async (req, res) => {
 
 //
 
-require('../api-docs').paths['/tilesets/{tileset}'] = {
-  delete: {
-    tags: ['Tilesets'],
-    parameters: [
-      { $ref: '#/components/parameters/tileset' },
-    ],
-    responses: {
-      200: {
-        description: 'The TileJSON of the corresponding tileset',
-        content: { 'application/json': {} },
-      },
-      404: {
-        description: 'The tileset does not exist',
-      },
+require('../api-docs').paths['/tilesets/{tileset}'].delete = {
+  tags: ['Tilesets'],
+  summary: 'Delete a Tileset',
+  parameters: [
+    { $ref: '#/components/parameters/tileset' },
+  ],
+  responses: {
+    204: {
+      content: { 'application/json': {} },
+    },
+    404: {
+      description: 'The tileset does not exist',
     },
   },
 }
