@@ -27,6 +27,7 @@ before('init axios', async () => {
     ax.interceptors.response.use(response => response, error => {
       if (!error.response) return Promise.reject(error)
       delete error.response.request
+      delete error.response.config.data
       return Promise.reject(error.response)
     })
     return ax
@@ -53,7 +54,7 @@ before('init axios', async () => {
 before('clean mongo', async () => {
   await global.app.db.collection('styles').deleteMany({})
   await global.app.db.collection('tilesets').deleteMany({})
-  await global.app.db.collection('import-mbtiles').deleteMany({})
+  await global.app.db.collection('task').deleteMany({})
   await global.app.db.collection('tiles').deleteMany({})
 })
 

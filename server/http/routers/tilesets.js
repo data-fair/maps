@@ -229,13 +229,23 @@ require('../api-docs').paths['/tilesets/{tileset}'].patch = {
 router.patch('/:tileset', asyncWrap(async (req, res) => {
   const filename = `./mbtiles/${nanoid()}.mbtiles`
   await fs.writeFile(filename, req.body)
+  const info = await (await asyncMBTiles(filename)).getInfo()
+  const $set = {}
+  if (info.format !== req.tilesetInfo.format) res.status(400).send('The tile format does not match the original tile format')
+  if (req.headersSent) return await fs.unlink(filename)
+
+  if (info.minzoom < req.tilesetInfo.minzoom) $set.minzoom = info.minzoom
+  if (info.maxzoom > req.tilesetInfo.maxzoom) $set.maxzoom = info.maxzoom
+
+  if (Object.keys($set).length) await req.app.get('db').collection('tilesets').updateOne({ _id: req.params.tileset }, { $set })
+
   await req.app.get('db').collection('task').insertOne({
     type: 'import-mbtiles',
     tileset: req.params.tileset,
     filename,
     status: 'pending',
   })
-  return res.send(req.tileset)
+  return res.send(req.tilesetInfo)
 }))
 
 //
