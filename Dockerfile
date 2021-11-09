@@ -21,4 +21,4 @@ COPY server server
 COPY scripts scripts
 
 
-CMD xvfb-run -s ":99" node server
+CMD xvfb-run -a node server
