@@ -11,9 +11,9 @@
         <v-btn text :to="{name:'tilesets'}">
           Tilesets
         </v-btn>
-        <v-btn text :to="{name:'render-demo'}">
+        <!-- <v-btn text :to="{name:'render-demo'}">
           Render-demo
-        </v-btn>
+        </v-btn> -->
       </v-app-bar>
       <events />
       <nuxt />

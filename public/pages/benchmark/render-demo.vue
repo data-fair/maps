@@ -5,19 +5,11 @@
       <v-card-title>
         Render demo
         <v-spacer />
-        <v-file-input
-          v-model="file"
-          counter
-          outlined
-          dense
-          show-size
-          :error="file===null"
-        />
-        <v-btn @click="$fetch">
-          Render
-        </v-btn>
-        <v-btn @click="items=[]">
+        <v-btn v-if="items.length" @click="items=[]">
           Reset
+        </v-btn>
+        <v-btn v-else @click="$fetch">
+          Render
         </v-btn>
       </v-card-title>
       <v-card-text>
@@ -43,33 +35,15 @@
 </template>
 
 <script>
+  import geoJsons from '~/assets/data-demo'
   import wkx from 'wkx'
   import { mapState } from 'vuex'
   export default {
     data: () => ({
       items: [],
-      file: undefined,
     }),
     async fetch() {
-      if (!this.file) return
-      const data = await new Promise((resolve, reject) => {
-        const reader = new FileReader()
-        reader.onload = () => {
-          try {
-            resolve(JSON.parse(reader.result).results)
-          } catch (error) {
-            reject(error)
-          }
-        }
-        reader.readAsText(this.file)
-      })
-      const sourcesList = data.filter(j => j.trackEvents && j.trackEvents.length).map((journey) => {
-        return {
-          type: 'MultiPoint',
-          coordinates: (journey.trackEvents || []).filter((e) => e.gps && e.gps.lon).map(e => [e.gps.lon, e.gps.lat]),
-        }
-      })
-      this.items = sourcesList.map((source) => {
+      this.items = geoJsons.map((source) => {
         return `${this.env.publicUrl}/api/render/openmaptiles-maptiler-basic/500x500.${['png', 'jpg', 'jpeg', 'webp'].at(Math.random() * 4)}?wkb=${wkx.Geometry.parseGeoJSON(source).toWkb().toString('base64').split('+').join('-').split('/').join('_')}&wkb-type=line&wkb-width=5`
       })
     },
