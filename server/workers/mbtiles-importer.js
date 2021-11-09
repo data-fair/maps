@@ -1,4 +1,6 @@
 const asyncSqlite = require('../utils/async-sqlite3')
+// const asyncMBTiles = require('../utils/async-MBTiles')
+
 const fs = require('fs/promises')
 const events = new (require('events').EventEmitter)()
 
@@ -19,13 +21,12 @@ const loop = async({ db }) => {
       const ts = importTask.tileset
       const filename = importTask.filename
 
+      // const info = await (await asyncMBTiles(filename)).getInfo()
       const sql = await asyncSqlite(filename)
       // eslint-disable-next-line no-unmodified-loop-condition
       while (!stopped) {
         const tiles = await sql.all(`SELECT * FROM tiles LIMIT ${batchSize} OFFSET ${skip}`)
-        if (!tiles.length) {
-          break
-        }
+        if (!tiles.length) break
         const insertedCount = (await Promise.all(tiles.map((tile) => (async() => {
           tile.tile_row = (1 << tile.zoom_level) - 1 - tile.tile_row
           const mongotile = {
@@ -46,7 +47,7 @@ const loop = async({ db }) => {
       else {
         await sql.close()
         await fs.unlink(filename)
-        await db.collection('task').updateOne({ _id: importTask._id, type: 'import-mbtiles', status: 'importing' }, { $set: { status: 'done' } })
+        await db.collection('task').deleteOne({ _id: importTask._id, type: 'import-mbtiles', status: 'importing' })
         events.emit(`imported:${ts}`)
       }
     } catch (error) {
@@ -58,7 +59,7 @@ const loop = async({ db }) => {
 
 const pool = []
 module.exports.start = async ({ db }) => {
-  for (let i = 0; i < 10; i++) pool.push(loop({ db }))
+  for (let i = 0; i < 4; i++) pool.push(loop({ db }))
   return { events }
 }
 
