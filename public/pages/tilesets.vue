@@ -21,11 +21,9 @@
           item-key="_id"
           :loading="$fetchState.pending"
           show-expand
-          :page.sync="page"
-          :items-per-page.sync="itemPerPage"
+          :options.sync="options"
           :server-items-length="itemCount"
           :footer-props="{'items-per-page-options':[5,10,20,50]}"
-          @pagination="$fetch"
         >
           <template #item.format_icon="{item}">
             <v-icon v-if="item.format==='jpg'" v-text="'mdi-image'" />
@@ -136,11 +134,10 @@
       importMbtiles,
     },
     data: () => ({
-      itemPerPage: 10,
+      options: {},
       itemCount: undefined,
-      page: 1,
       headers: [
-        { text: '', value: 'format_icon' },
+        { text: '', value: 'format_icon', sortable: false },
         { text: 'id', value: '_id' },
         { text: 'Name', value: 'name' },
         { text: 'Min Zoom', value: 'minzoom' },
@@ -153,15 +150,22 @@
       items: [],
     }),
     async fetch() {
-      const { results, count } = await this.$axios.$get(this.env.publicUrl + '/api/tilesets?size=' + this.itemPerPage + '&page=' + this.page)
+      await this.$nextTick()
+      const sort = ((this.options && this.options.sortBy && this.options.sortBy.length) ? `&sort=${this.options.sortBy.map((sort, index) => `${sort}:${this.options.sortDesc[index] ? -1 : 1}`)}` : '')
+      const { results, count } = await this.$axios.$get(`${this.env.publicUrl}/api/tilesets?size=${this.options.itemsPerPage}&page=${this.options.page}` + sort)
       this.items = results
       this.itemCount = count
     },
     computed: {
-      pageCount() {
-        return Math.ceil((this.itemCount || 0) / this.itemPerPage)
-      },
       ...mapState(['env']),
+    },
+    watch: {
+      options: {
+        handler () {
+          this.$fetch()
+        },
+        deep: true,
+      },
     },
     async mounted() {
       await this.$fetch()

@@ -56,11 +56,11 @@ require('../api-docs').paths['/tilesets'].get = {
   },
 }
 
-router.get('', require('../middlewares/pagination')(), asyncWrap(async (req, res) => {
+router.get('', require('../middlewares/pagination')(), require('../middlewares/sort')(), asyncWrap(async (req, res) => {
   const query = {}
   const [tilesets, count] = await Promise.all([
     req.pagination.size > 0
-      ? req.app.get('db').collection('tilesets').find(query).limit(req.pagination.size).skip(req.pagination.skip).toArray()
+      ? req.app.get('db').collection('tilesets').find(query).sort(req.sort).limit(req.pagination.size).skip(req.pagination.skip).toArray()
       : Promise.resolve([]),
     req.app.get('db').collection('tilesets').countDocuments(query),
   ])
