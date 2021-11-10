@@ -82,21 +82,19 @@
     },
     methods: {
       async importMBTiles() {
-        const reader = new FileReader()
-        reader.onload = async() => {
-          if (!this.saveId) {
-            await this.$axios.$post(this.env.publicUrl + '/api/tilesets', reader.result, { headers: { 'Content-type': 'application/octet-stream' } })
+        const formData = new FormData()
+        formData.append('tileset.mbtiles', this.file)
+        if (!this.saveId) {
+          await this.$axios.$post(this.env.publicUrl + '/api/tilesets', formData, { headers: 'multipart/form-data' })
+        } else {
+          if (this.newTileset) {
+            await this.$axios.$put(this.env.publicUrl + '/api/tilesets/' + this.saveId, formData, { headers: 'multipart/form-data' })
           } else {
-            if (this.newTileset) {
-              await this.$axios.$put(this.env.publicUrl + '/api/tilesets/' + this.saveId, reader.result, { headers: { 'Content-type': 'application/octet-stream' } })
-            } else {
-              await this.$axios.$patch(this.env.publicUrl + '/api/tilesets/' + this.saveId, reader.result, { headers: { 'Content-type': 'application/octet-stream' } })
-            }
+            await this.$axios.$patch(this.env.publicUrl + '/api/tilesets/' + this.saveId, formData, { headers: 'multipart/form-data' })
           }
-
-          this.$emit('change')
         }
-        reader.readAsArrayBuffer(this.file)
+
+        this.$emit('change')
       },
     },
   }
