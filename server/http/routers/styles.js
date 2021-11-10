@@ -4,6 +4,7 @@ const importZippedStyle = require('../../utils/import-zipped-style')
 const maplibreStyle = require('@maplibre/maplibre-gl-style-spec')
 const asyncWrap = require('../../utils/async-wrap')
 const multer = require('multer')
+const styleZip = multer().single('style.zip')
 
 const router = module.exports = require('express').Router()
 
@@ -65,7 +66,6 @@ require('../api-docs').paths['/styles'].post = {
   },
 }
 
-const styleZip = multer().single('style.zip')
 router.post('', asyncWrap(async (req, res) => {
   if (req.headers['content-type'] === 'application/json') {
     const errors = maplibreStyle.validate(req.body)
@@ -77,6 +77,7 @@ router.post('', asyncWrap(async (req, res) => {
   } else if (req.headers['content-type'].match('multipart/form-data')) {
     styleZip(req, res, async (err) => {
       if (err) return res.status(500).send(err.message)
+      console.log(req.file.originalname)
       res.send(await importZippedStyle(req.app.get('db'), req.file.buffer, nanoid(), req.body.tileset))
     })
   } else {

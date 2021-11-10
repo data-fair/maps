@@ -1,11 +1,13 @@
 const assert = require('assert')
 const eventToPromise = require('event-to-promise')
-const fs = require('fs/promises')
+const FormData = require('form-data')
+const fs = require('fs')
 
 describe('Tilesets', () => {
   it('Should import a tileset from a mbtiles', async () => {
-    const buffer = await fs.readFile('./test/resources/mbtiles/zoom0.mbtiles')
-    let tileset = (await global.ax.superadmin.post('/api/tilesets', buffer, { headers: { 'Content-type': 'application/octet-stream' } })).data
+    const formData = new FormData()
+    formData.append('tileset.mbtiles', fs.createReadStream('./test/resources/mbtiles/zoom0.mbtiles'))
+    let tileset = (await global.ax.superadmin.post('/api/tilesets', formData, { headers: formData.getHeaders() })).data
 
     assert.ok(tileset)
     assert.ok(tileset._id)
@@ -20,8 +22,9 @@ describe('Tilesets', () => {
   })
   it('Should import a tileset with _id as superAdmin from a mbtiles', async () => {
     const _id = 'test-put-tileset'
-    const buffer = await fs.readFile('./test/resources/mbtiles/zoom0.mbtiles')
-    let tileset = (await global.ax.superadmin.put('/api/tilesets/' + _id, buffer, { headers: { 'Content-type': 'application/octet-stream' } })).data
+    const formData = new FormData()
+    formData.append('tileset.mbtiles', fs.createReadStream('./test/resources/mbtiles/zoom0.mbtiles'))
+    let tileset = (await global.ax.superadmin.put('/api/tilesets/' + _id, formData, { headers: formData.getHeaders() })).data
 
     assert.ok(tileset)
     assert.ok(tileset._id)
@@ -35,10 +38,12 @@ describe('Tilesets', () => {
     assert.ok(tile)
   })
   it('Should patch tileset with mbtiles diff', async () => {
-    const zoom0 = await fs.readFile('./test/resources/mbtiles/zoom0.mbtiles')
-    const zoom1 = await fs.readFile('./test/resources/mbtiles/zoom1.mbtiles')
+    const formData0 = new FormData()
+    formData0.append('tileset.mbtiles', fs.createReadStream('./test/resources/mbtiles/zoom0.mbtiles'))
+    const formData1 = new FormData()
+    formData1.append('tileset.mbtiles', fs.createReadStream('./test/resources/mbtiles/zoom1.mbtiles'))
 
-    let tileset = (await global.ax.superadmin.post('/api/tilesets', zoom0, { headers: { 'Content-type': 'application/octet-stream' } })).data
+    let tileset = (await global.ax.superadmin.post('/api/tilesets', formData0, { headers: formData0.getHeaders() })).data
     await eventToPromise(global.app.workers.importMBTiles.events, `imported:${tileset._id}`)
     tileset = (await global.ax.superadmin.get(`/api/tilesets/${tileset._id}.json`)).data
     assert.equal(tileset.tileCount, 1)
@@ -47,7 +52,7 @@ describe('Tilesets', () => {
     assert.ok(await global.ax.superadmin.get(`/api/tilesets/${tileset._id}/tiles/0/0/0.pbf`))
     await assert.rejects(global.ax.superadmin.get(`/api/tilesets/${tileset._id}/tiles/1/0/0.pbf`))
 
-    await global.ax.superadmin.patch('/api/tilesets/' + tileset._id, zoom1, { headers: { 'Content-type': 'application/octet-stream' } })
+    await global.ax.superadmin.patch('/api/tilesets/' + tileset._id, formData1, { headers: formData1.getHeaders() })
     await eventToPromise(global.app.workers.importMBTiles.events, `imported:${tileset._id}`)
     tileset = (await global.ax.superadmin.get(`/api/tilesets/${tileset._id}.json`)).data
     assert.equal(tileset.tileCount, 3)
@@ -57,8 +62,9 @@ describe('Tilesets', () => {
     assert.ok(await global.ax.superadmin.get(`/api/tilesets/${tileset._id}/tiles/1/0/0.pbf`))
   })
   it('Should delete tileset and tiles', async () => {
-    const zoom0 = await fs.readFile('./test/resources/mbtiles/zoom0.mbtiles')
-    let tileset = (await global.ax.superadmin.post('/api/tilesets', zoom0, { headers: { 'Content-type': 'application/octet-stream' } })).data
+    const formData = new FormData()
+    formData.append('tileset.mbtiles', fs.createReadStream('./test/resources/mbtiles/zoom0.mbtiles'))
+    let tileset = (await global.ax.superadmin.post('/api/tilesets', formData, { headers: formData.getHeaders() })).data
     await eventToPromise(global.app.workers.importMBTiles.events, `imported:${tileset._id}`)
     tileset = (await global.ax.superadmin.get(`/api/tilesets/${tileset._id}.json`)).data
     assert.equal(tileset.tileCount, 1)

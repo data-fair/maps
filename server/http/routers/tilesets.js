@@ -2,6 +2,8 @@ const asyncMBTiles = require('../../utils/async-MBTiles')
 const fs = require('fs/promises')
 const { nanoid } = require('nanoid')
 const asyncWrap = require('../../utils/async-wrap')
+const multer = require('multer')
+const loadmbtiles = multer().single('tileset.mbtiles')
 
 const router = module.exports = require('express').Router()
 
@@ -97,10 +99,10 @@ require('../api-docs').paths['/tilesets'].post = {
   },
 }
 
-router.post('', asyncWrap(async (req, res) => {
+router.post('', loadmbtiles, asyncWrap(async (req, res) => {
   const _id = nanoid(10)
   const filename = `./mbtiles/${_id}.mbtiles`
-  await fs.writeFile(filename, req.body)
+  await fs.writeFile(filename, req.file.buffer)
   const MBTiles = await asyncMBTiles(filename)
   const info = await MBTiles.getInfo()
   delete info.basename
@@ -177,12 +179,12 @@ require('../api-docs').paths['/tilesets/{tileset}'].put = {
   },
 }
 
-router.put('/:tileset', asyncWrap(async (req, res) => {
+router.put('/:tileset', loadmbtiles, asyncWrap(async (req, res) => {
   const _id = req.params.tileset
   const tileset = await req.app.get('db').collection('tilesets').findOne({ _id })
   if (tileset) return res.status(400).send('This tileset already exist')
   const filename = `./mbtiles/${_id}.mbtiles`
-  await fs.writeFile(filename, req.body)
+  await fs.writeFile(filename, req.file.buffer)
   const MBTiles = await asyncMBTiles(filename)
   const info = await MBTiles.getInfo()
   delete info.basename
@@ -226,9 +228,9 @@ require('../api-docs').paths['/tilesets/{tileset}'].patch = {
   },
 }
 
-router.patch('/:tileset', asyncWrap(async (req, res) => {
+router.patch('/:tileset', loadmbtiles, asyncWrap(async (req, res) => {
   const filename = `./mbtiles/${nanoid()}.mbtiles`
-  await fs.writeFile(filename, req.body)
+  await fs.writeFile(filename, req.file.buffer)
   const info = await (await asyncMBTiles(filename)).getInfo()
   const $set = {}
   if (info.format !== req.tilesetInfo.format) res.status(400).send('The tile format does not match the original tile format')
