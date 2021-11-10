@@ -115,6 +115,7 @@ router.post('', loadmbtiles, asyncWrap(async (req, res) => {
     tileset: _id,
     filename,
     status: 'pending',
+    area: req.body.area || 'default-area',
   })
   return res.send(info)
 }))
@@ -197,6 +198,7 @@ router.put('/:tileset', loadmbtiles, asyncWrap(async (req, res) => {
     tileset: _id,
     filename,
     status: 'pending',
+    area: req.body.area || 'default-area',
   })
   return res.send(info)
 }))
@@ -246,6 +248,7 @@ router.patch('/:tileset', loadmbtiles, asyncWrap(async (req, res) => {
     tileset: req.params.tileset,
     filename,
     status: 'pending',
+    area: req.body.area || 'default-area',
   })
   return res.send(req.tilesetInfo)
 }))

@@ -1,8 +1,12 @@
-const asyncSqlite = require('../utils/async-sqlite3')
-// const asyncMBTiles = require('../utils/async-MBTiles')
+const asyncSqlite = require('../../utils/async-sqlite3')
+const asyncMBTiles = require('../../utils/async-MBTiles')
 
 const fs = require('fs/promises')
 const events = new (require('events').EventEmitter)()
+
+const defaultTiles = require('./default-tiles')
+const pbfTiles = require('./pbf-tiles')
+const { nanoid } = require('nanoid')
 
 const batchSize = 200
 const timeout = process.env.NODE_ENV === 'test' ? 100 : 5000
@@ -21,23 +25,18 @@ const loop = async({ db }) => {
       const ts = importTask.tileset
       const filename = importTask.filename
 
-      // const info = await (await asyncMBTiles(filename)).getInfo()
+      const info = await (await asyncMBTiles(filename)).getInfo()
+      let importTile = defaultTiles.importTile
+      if (info.format === 'pbf') {
+        importTile = pbfTiles.importTile
+      }
+
       const sql = await asyncSqlite(filename)
       // eslint-disable-next-line no-unmodified-loop-condition
       while (!stopped) {
         const tiles = await sql.all(`SELECT * FROM tiles LIMIT ${batchSize} OFFSET ${skip}`)
         if (!tiles.length) break
-        const insertedCount = (await Promise.all(tiles.map((tile) => (async() => {
-          tile.tile_row = (1 << tile.zoom_level) - 1 - tile.tile_row
-          const mongotile = {
-            ts,
-            z: tile.zoom_level,
-            y: tile.tile_row,
-            x: tile.tile_column,
-          }
-          const replaceOne = await db.collection('tiles').replaceOne(mongotile, { ...mongotile, d: tile.tile_data }, { upsert: true })
-          return 1 - replaceOne.matchedCount
-        })()))).reduce((a, b) => a + b)
+        const insertedCount = (await Promise.all(tiles.map((tile) => importTile(db, importTask, tile)))).reduce((a, b) => a + b)
 
         skip += batchSize
 
