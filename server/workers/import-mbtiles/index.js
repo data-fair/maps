@@ -6,7 +6,6 @@ const events = new (require('events').EventEmitter)()
 
 const defaultTiles = require('./default-tiles')
 const pbfTiles = require('./pbf-tiles')
-const { nanoid } = require('nanoid')
 
 const batchSize = 200
 const timeout = process.env.NODE_ENV === 'test' ? 100 : 5000
