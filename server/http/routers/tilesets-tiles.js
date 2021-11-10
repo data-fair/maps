@@ -1,5 +1,8 @@
+const { VectorTile } = require('@mapbox/vector-tile')
+const Protobuf = require('pbf')
 const tiletype = require('@mapbox/tiletype')
 const asyncWrap = require('../../utils/async-wrap')
+const zlib = require('zlib')
 
 const router = module.exports = require('express').Router({ mergeParams: true })
 
@@ -9,7 +12,6 @@ router.use(require('../params/tileset'))
 router.param('z', require('../params/xyz').z)
 router.param('x', require('../params/xyz').x)
 router.param('y', require('../params/xyz').y)
-router.param('tileFormat', require('../params/tile-format'))
 
 //
 
@@ -25,13 +27,19 @@ require('../api-docs').paths['/tilesets/{tileset}/tiles/{z}/{x}/{y}.{format}'] =
       { $ref: '#/components/parameters/z' },
       { $ref: '#/components/parameters/x' },
       { $ref: '#/components/parameters/y' },
-      { $ref: '#/components/parameters/tileFormat' },
+      {
+        name: 'format',
+        in: 'path',
+        description: 'format of the tile',
+        required: true,
+      },
     ],
     responses: {
       200: {
         description: 'The corresponding tile',
         content: {
           'application/x-protobuf': {},
+          'application/json': {},
           'image/jpg': {},
         },
       },
@@ -42,7 +50,38 @@ require('../api-docs').paths['/tilesets/{tileset}/tiles/{z}/{x}/{y}.{format}'] =
   },
 }
 
+router.get('/:z/:x/:y.geojson', asyncWrap(async (req, res) => {
+  if (req.tilesetInfo.format !== 'pbf') return res.status(400).send('Wrong format')
+  const query = {
+    ts: req.params.tileset,
+    x: req.params.x,
+    y: req.params.y,
+    z: req.params.z,
+  }
+
+  const tile = await req.app.get('db').collection('tiles').findOne(query)
+  if (!tile) { return res.sendStatus(404) }
+  const pbf = zlib.gunzipSync(tile.d.buffer)
+  const vectorTile = new VectorTile(new Protobuf(pbf))
+  const geojson = {
+    type: 'FeatureCollection',
+    features: [],
+  }
+  for (const layerName in vectorTile.layers) {
+    const layer = vectorTile.layers[layerName]
+    for (let i = 0; i < layer.length; i++) {
+      const feature = layer.feature(i)
+      const featureGeoJSON = feature.toGeoJSON(req.params.x, req.params.y, req.params.z)
+      featureGeoJSON.properties.layer = layerName
+      geojson.features.push(featureGeoJSON)
+    }
+  }
+  res.send(geojson)
+}))
+
 router.get('/:z/:x/:y.:tileFormat', asyncWrap(async (req, res) => {
+  if (req.tilesetInfo && req.params.tileFormat !== req.tilesetInfo.format) return res.status(400).send('Wrong tile format')
+
   const query = {
     ts: req.params.tileset,
     x: req.params.x,
