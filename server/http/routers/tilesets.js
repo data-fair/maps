@@ -270,6 +270,10 @@ require('../api-docs').paths['/tilesets/{tileset}'].delete = {
 
 router.delete('/:tileset', asyncWrap(async (req, res) => {
   await req.app.get('db').collection('tilesets').deleteOne({ _id: req.params.tileset })
-  await req.app.get('db').collection('tiles').deleteMany({ ts: req.params.tileset })
+  await req.app.get('db').collection('task').insertOne({
+    type: 'delete-tileset',
+    tileset: req.params.tileset,
+    status: 'pending',
+  })
   res.sendStatus(204)
 }))

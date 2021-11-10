@@ -11,7 +11,7 @@ describe('Tilesets', () => {
     assert.ok(tileset._id)
     assert.equal(tileset.tileCount, 0)
 
-    await eventToPromise(global.app.workers.mbtilesImporter.events, `imported:${tileset._id}`)
+    await eventToPromise(global.app.workers.importMBTiles.events, `imported:${tileset._id}`)
     tileset = (await global.ax.superadmin.get(`/api/tilesets/${tileset._id}.json`)).data
     assert.equal(tileset.tileCount, 1)
 
@@ -27,7 +27,7 @@ describe('Tilesets', () => {
     assert.ok(tileset._id)
     assert.equal(tileset.tileCount, 0)
 
-    await eventToPromise(global.app.workers.mbtilesImporter.events, `imported:${tileset._id}`)
+    await eventToPromise(global.app.workers.importMBTiles.events, `imported:${tileset._id}`)
     tileset = (await global.ax.superadmin.get(`/api/tilesets/${_id}.json`)).data
     assert.equal(tileset.tileCount, 1)
 
@@ -39,7 +39,7 @@ describe('Tilesets', () => {
     const zoom1 = await fs.readFile('./test/resources/mbtiles/zoom1.mbtiles')
 
     let tileset = (await global.ax.superadmin.post('/api/tilesets', zoom0, { headers: { 'Content-type': 'application/octet-stream' } })).data
-    await eventToPromise(global.app.workers.mbtilesImporter.events, `imported:${tileset._id}`)
+    await eventToPromise(global.app.workers.importMBTiles.events, `imported:${tileset._id}`)
     tileset = (await global.ax.superadmin.get(`/api/tilesets/${tileset._id}.json`)).data
     assert.equal(tileset.tileCount, 1)
     assert.equal(tileset.minzoom, 0)
@@ -48,7 +48,7 @@ describe('Tilesets', () => {
     await assert.rejects(global.ax.superadmin.get(`/api/tilesets/${tileset._id}/tiles/1/0/0.pbf`))
 
     await global.ax.superadmin.patch('/api/tilesets/' + tileset._id, zoom1, { headers: { 'Content-type': 'application/octet-stream' } })
-    await eventToPromise(global.app.workers.mbtilesImporter.events, `imported:${tileset._id}`)
+    await eventToPromise(global.app.workers.importMBTiles.events, `imported:${tileset._id}`)
     tileset = (await global.ax.superadmin.get(`/api/tilesets/${tileset._id}.json`)).data
     assert.equal(tileset.tileCount, 3)
     assert.equal(tileset.minzoom, 0)
@@ -59,13 +59,14 @@ describe('Tilesets', () => {
   it('Should delete tileset and tiles', async () => {
     const zoom0 = await fs.readFile('./test/resources/mbtiles/zoom0.mbtiles')
     let tileset = (await global.ax.superadmin.post('/api/tilesets', zoom0, { headers: { 'Content-type': 'application/octet-stream' } })).data
-    await eventToPromise(global.app.workers.mbtilesImporter.events, `imported:${tileset._id}`)
+    await eventToPromise(global.app.workers.importMBTiles.events, `imported:${tileset._id}`)
     tileset = (await global.ax.superadmin.get(`/api/tilesets/${tileset._id}.json`)).data
     assert.equal(tileset.tileCount, 1)
 
     await global.ax.superadmin.delete('/api/tilesets/' + tileset._id)
     await assert.rejects(global.ax.superadmin.get(`/api/tilesets/${tileset._id}.json`))
 
+    await eventToPromise(global.app.workers.deleteTileset.events, `deleted:${tileset._id}`)
     const tiles = await global.app.db.collection('tiles').find({ ts: tileset._id }).toArray()
     assert.equal(tiles.length, 0)
   })
