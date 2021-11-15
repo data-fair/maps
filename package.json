@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@koumoul/nuxt-config-inject": "^0.4.10",
-    "@koumoul/sd-express": "^1.0.0",
+    "@koumoul/sd-express": "^1.1.1",
     "@koumoul/sd-vue": "^1.2.1",
     "@mapbox/glyph-pbf-composite": "^0.0.3",
     "@mapbox/mbtiles": "^0.12.1",
