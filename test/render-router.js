@@ -40,11 +40,11 @@ describe('Render routes mapOptions', () => {
     const wkb = wkx.Geometry.parseGeoJSON(geojson).toWkb().toString('base64url')
     const promise = eventToPromise(global.app.renderer.events, 'render')
     await global.ax.superadmin.get('/api/render/' + style._id + '/200x200.png?wkb-type=line&wkb=' + wkb)
-    const { mapOptions, style: style2 } = await promise
+    const { mapOptions, context } = await promise
     assert.equal(mapOptions.center[0], 0.5)
     assert.equal(mapOptions.center[1], 0.5)
     assert.equal(mapOptions.zoom, 6.872601626926404)
-    assert.deepEqual(style2.sources.wkb.data, geojson)
+    assert.deepEqual(context.additionalSources.wkb.data, geojson)
   })
 
   it('Should get mapOptions from geojson in body', async () => {
@@ -62,11 +62,11 @@ describe('Render routes mapOptions', () => {
     }
     const promise = eventToPromise(global.app.renderer.events, 'render')
     await global.ax.superadmin.post('/api/render/' + style._id + '/200x200.png', body)
-    const { mapOptions, style: style2 } = await promise
+    const { mapOptions, context } = await promise
     assert.equal(mapOptions.center[0], 0.5)
     assert.equal(mapOptions.center[1], 0.5)
     assert.equal(mapOptions.zoom, 6.872601626926404)
-    assert.deepEqual(style2.sources.geojson, body.sources.geojson)
+    assert.deepEqual(context.additionalSources.geojson, body.sources.geojson)
   })
 
   it('Should get mapOptions from multiple geojson in body', async () => {
@@ -91,12 +91,12 @@ describe('Render routes mapOptions', () => {
     }
     const promise = eventToPromise(global.app.renderer.events, 'render')
     await global.ax.superadmin.post('/api/render/' + style._id + '/200x200.png', body)
-    const { mapOptions, style: style2 } = await promise
+    const { mapOptions, context } = await promise
     assert.equal(mapOptions.center[0], 1)
     assert.equal(mapOptions.center[1], 1)
     assert.equal(mapOptions.zoom, 5.8723818428626515)
-    assert.deepEqual(style2.sources.geojson, body.sources.geojson)
-    assert.deepEqual(style2.sources.geojson2, body.sources.geojson2)
+    assert.deepEqual(context.additionalSources.geojson, body.sources.geojson)
+    assert.deepEqual(context.additionalSources.geojson2, body.sources.geojson2)
   })
 
   it('Should respond with statusCode 400 if there is nothing to center on', async () => {

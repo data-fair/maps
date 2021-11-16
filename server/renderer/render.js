@@ -9,17 +9,28 @@ module.exports = (pool) => ({
   async render(style, mapOptions, imageProperties, context = {}) {
     const renderId = nanoid()
     const imageBuffer = await pool.use((resource) => new Promise((resolve, reject) => {
-      events.emit('render', { style, mapOptions, imageProperties, context })
-      debug('start render ', renderId)
-      resource.context = context
-      resource.map.load(style)
-      resource.map.render(mapOptions, (err, buffer) => {
-        delete resource.context
+      try {
+        events.emit('render', { style, mapOptions, imageProperties, context })
+        debug('start render ', renderId)
+        resource.context = context
+        if (!resource.oldStyle || resource.oldStyle !== style._id) resource.map.load(style)
+        // resource.oldStyle = style._id
 
-        debug('end render ', renderId)
-        if (err) reject(err)
-        else resolve(buffer)
-      })
+        for (const source in context.additionalSources || {}) resource.map.addSource(source, context.additionalSources[source])
+        for (const layer of (context.additionalLayers || []).flat()) resource.map.addLayer(layer)
+
+        resource.map.render(mapOptions, (err, buffer) => {
+          for (const source in context.additionalSources || {}) resource.map.removeSource(source)
+          for (const layer of (context.additionalLayers || []).flat()) resource.map.removeLayer(layer.id)
+          delete resource.context
+          debug('end render ', renderId)
+          if (err) reject(err)
+          else resolve(buffer)
+        })
+      } catch (error) {
+        console.log(error)
+        reject(error)
+      }
     }))
 
     const image = sharp(imageBuffer, {

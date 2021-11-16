@@ -127,7 +127,8 @@ async function getOrPost(req, res) {
   const additionalSources = {}
   const additionalLayers = []
   const imageProperties = {}
-  let style = req.style.style
+  const style = req.style.style
+  // style._id = req.style._id
   //
 
   // Image size
@@ -250,18 +251,13 @@ async function getOrPost(req, res) {
 
   //
 
-  // update style
-  if (Object.keys(additionalSources).length || additionalLayers.length) {
-    style = JSON.parse(JSON.stringify(req.style.style))
-    Object.assign(style.sources, additionalSources || {})
-    style.layers = style.layers.concat(additionalLayers.flat())
-  }
-
   try {
     const context = {
       cookie: req.headers.cookie,
       publicBaseUrl: req.publicBaseUrl,
       cachingSize: 0,
+      additionalSources,
+      additionalLayers,
     }
 
     if (req.style.sprite_png) context.spritePng = req.style.sprite_png.buffer
