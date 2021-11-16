@@ -4,10 +4,10 @@
       {{ title }}
       <v-spacer />
       <v-btn v-if="running" @click="avoidCache=undefined">
-        Reset
+        Stop
       </v-btn>
       <v-btn v-else @click="avoidCache=`&avoid-cache=${Math.random()}`,start()">
-        Render
+        Start
       </v-btn>
     </v-card-title>
     <v-card-text>
@@ -16,10 +16,10 @@
         <!--  -->
         </v-col>
         <v-col class="col-12 col-lg-6 col-xl-8" style="min-height:80vh;max-height:80vh;overflow:auto">
-          <v-row v-if="avoidCache">
+          <v-row class="flex-wrap-reverse">
             <v-col
               v-for="url in dataUrls"
-              :key="url"
+              :key="url.dataUrl"
               cols="6"
               md="4"
               lg="2"
@@ -27,10 +27,9 @@
             >
               <v-card>
                 <v-img
-                  :src="url"
-                  :aspect-ratio="1"
+                  :src="url.dataUrl"
                 >
-                  <!-- {{ url && url.length }} -->
+                  {{ url && url.time && (Math.round(url.time*1000)/1000 + 'ms') }}
                 </v-img>
               </v-card>
             </v-col>
