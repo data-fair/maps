@@ -17,7 +17,7 @@
     computed: {
       ...mapState(['env']),
       urls() {
-        return geoJsons.filter((v, i) => i < 1000).map((source) => {
+        return geoJsons.filter((v) => v.geometry.coordinates.length === 1).map((source) => {
           return `${this.env.publicUrl}/api/render/openmaptiles-maptiler-basic/500x500.png?wkb=${wkx.Geometry.parseGeoJSON(source.geometry).toWkb().toString('base64').split('+').join('-').split('/').join('_')}&wkb-type=line&wkb-width=5`
         })
       },

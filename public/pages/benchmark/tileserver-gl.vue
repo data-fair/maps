@@ -16,8 +16,8 @@
     computed: {
       ...mapState(['env']),
       urls() {
-        return geoJSONs.filter((v, i) => i < 1000).map((source) => {
-          return `https://staging-koumoul.com/s/tileserver/styles/osm-bright/static/auto/500x500.png?path=${source.geometry.coordinates.map((lonlat) => lonlat.join(',')).join('|')}&width=5`
+        return geoJSONs.filter((v) => v.geometry.coordinates.length === 1).map((source) => {
+          return `https://staging-koumoul.com/s/tileserver/styles/osm-bright/static/auto/500x500.png?path=${source.geometry.coordinates[0].map((lonlat) => lonlat.join(',')).join('|')}&width=5`
         })
       },
     },
