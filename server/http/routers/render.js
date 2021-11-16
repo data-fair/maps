@@ -98,8 +98,39 @@ require('../api-docs').paths['/render/{style}/{width}x{height}.{format}'] = {
       {
         name: 'wkb',
         in: 'query',
-        description: '',
+        description: 'A base64url encoded Wkb used draw additional data, must be used with "wkb-type"',
         required: false,
+        schema: {
+          type: 'string',
+          format: 'base64url',
+        },
+      },
+      {
+        name: 'wkb-type',
+        in: 'query',
+        description: 'Type of geometry to draw, one of "fill", "line" or "circle"',
+        required: false,
+        schema: {
+          type: 'string',
+        },
+      },
+      {
+        name: 'wkb-color',
+        in: 'query',
+        description: 'Color used to draw the geometry',
+        required: false,
+        schema: {
+          type: 'string',
+        },
+      },
+      {
+        name: 'wkb-width',
+        in: 'query',
+        description: 'Width used as circle-radius or line-width to draw the geometry',
+        required: false,
+        schema: {
+          type: 'number',
+        },
       },
     ],
     responses: {
@@ -192,7 +223,8 @@ async function getOrPost(req, res) {
     } catch (error) {
       return res.status(400).send('Query parameter "wkb" has to be a valid wkb')
     }
-    if (!['fill', 'line', 'symbol', 'circle'].includes(req.query['wkb-type'])) return res.status(400).send('Query parameter "wkb-type" is not a valid layer type, it should be one of "fill", "line", "symbol" or "circle"')
+
+    if (!['fill', 'line', /* 'symbol', */ 'circle'].includes(req.query['wkb-type'])) return res.status(400).send('Query parameter "wkb-type" is not a valid layer type, it should be one of "fill", "line", "symbol" or "circle"')
     const wkbLayer = {
       id: 'wkb-layer',
       source: 'wkb',
@@ -211,7 +243,7 @@ async function getOrPost(req, res) {
       wkbLayer.paint = {
         'line-color': req.query['wkb-color'] || '#000000',
         'line-opacity': 1,
-        'line-width': parseInt(req.query['wkb-width']) || 1,
+        'line-width': parseFloat(req.query['wkb-width']) || 1,
       }
     } else if (req.query['wkb-type'] === 'circle') {
       wkbLayer.paint = {
@@ -219,7 +251,7 @@ async function getOrPost(req, res) {
         'circle-color': req.query['wkb-color'] || '#000000',
         'circle-opacity': 0.5,
         'circle-stroke-opacity': 1,
-        'circle-radius': parseInt(req.query['wkb-width']) || 5,
+        'circle-radius': parseFloat(req.query['wkb-width']) || 5,
       }
     }
 
@@ -250,7 +282,6 @@ async function getOrPost(req, res) {
   //
 
   //
-
   try {
     const context = {
       cookie: req.headers.cookie,
