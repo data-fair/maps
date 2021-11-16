@@ -13,7 +13,7 @@ services:
       - 5680:8080
 
   sd:
-    image: koumoul/simple-directory:multi-domain
+    image: koumoul/simple-directory:master
     network_mode: host
     environment:
       - ADMINS=["superadmin@test.com","banchereau.tom@gmail.com","alban.mouton@koumoul.com"]
