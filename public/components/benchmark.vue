@@ -12,19 +12,22 @@
     </v-card-title>
     <v-card-text>
       <v-row>
-        <v-col class="col-12 col-lg-6 col-xl-3">
+        <v-col class="col-12 col-lg-6 col-xl-4">
         <!--  -->
         </v-col>
-        <v-col class="col-12 col-lg-6 col-xl-9">
+        <v-col class="col-12 col-lg-6 col-xl-8" style="min-height:80vh;max-height:80vh;overflow:auto">
           <v-row v-if="avoidCache">
             <v-col
               v-for="url in dataUrls"
               :key="url"
+              cols="6"
+              md="4"
+              lg="2"
+              xl="1"
             >
               <v-card>
                 <v-img
                   :src="url"
-                  width="40px"
                   :aspect-ratio="1"
                 >
                   <!-- {{ url && url.length }} -->
@@ -56,18 +59,28 @@
         const promises = []
         for (let index = 0; index < this.urls.length; index++) {
           if (!this.avoidCache) break
-          if (promises.length > 10) {
+          if (promises.length > 5) {
             const endedUrlIndex = await Promise.race(promises.map(v => v.promise))
             promises.splice(promises.findIndex(v => v.urlIndex === endedUrlIndex), 1)
           }
           promises.push({
             urlIndex: index,
             promise: (async() => {
+              let dataUrl
+              let error
+              const start = Date.now()
               try {
                 const buffer = await this.$axios.$get(this.urls[index] + this.avoidCache, { responseType: 'arraybuffer' })
-                const dataUrl = `data:image/png;charset=utf-8;base64,${Buffer.from(buffer).toString('base64')}`
-                this.dataUrls.push(dataUrl)
+                dataUrl = `data:image/png;charset=utf-8;base64,${Buffer.from(buffer).toString('base64')}`
+              } catch (e) {
+                error = e
               } finally {
+                this.dataUrls.push({
+                  dataUrl,
+                  originalUrl: this.urls[index] + this.avoidCache,
+                  error,
+                  time: Date.now() - start,
+                })
                 // eslint-disable-next-line no-unsafe-finally
                 return index
               }
