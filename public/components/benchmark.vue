@@ -13,13 +13,15 @@
     <v-card-text>
       <v-row>
         <v-col class="col-12 col-lg-6 col-xl-4">
-        <!--  -->
+          <v-card-text>
+            <span>Average milliseconds per render: {{ Math.round(dataUrls.filter(v=>!v.error).reduce((acc,v,index,array)=>acc+(v.time)/array.length,0)) }}ms</span>
+          </v-card-text>
         </v-col>
         <v-col class="col-12 col-lg-6 col-xl-8" style="min-height:80vh;max-height:80vh;overflow:auto">
           <v-row class="flex-wrap-reverse">
             <v-col
               v-for="url in dataUrls"
-              :key="url.dataUrl"
+              :key="url.originalUrl"
               cols="6"
               md="4"
               lg="2"
@@ -56,9 +58,9 @@
         this.running = true
         this.dataUrls = []
         const promises = []
-        for (let index = 0; index < this.urls.length; index++) {
+        for (let index = 0; index < Math.min(this.urls.length, 144); index++) {
           if (!this.avoidCache) break
-          if (promises.length > 5) {
+          if (promises.length > 4) {
             const endedUrlIndex = await Promise.race(promises.map(v => v.promise))
             promises.splice(promises.findIndex(v => v.urlIndex === endedUrlIndex), 1)
           }
@@ -67,10 +69,12 @@
             promise: (async() => {
               let dataUrl
               let error
-              const start = Date.now()
+              let time
               try {
+                const start = Date.now()
                 const buffer = await this.$axios.$get(this.urls[index] + this.avoidCache, { responseType: 'arraybuffer' })
                 dataUrl = `data:image/png;charset=utf-8;base64,${Buffer.from(buffer).toString('base64')}`
+                time = Date.now() - start
               } catch (e) {
                 error = e
               } finally {
@@ -78,7 +82,7 @@
                   dataUrl,
                   originalUrl: this.urls[index] + this.avoidCache,
                   error,
-                  time: Date.now() - start,
+                  time,
                 })
                 // eslint-disable-next-line no-unsafe-finally
                 return index
