@@ -5,4 +5,5 @@ module.exports = {
   publicUrl2: 'http://127.0.0.1:7401',
   noUI: true,
   prometheus: false,
+  fontsPath: './test/resources/fonts',
 }

@@ -7,6 +7,8 @@ module.exports = {
   mongoUrl: 'MONGO_URL',
   maplibrePool: 'MAPLIBRE_POOL',
   imageSizeLimit: 'IMAGE_SIZE_LIMIT',
+  prometheus: 'PROMETHEUS',
+  fontsPath: 'FONTS_PATH',
   theme: {
     dark: {
       __name: 'THEME_DARK',
