@@ -3,7 +3,7 @@ const config = require('config')
 const fs = require('fs')
 const FormData = require('form-data')
 
-describe('public-url', () => {
+describe('Multi-domain support', () => {
   it('Should replace public urls inside style.json for multi domain support', async () => {
     const publicUrlStyle = require('./resources/public-url-style')
     let _id
