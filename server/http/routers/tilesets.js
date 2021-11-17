@@ -148,7 +148,7 @@ require('../api-docs').paths['/tilesets/{tileset}.json'].get = {
 
 router.get('/:tileset.json', asyncWrap(async (req, res) => {
   req.tilesetInfo.tiles = [
-    `${req.publicBaseUrl}/api/tiles/${req.params.tileset}/{z}/{x}/{y}.${req.tilesetInfo.format}`,
+    `${req.publicBaseUrl}/api/tilesets/${req.params.tileset}/tiles/{z}/{x}/{y}.${req.tilesetInfo.format}`,
   ]
   res.send(req.tilesetInfo)
 }))
