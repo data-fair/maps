@@ -26,7 +26,7 @@ require('../api-docs').paths['/fonts'].get = {
 }
 
 router.get('', async (req, res) => {
-  res.send(fontsUtils.getFontsList())
+  res.send(await fontsUtils.getFontsList())
 })
 
 //
