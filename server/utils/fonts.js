@@ -1,6 +1,6 @@
 const { combine } = require('@mapbox/glyph-pbf-composite')
 const fs = require('fs/promises')
-module.exports = { getFonts }
+module.exports = { getFonts, getFontsList }
 
 async function getFonts(fontStack, range) {
   const fontList = fontStack.split(',')
@@ -9,5 +9,9 @@ async function getFonts(fontStack, range) {
 }
 
 async function getFont(font, range) {
-  return fs.readFile(`fonts/${font}/${range}.pbf`)
+  return await fs.readFile(`fonts/${font}/${range}.pbf`)
+}
+
+async function getFontsList() {
+  return await fs.readdir('./fonts')
 }
