@@ -73,8 +73,8 @@
               try {
                 const start = Date.now()
                 const buffer = await this.$axios.$get(this.urls[index] + this.avoidCache, { responseType: 'arraybuffer' })
-                dataUrl = `data:image/png;charset=utf-8;base64,${Buffer.from(buffer).toString('base64')}`
                 time = Date.now() - start
+                dataUrl = `data:image/png;charset=utf-8;base64,${Buffer.from(buffer).toString('base64')}`
               } catch (e) {
                 error = e
               } finally {

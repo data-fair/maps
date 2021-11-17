@@ -1,3 +1,34 @@
+<i18n lang="yaml">
+fr:
+  import-json: Importer un style depuis un fichier json
+  import-zip: Importer un style avec ses sprite depuis une archive zip
+
+  label-id: Identifiant du nouveau style
+  label-file-json: Ficher json
+  label-file-zip: Archive zip
+
+  warning: Etes-vous sur de vouloir remplacer ce style
+  warning-bold: Cette action est irréversible
+
+  button-cancel: Annuler
+  button-import: Importer
+  button-replace: Remplacer
+en:
+  import-json: Import a style from json file
+  import-zip: Import style and sprite from zipped files
+
+  label-id: Id of the new style
+  label-file-json: Json file
+  label-file-zip: Zipped files
+
+  warning: Are you sure you want to replace this style
+  warning-bold: This action cannot be undone
+
+  button-cancel: Cancel
+  button-import: Import
+  button-replace: Replace
+</i18n>
+
 <template>
   <v-dialog max-width="600">
     <template #activator="{on:dialog,attrs}">
@@ -18,42 +49,44 @@
             v-text="'mdi-folder-upload'"
           />
         </template>
-        <span v-if="format === 'json'" v-text="'Import Style from json file'" />
-        <span v-if="format === 'zip'" v-text="'Import Style and sprite from zipped files'" />
+        <span v-if="format === 'json'" v-text="$t('import-json')" />
+        <span v-if="format === 'zip'" v-text="$t('import-zip')" />
       </v-tooltip>
     </template>
     <template #default="dialog">
       <v-card>
-        <v-card-title v-if="format === 'json'" v-text="'Import Style from json file'" />
-        <v-card-title v-if="format === 'zip'" v-text="'Import Style and sprite from zipped files'" />
+        <v-card-title v-if="format === 'json'" v-text="$t('import-json')" />
+        <v-card-title v-if="format === 'zip'" v-text="$t('import-zip')" />
         <v-card-text>
           <v-form v-model="valid">
             <v-text-field
               v-if="adminMode && newStyle"
               v-model="id"
               :rules="[v=>(!!(v || '').match(/^[a-z0-9A-Z\-\_]*$/) || 'Invalid character')]"
-              label="Id of the new style"
+              :label="$t('label-id')"
             />
             <v-file-input
               v-model="file"
               :accept="format==='json'?'application/json':'.zip'"
-              :label="format==='json'?'Style json file':'Zipped files'"
               :rules="[v=>(!!v || 'File required')]"
               outlined
               dense
+              :label="format==='json'?$t('label-file-json'):$t('label-file-zip')"
             />
           </v-form>
-          <p v-if="!newStyle" v-text="'Are you sure you want to replace this existing style ?'" />
-          <p v-if="!newStyle" v-text="'This action cannot be undone'" />
+          <p v-if="!newStyle" v-text="$t('warning')" />
+          <p v-if="!newStyle" v-text="$t('warning-bold')" />
           <v-card-actions class="justify-end">
-            <v-btn color="error" @click="dialog.value=false">
-              Cancel
-            </v-btn>
+            <v-btn
+              color="error"
+              @click="dialog.value=false"
+              v-text="$t('button-cancel')"
+            />
             <v-btn
               :disabled="!valid"
               color="success"
               @click="dialog.value=false;importStyle()"
-              v-text="newStyle?(id ? 'Import / Replace' : 'Import'):'Replace'"
+              v-text="newStyle?(id ? `${$('button-import')} / ${$('button-replace')}` : $('button-import')):$('button-replace')"
             />
           </v-card-actions>
         </v-card-text>

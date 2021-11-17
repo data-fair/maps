@@ -1,7 +1,7 @@
 <i18n lang="yaml">
 fr:
   title: Supprimer
-  warning: Etes-vous sur de vouloir supprimer ce style
+  warning: Etes-vous sur de vouloir supprimer ce tileset
   warning-bold: Cette action est irréversible
   button-cancel: Annuler
   button-delete: Supprimer
@@ -41,7 +41,7 @@ en:
           />
           <v-btn
             color="error"
-            @click="dialog.value = false;deleteStyle()"
+            @click="dialog.value = false;deleteTileset()"
             v-text="$t('button-delete')"
           />
         </v-card-actions>
@@ -56,15 +56,15 @@ en:
 
   export default {
     props: {
-      value: { type: Object, default: () => ({}) },
+      value: { type: Object, required: true },
     },
     computed: {
       ...mapState(['env']),
     },
     methods: {
-      async deleteStyle() {
+      async deleteTileset() {
         try {
-          await this.$axios.$delete(`${this.env.publicUrl}/api/styles/${this.value._id}.json`)
+          await this.$axios.$delete(this.env.publicUrl + '/api/tilesets/' + this.value._id)
           this.$emit('change')
         } catch (error) {
           eventBus.$emit('error', error)

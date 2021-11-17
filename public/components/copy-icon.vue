@@ -10,7 +10,7 @@
         mdi-content-copy
       </v-icon>
     </template>
-    <span>Copy {{ label }} to clipboard</span>
+    <span v-text="label" />
   </v-tooltip>
 </template>
 

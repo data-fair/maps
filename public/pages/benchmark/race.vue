@@ -70,7 +70,7 @@
 </template>
 
 <script>
-  import geoJSONs from '~/assets/vannes.json'
+  import geoJSONs from '~/assets/data-demo.json'
   import wkx from 'wkx'
   import { mapState } from 'vuex'
 

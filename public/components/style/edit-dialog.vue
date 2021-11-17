@@ -1,3 +1,14 @@
+<i18n lang="yaml">
+fr:
+  edit-tooltip: Éditer ce style
+  button-cancel: Annuler
+  button-save: Sauvegarder
+en:
+  edit-tooltip: Edit this style
+  button-cancel: Cancel
+  button-save: Save
+</i18n>
+
 <template>
   <v-dialog
     transition="dialog-bottom-transition"
@@ -14,30 +25,24 @@
             v-text="'mdi-pencil'"
           />
         </template>
-        <span v-text="'Edit Style'" />
+        <span v-text="$t('edit-tooltip')" />
       </v-tooltip>
     </template>
     <template #default="dialog">
       <v-card>
-        <v-jsoneditor
-          v-model="jsonStyle"
-          :options="{
-            onValidate:validate
-          }"
-        >
-        <!--  -->
-        </v-jsoneditor>
+        <v-jsoneditor v-model="jsonStyle" :options="{ onValidate: validate }" />
         <v-card-actions class="justify-end">
-          <v-btn color="warning" @click="dialog.value=false">
-            Cancel
-          </v-btn>
+          <v-btn
+            color="warning"
+            @click="dialog.value=false"
+            v-text="$t('button-cancel')"
+          />
           <v-btn
             color="success"
             :disabled="!valid"
             @click="dialog.value=false;save()"
-          >
-            Save
-          </v-btn>
+            v-text="$t('button-save')"
+          />
         </v-card-actions>
       </v-card>
     </template>
@@ -51,7 +56,6 @@
 
   const maplibreStyle = require('@maplibre/maplibre-gl-style-spec')
   export default {
-
     components: {
       VJsoneditor,
     },

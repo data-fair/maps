@@ -1,8 +1,17 @@
+<i18n lang="yaml">
+fr:
+  title: Styles
+  copy-url-tooltip: Copier l'adresse du style
+en:
+  title: Styles
+  copy-url-tooltip: Copy style url to clipboard
+</i18n>
+
 <template>
   <v-container>
     <v-card :loading="$fetchState.pending">
       <v-card-title>
-        Styles
+        {{ $t('title') }}
         <v-spacer />
         <import-dialog
           v-if="isAdmin"
@@ -35,7 +44,7 @@
                 />
                 <v-spacer />
                 <v-card-actions class="justify-end">
-                  <copy-icon :value="`${env.publicUrl}/api/styles/${item._id}.json`" label="Style url" />
+                  <copy-icon :value="`${env.publicUrl}/api/styles/${item._id}.json`" :label="$t('copy-url-tooltip')" />
                   <import-dialog
                     v-if="isAdmin"
                     format="json"

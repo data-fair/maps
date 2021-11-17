@@ -44,5 +44,9 @@ module.exports = {
     cssUrl: null,
     cssText: '',
   },
+  i18n: {
+    locales: 'fr,en',
+    defaultLocale: 'fr',
+  },
   // darkModeSwitch: true,
 }

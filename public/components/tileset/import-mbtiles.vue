@@ -1,3 +1,32 @@
+<i18n lang="yaml">
+fr:
+  import-tileset: Importer un tileset depuis un fichier MBTiles
+  import-tiles: Importer des tuiles depuis un fichier MBTiles
+
+  title: Importer un fichier MBTiles
+
+  label-id: Identifiant du nouveau tileset
+  label-file: Ficher MBTiles
+  rule-file-required: Ficher requis
+  rule-invalid-character: Caractère invalide
+
+  button-cancel: Annuler
+  button-import: Importer
+en:
+  import-tileset: Import Tileset from MBTiles
+  import-tiles: Import tiles from MBTiles
+
+  title: Import MBTiles
+
+  label-id: Id of the new tileset
+  label-file: MBTiles file
+  rule-file-required: File required
+  rule-invalid-character: Invalid character
+
+  button-cancel: Cancel
+  button-import: Import
+</i18n>
+
 <template>
   <v-dialog max-width="600">
     <template #activator="{on:dialog,attrs}">
@@ -10,28 +39,26 @@
             v-text="newTileset?'mdi-plus':'mdi-upload'"
           />
         </template>
-        <span v-if="newTileset" v-text="'Import Tileset from MBTiles'" />
-        <span v-else v-text="'Import tiles from MBTiles'" />
+        <span v-if="newTileset" v-text="$t('import-tileset')" />
+        <span v-else v-text="$t('import-tiles')" />
       </v-tooltip>
     </template>
     <template #default="dialog">
       <v-card>
-        <v-card-title>
-          Import MBTiles
-        </v-card-title>
+        <v-card-title v-text="$('title')" />
         <v-card-text>
           <v-form v-model="valid">
             <v-text-field
               v-if="adminMode && newTileset"
               v-model="id"
-              :rules="[v=>(!!(v || '').match(/^[a-z0-9A-Z\-\_]*$/) || 'Invalid character')]"
-              label="Id of the new tileset"
+              :rules="[v=>(!!(v || '').match(/^[a-z0-9A-Z\-\_]*$/) || $t('rule-invalid-character'))]"
+              :label="$t('label-id')"
             />
             <v-file-input
               v-model="file"
               accept=".mbtiles"
-              label="MBTiles file to import"
-              :rules="[v=>(!!v || 'File required')]"
+              :label="$('label-file')"
+              :rules="[v=>(!!v || $t('rule-file-required'))]"
               outlined
               dense
               counter
@@ -39,16 +66,17 @@
             />
           </v-form>
           <v-card-actions>
-            <v-btn color="error" @click="dialog.value=false">
-              Cancel
-            </v-btn>
+            <v-btn
+              color="error"
+              @click="dialog.value=false"
+              v-text="$t('button-cancel')"
+            />
             <v-btn
               color="success"
               :disabled="!valid"
               @click="dialog.value=false;importMBTiles()"
-            >
-              Import
-            </v-btn>
+              v-text="$t('button-import')"
+            />
           </v-card-actions>
         </v-card-text>
       </v-card>

@@ -1,5 +1,6 @@
 const URL = require('url').URL
 // const i18n = require('./i18n')
+const fr = require('vuetify/es5/locale/fr').default
 const en = require('vuetify/es5/locale/en').default
 let config = require('config')
 config.basePath = new URL(config.publicUrl + '/').pathname
@@ -58,7 +59,20 @@ module.exports = {
     browserBaseURL: config.basePath,
     // baseURL: `http://localhost:${config.port}/`,
   },
-  buildModules: ['@nuxtjs/vuetify'], // , '@nuxtjs/svg'
+  buildModules: ['@nuxtjs/vuetify', ['@nuxtjs/i18n', {
+    seo: false,
+    locales: ['fr', 'en'],
+    defaultLocale: config.i18n.defaultLocale,
+    vueI18nLoader: true,
+    strategy: 'no_prefix',
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'i18n_lang',
+    },
+    vueI18n: {
+      fallbackLocale: config.i18n.defaultLocale,
+    },
+  }]], // , '@nuxtjs/svg'
   vuetify: {
     theme: {
       dark: config.theme.dark,
@@ -73,8 +87,8 @@ module.exports = {
       },
     },
     lang: {
-      locales: { en },
-      current: 'en',
+      locales: { fr, en },
+      current: config.i18n.defaultLocale,
     },
   },
   env: {

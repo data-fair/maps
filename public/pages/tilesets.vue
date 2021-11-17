@@ -1,20 +1,47 @@
+<i18n lang="yaml">
+fr:
+  title: Tilesets
+
+  tilesets-table-header-id: Identifiant
+  tilesets-table-header-name: Nom
+  tilesets-table-header-minzoom: Zoom minimum
+  tilesets-table-header-maxzoom: Zoom maximum
+  tilesets-table-header-tile-format: Format des tuiles
+  tilesets-table-header-tile-count: Nombre de tuile
+  tilesets-table-header-layer-count: Nombre de couche
+
+  layers-table-header-id: Identifiant
+  layers-table-header-description: Description
+  layers-table-header-fields: Champs
+
+en:
+  title: Tilesets
+
+  tilesets-table-header-id: Id
+  tilesets-table-header-name: Name
+  tilesets-table-header-minzoom: Min zoom
+  tilesets-table-header-maxzoom: Max zoom
+  tilesets-table-header-tile-format: Tile format
+  tilesets-table-header-tile-count: Tile count
+  tilesets-table-header-layer-count: Layer count
+
+  layers-table-header-id: Id
+  layers-table-header-description: Description
+  layers-table-header-fields: Fields
+</i18n>
+
 <template>
   <v-container>
     <v-card
       elevation="5"
     >
       <v-card-title>
-        Tilesets
+        {{ $t('title') }}
         <v-spacer />
         <v-icon @click="$fetch" v-text="'mdi-refresh'" />
         <import-mbtiles @change="$fetch" />
       </v-card-title>
-      <!-- <v-card-subtitle> -->
-      <!--  -->
-      <!-- </v-card-subtitle> -->
       <v-card-text>
-        <!-- pagination.sync="pagination" -->
-        <!-- hide-actions -->
         <v-data-table
           :headers="headers"
           :items="items"
@@ -29,29 +56,18 @@
             <v-icon v-if="item.format==='jpg'" v-text="'mdi-image'" />
             <v-icon v-if="item.format==='pbf'" v-text="'mdi-vector-square'" />
           </template>
-          <!-- show-expand -->
           <template #expanded-item="{ item }">
             <td :colspan="headers.length" class="pa-0">
-              <!-- More info about {{ item.name }} -->
               <v-simple-table tile dense>
                 <thead>
                   <tr>
-                    <th class="text-left">
-                      Id
-                    </th>
-                    <th class="text-left">
-                      Description
-                    </th>
-                    <th class="text-left">
-                      Fields
-                    </th>
+                    <th class="text-left" v-text="$t('layers-table-header-id')" />
+                    <th class="text-left" v-text="$t('layers-table-header-description')" />
+                    <th class="text-left" v-text="$t('layers-table-header-fields')" />
                   </tr>
                 </thead>
                 <tbody>
-                  <tr
-                    v-for="layer in item.vector_layers"
-                    :key="layer.id"
-                  >
+                  <tr v-for="layer in item.vector_layers" :key="layer.id">
                     <td>{{ layer.id }}</td>
                     <td>{{ layer.description }}</td>
                     <td>{{ layer.fields }}</td>
@@ -69,55 +85,7 @@
                 v-text="'mdi-layers-search'"
               />
               <import-mbtiles :value="item" @change="$fetch" />
-
-              <!-- <v-icon
-              small
-              class="mr-2"
-              @click="editItem(item)"
-            >
-              mdi-pencil
-            </v-icon> -->
-              <v-dialog
-                transition="dialog-bottom-transition"
-                max-width="600"
-              >
-                <template #activator="{ on }">
-                  <v-icon
-                    color="error"
-                    class="mx-1"
-                    v-on="on"
-                  >
-                    mdi-delete
-                  </v-icon>
-                </template>
-                <template #default="dialog">
-                  <v-card>
-                    <v-card-title>
-                      Delete {{ item.name }}
-                    </v-card-title>
-                    <v-card-text>
-                      <p>Are you sure you want to delete this tileset</p>
-                      <p class="font-weight-bold">
-                        This action cannot be undone
-                      </p>
-                    </v-card-text>
-                    <v-card-actions class="justify-end">
-                      <v-btn
-                        color="warning"
-                        @click="dialog.value = false"
-                      >
-                        Cancel
-                      </v-btn>
-                      <v-btn
-                        color="error"
-                        @click="dialog.value = false;deleteTileset(item)"
-                      >
-                        Delete
-                      </v-btn>
-                    </v-card-actions>
-                  </v-card>
-                </template>
-              </v-dialog>
+              <delete-tileset :value="item" @change="$fetch" />
             </v-row>
           </template>
         </v-data-table>
@@ -128,27 +96,31 @@
 
 <script>
   import importMbtiles from '~/components/tileset/import-mbtiles'
+  import deleteTileset from '~/components/tileset/delete-dialog'
   import { mapState } from 'vuex'
   export default {
     components: {
       importMbtiles,
+      deleteTileset,
     },
-    data: () => ({
-      options: {},
-      itemCount: undefined,
-      headers: [
-        { text: '', value: 'format_icon', sortable: false },
-        { text: 'id', value: '_id' },
-        { text: 'Name', value: 'name' },
-        { text: 'Min Zoom', value: 'minzoom' },
-        { text: 'Max Zoom', value: 'maxzoom' },
-        { text: 'Tile format', value: 'format' },
-        { text: 'Tile count', value: 'tileCount' },
-        { text: 'Vector layer count', value: 'vector_layers.length' },
-        { text: 'Actions', value: 'data-table-expand', sortable: false, width: '110px' },
-      ],
-      items: [],
-    }),
+    data () {
+      return {
+        options: {},
+        itemCount: undefined,
+        headers: [
+          { text: '', value: 'format_icon', sortable: false },
+          { text: this.$t('tilesets-table-header-id'), value: '_id' },
+          { text: this.$t('tilesets-table-header-name'), value: 'name' },
+          { text: this.$t('tilesets-table-header-minzoom'), value: 'minzoom' },
+          { text: this.$t('tilesets-table-header-maxzoom'), value: 'maxzoom' },
+          { text: this.$t('tilesets-table-header-tile-format'), value: 'format' },
+          { text: this.$t('tilesets-table-header-tile-count'), value: 'tileCount' },
+          { text: this.$t('tilesets-table-header-layer-count'), value: 'vector_layers.length' },
+          { text: '', value: 'data-table-expand', sortable: false, width: '110px' },
+        ],
+        items: [],
+      }
+    },
     async fetch() {
       await this.$nextTick()
       const sort = ((this.options && this.options.sortBy && this.options.sortBy.length) ? `&sort=${this.options.sortBy.map((sort, index) => `${sort}:${this.options.sortDesc[index] ? -1 : 1}`)}` : '')
@@ -169,12 +141,6 @@
     },
     async mounted() {
       await this.$fetch()
-    },
-    methods: {
-      async deleteTileset(item) {
-        await this.$axios.$delete(this.env.publicUrl + '/api/tilesets/' + item._id)
-        await this.$fetch()
-      },
     },
   }
 </script>
