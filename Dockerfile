@@ -6,6 +6,11 @@ RUN ln -s /maplibre-gl-native/lib /webapp/lib
 
 ENV NODE_ENV production
 
+RUN mkdir ./fonts &&\
+  wget -nv -O fonts.zip https://github.com/openmaptiles/fonts/releases/download/v2.0/v2.0.zip &&\
+  unzip -q fonts.zip -d ./fonts &&\
+  rm fonts.zip
+
 COPY package.json .
 COPY package-lock.json .
 
