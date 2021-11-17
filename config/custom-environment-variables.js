@@ -8,6 +8,7 @@ module.exports = {
   maplibrePool: 'MAPLIBRE_POOL',
   imageSizeLimit: 'IMAGE_SIZE_LIMIT',
   prometheus: 'PROMETHEUS',
+  exposePrometheus: 'EXPOSE_PROMETHEUS',
   fontsPath: 'FONTS_PATH',
   theme: {
     dark: {

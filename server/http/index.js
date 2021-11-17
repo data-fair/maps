@@ -2,7 +2,7 @@ const express = require('express')
 const eventToPromise = require('event-to-promise')
 const config = require('config')
 const sd = require('@koumoul/sd-express')({ directoryUrl: config.directoryUrl, privateDirectoryUrl: config.privateDirectoryUrl })
-
+const prometheus = require('../prometheus').client
 const app = express()
 const nuxt = require('./nuxt')
 
@@ -16,6 +16,12 @@ app.use(require('body-parser').raw({ type: 'application/octet-stream', limit: '1
 app.use(require('./middlewares/public-url'))
 app.use(sd.auth)
 // app.use()
+if (config.exposePrometheus) {
+  app.get('/metrics', async (req, res) => {
+    res.set('Content-Type', prometheus.register.contentType)
+    res.send(await prometheus.register.metrics())
+  })
+}
 
 app.use('/api/tilesets', require('./middlewares/super-admin-except-get'), require('./routers/tilesets'))
 

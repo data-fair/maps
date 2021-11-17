@@ -4,10 +4,11 @@ const client = require('prom-client')
 
 const app = express()
 const server = require('http').createServer(app)
-app.get('/metrics', (req, res) => {
+app.get('/metrics', async (req, res) => {
   res.set('Content-Type', client.register.contentType)
-  res.send(client.register.metrics())
+  res.send(await client.register.metrics())
 })
+exports.client = client
 exports.start = async () => {
   server.listen(9090)
   await eventToPromise(server, 'listening')
@@ -21,4 +22,10 @@ exports.stop = async () => {
 exports.maplibre_pool_size = new client.Gauge({
   name: 'maplibre_pool_size',
   help: 'Current size of the maplibre pool',
+})
+
+exports.maplibre_render_timer = new client.Histogram({
+  name: 'maplibre_render_timer',
+  help: 'Timers of maplibre render calls',
+  buckets: [0.1, 0.2, 0.3, 0.4, 0.5, 0.75, 1, 2, 4, 10, 30, 60],
 })

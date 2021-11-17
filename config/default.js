@@ -8,6 +8,7 @@ module.exports = {
   imageSizeLimit: 1000 * 1000,
   fontsPath: './fonts',
   prometheus: true,
+  exposePrometheus: true,
   // openapiViewerUrl: 'https://koumoul.com/openapi-viewer/',
   // info: {
   //   termsOfService: 'https://koumoul.com/platform/term-of-service',

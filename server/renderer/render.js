@@ -1,6 +1,7 @@
 const sharp = require('sharp')
 const debug = require('debug')('renderer:render')
 const { nanoid } = require('nanoid')
+const prometheus = require('../prometheus')
 
 const events = new (require('events').EventEmitter)()
 
@@ -11,6 +12,7 @@ module.exports = (pool) => ({
     const imageBuffer = await pool.use((resource) => new Promise((resolve, reject) => {
       try {
         events.emit('render', { style, mapOptions, imageProperties, context })
+        const end = prometheus.maplibre_render_timer.startTimer()
         debug('start render ', renderId)
         resource.context = context
         if (!resource.oldStyle || resource.oldStyle !== style._id) resource.map.load(style)
@@ -23,7 +25,9 @@ module.exports = (pool) => ({
           for (const source in context.additionalSources || {}) resource.map.removeSource(source)
           for (const layer of (context.additionalLayers || []).flat()) resource.map.removeLayer(layer.id)
           delete resource.context
+          end()
           debug('end render ', renderId)
+
           if (err) reject(err)
           else resolve(buffer)
         })
