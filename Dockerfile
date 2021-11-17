@@ -2,6 +2,8 @@ FROM ghcr.io/koumoul-dev/docker-maplibre-gl-native:master
 
 WORKDIR /webapp
 
+RUN apt-get -qq update && apt-get install -y --no-install-recommends wget 
+
 RUN ln -s /maplibre-gl-native/lib /webapp/lib
 
 ENV NODE_ENV production
