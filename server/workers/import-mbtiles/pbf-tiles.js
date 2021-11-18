@@ -83,7 +83,8 @@ module.exports = {
     } else {
       const newTile = prepareVectorTile(tile.tile_data, { area })
       const oldTile = prepareVectorTile(existingTile.d.buffer, { })
-      const d = mergeTiles(newTile, oldTile, area)
+      mergeTiles(newTile, oldTile, area)
+      const d = vectorTileAsPbfBuffer(newTile)
       await db.collection('tiles').replaceOne(mongoTileQuery, { ...mongoTileQuery, d }, { upsert: true })
       return 0
     }
