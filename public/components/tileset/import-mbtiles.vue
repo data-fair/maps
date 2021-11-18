@@ -6,6 +6,7 @@ fr:
   title: Importer un fichier MBTiles
 
   label-id: Identifiant du nouveau tileset
+  label-area: Zone
   label-file: Ficher MBTiles
   rule-file-required: Ficher requis
   rule-invalid-character: Caractère invalide
@@ -19,6 +20,7 @@ en:
   title: Import MBTiles
 
   label-id: Id of the new tileset
+  label-area: Area
   label-file: MBTiles file
   rule-file-required: File required
   rule-invalid-character: Invalid character
@@ -45,7 +47,7 @@ en:
     </template>
     <template #default="dialog">
       <v-card>
-        <v-card-title v-text="$('title')" />
+        <v-card-title v-text="$t('title')" />
         <v-card-text>
           <v-form v-model="valid">
             <v-text-field
@@ -54,10 +56,14 @@ en:
               :rules="[v=>(!!(v || '').match(/^[a-z0-9A-Z\-\_]*$/) || $t('rule-invalid-character'))]"
               :label="$t('label-id')"
             />
+            <v-text-field
+              v-model="area"
+              :label="$t('label-area')"
+            />
             <v-file-input
               v-model="file"
               accept=".mbtiles"
-              :label="$('label-file')"
+              :label="$t('label-file')"
               :rules="[v=>(!!v || $t('rule-file-required'))]"
               outlined
               dense
@@ -94,6 +100,7 @@ en:
       id: undefined,
       valid: false,
       file: undefined,
+      area: undefined,
     }),
     computed: {
       ...mapState(['env']),
@@ -112,6 +119,7 @@ en:
       async importMBTiles() {
         const formData = new FormData()
         formData.append('tileset.mbtiles', this.file)
+        formData.append('area', this.area)
         if (!this.saveId) {
           await this.$axios.$post(this.env.publicUrl + '/api/tilesets', formData, { headers: 'multipart/form-data' })
         } else {
