@@ -159,7 +159,7 @@ async function getOrPost(req, res) {
   const additionalLayers = []
   const imageProperties = {}
   const style = req.style.style
-  // style._id = req.style._id
+  style._id = req.style._id
   //
 
   // Image size

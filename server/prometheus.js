@@ -27,5 +27,6 @@ exports.maplibre_pool_size = new client.Gauge({
 exports.maplibre_render_timer = new client.Histogram({
   name: 'maplibre_render_timer',
   help: 'Timers of maplibre render calls',
+  labelNames: ['reuse'],
   buckets: [0.1, 0.2, 0.3, 0.4, 0.5, 0.75, 1, 2, 4, 10, 30, 60],
 })

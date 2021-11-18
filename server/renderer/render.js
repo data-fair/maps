@@ -12,19 +12,24 @@ module.exports = (pool) => ({
     const imageBuffer = await pool.use((resource) => new Promise((resolve, reject) => {
       try {
         events.emit('render', { style, mapOptions, imageProperties, context })
-        const end = prometheus.maplibre_render_timer.startTimer()
+        const reuseOldStyle = !!(resource.oldStyle && resource.oldStyle === style._id)
+        const end = prometheus.maplibre_render_timer.labels(reuseOldStyle).startTimer()
         debug('start render ', renderId)
+        // prometheus.maplibre_reuse_style.labels(reuseOldStyle).inc(1)
         resource.context = context
-        if (!resource.oldStyle || resource.oldStyle !== style._id) resource.map.load(style)
-        // resource.oldStyle = style._id
+        if (!reuseOldStyle) {
+          resource.map.load(style)
+          resource.oldStyle = style._id
+        }
 
         for (const source in context.additionalSources || {}) resource.map.addSource(source, context.additionalSources[source])
         for (const layer of (context.additionalLayers || []).flat()) resource.map.addLayer(layer)
 
         resource.map.render(mapOptions, (err, buffer) => {
-          for (const source in context.additionalSources || {}) resource.map.removeSource(source)
           for (const layer of (context.additionalLayers || []).flat()) resource.map.removeLayer(layer.id)
+          for (const source in context.additionalSources || {}) resource.map.removeSource(source)
           delete resource.context
+
           end()
           debug('end render ', renderId)
 
