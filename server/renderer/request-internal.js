@@ -49,9 +49,9 @@ module.exports = async (req, { db, context }) => {
       throw new Error('tile not found : ' + req.url)
     }
     if (format === 'pbf') {
-      return { data: zlib.unzipSync(tile.d.buffer) }
+      return { data: zlib.unzipSync(tile.d.buffer), expires: new Date(Date.now() + 10000) }
     } else {
-      return { data: tile.d.buffer }
+      return { data: tile.d.buffer, expires: new Date(Date.now() + 10000) }
     }
     // } else {
     //   const tile = await db.collection('tiles').findOne(query)
