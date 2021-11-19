@@ -241,7 +241,7 @@ router.patch('/:tileset', loadmbtiles, asyncWrap(async (req, res) => {
   if (info.minzoom < req.tilesetInfo.minzoom) $set.minzoom = info.minzoom
   if (info.maxzoom > req.tilesetInfo.maxzoom) $set.maxzoom = info.maxzoom
 
-  if (Object.keys($set).length) await req.app.get('db').collection('tilesets').updateOne({ _id: req.params.tileset }, { $set })
+  if (Object.keys($set).length) await req.app.get('db').collection('tilesets').updateOne({ _id: req.params.tileset }, { $set, $unset: { bounds: undefined } })
 
   await req.app.get('db').collection('task').insertOne({
     type: 'import-mbtiles',
