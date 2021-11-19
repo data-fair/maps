@@ -30,3 +30,10 @@ exports.maplibre_render_timer = new client.Histogram({
   labelNames: ['reuse'],
   buckets: [0.1, 0.2, 0.3, 0.4, 0.5, 0.75, 1, 2, 4, 10, 30, 60],
 })
+
+exports.maplibre_request_timer = new client.Histogram({
+  name: 'maplibre_request_timer',
+  help: 'Timers of maplibre requests',
+  labelNames: ['internal', 'kind'],
+  buckets: [0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5],
+})
