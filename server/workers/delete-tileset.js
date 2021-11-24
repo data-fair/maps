@@ -14,7 +14,6 @@ const loop = async({ db }) => {
     if (!deleteTask) continue
     try {
       const ts = deleteTask.tileset
-      // eslint-disable-next-line no-unmodified-loop-condition
       await db.collection('tiles').deleteMany({ ts })
       await db.collection('task').deleteOne({ _id: deleteTask._id, type: 'delete-tileset', status: 'working' })
       events.emit(`deleted:${ts}`)
