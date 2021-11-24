@@ -46,12 +46,12 @@ module.exports = async (req, { db, context }) => {
     const tile = await context.cache[`${z}/${x}/${y}`]
 
     if (!tile) {
-      throw new Error('tile not found : ' + req.url)
+      return { data: Buffer.from('') }
     }
     if (format === 'pbf') {
-      return { data: zlib.unzipSync(tile.d.buffer), expires: new Date(Date.now() + 10000) }
+      return { data: zlib.unzipSync(tile.d.buffer) }
     } else {
-      return { data: tile.d.buffer, expires: new Date(Date.now() + 10000) }
+      return { data: tile.d.buffer }
     }
     // } else {
     //   const tile = await db.collection('tiles').findOne(query)
@@ -62,7 +62,7 @@ module.exports = async (req, { db, context }) => {
   } else if (req.kind === resourceType.Glyphs) {
     if (!req.url.match('^maps://api/fonts/.*/\\d+\\-\\d+.pbf$')) throw new Error(req.url)
     const args = req.url.split('/')
-    const fontStack = decodeURI(args[4])
+    const fontStack = unescape(args[4])
     const range = args[5].split('.')[0]
     return { data: await getFonts(fontStack, range) }
 
