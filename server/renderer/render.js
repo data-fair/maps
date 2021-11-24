@@ -30,6 +30,7 @@ module.exports = (pool) => ({
           for (const source in context.additionalSources || {}) resource.map.removeSource(source)
           delete resource.context
 
+          resource.map.reduceMemoryUse()
           end()
           debug('end render ', renderId)
 
