@@ -2,20 +2,28 @@
 
 ## Development
 
-### Setup development environment
-Install maplibre-gl-native
+### Requirement
 
-    TODO
+-   Node 16
+-   Docker
 
-Install node dependencies:
+### Setup environment
+
+#### Install maplibre-gl-native
+
+    docker create --name maplibre-gl-native ghcr.io/koumoul-dev/docker-maplibre-gl-native:master &&\
+    docker cp maplibre-gl-native:/maplibre-gl-native/lib . &&\
+    docker rm maplibre-gl-native
+
+#### Install node dependencies:
 
     npm i
 
-Pull and start service dependencies
+#### Pull and start service dependencies
 
     docker-compose up -d
 
-Download openmaptiles styles
+#### Download openmaptiles styles
 
     node scripts/import-openmaptiles-style.js 
 
