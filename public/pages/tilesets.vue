@@ -10,10 +10,15 @@ fr:
   tilesets-table-header-tile-count: Nombre de tuile
   tilesets-table-header-layer-count: Nombre de couche
 
+  layers-table-title: Formats des couches
   layers-table-header-id: Identifiant
   layers-table-header-description: Description
   layers-table-header-fields: Champs
 
+  status-tooltip-error: Une erreur a eu lieu pendant l'importation
+  status-tooltip-pending: Une tache d'importation est en attente
+  status-tooltip-importing: Une tache d'importation est en cours
+  status-tooltip-done: Le tileset est à jour
 en:
   title: Tilesets
 
@@ -25,9 +30,15 @@ en:
   tilesets-table-header-tile-count: Tile count
   tilesets-table-header-layer-count: Layer count
 
+  layers-table-title: Layer formats
   layers-table-header-id: Id
   layers-table-header-description: Description
   layers-table-header-fields: Fields
+
+  status-tooltip-error: An error has occured
+  status-tooltip-pending: An import task is pending
+  status-tooltip-importing: An import task is running
+  status-tooltip-done: Tileset is up to date
 </i18n>
 
 <template>
@@ -48,6 +59,7 @@ en:
           item-key="_id"
           :loading="$fetchState.pending"
           show-expand
+          single-expand
           :options.sync="options"
           :server-items-length="itemCount"
           :footer-props="{'items-per-page-options':[5,10,20,50]}"
@@ -57,23 +69,33 @@ en:
             <v-icon v-if="item.format==='pbf'" v-text="'mdi-vector-square'" />
           </template>
           <template #expanded-item="{ item }">
-            <td :colspan="headers.length" class="pa-0">
-              <v-simple-table tile dense>
-                <thead>
-                  <tr>
-                    <th class="text-left" v-text="$t('layers-table-header-id')" />
-                    <th class="text-left" v-text="$t('layers-table-header-description')" />
-                    <th class="text-left" v-text="$t('layers-table-header-fields')" />
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="layer in item.vector_layers" :key="layer.id">
-                    <td>{{ layer.id }}</td>
-                    <td>{{ layer.description }}</td>
-                    <td>{{ layer.fields }}</td>
-                  </tr>
-                </tbody>
-              </v-simple-table>
+            <td :colspan="headers.length" class="pa-0 primary">
+              <v-card
+                v-if="expandmode==='layers'"
+                tile
+                class="mx-2"
+              >
+                <v-card-title v-text="$t('layers-table-title')" />
+                <v-simple-table
+                  dense
+                >
+                  <thead>
+                    <tr>
+                      <th class="text-left" v-text="$t('layers-table-header-id')" />
+                      <th class="text-left" v-text="$t('layers-table-header-description')" />
+                      <th class="text-left" v-text="$t('layers-table-header-fields')" />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="layer in item.vector_layers" :key="layer.id">
+                      <td>{{ layer.id }}</td>
+                      <td>{{ layer.description }}</td>
+                      <td>{{ layer.fields }}</td>
+                    </tr>
+                  </tbody>
+                </v-simple-table>
+              </v-card>
+              <history-table v-if="expandmode==='import'" :value="item._id" />
             </td>
           </template>
           <template #item.data-table-expand="{ expand, isExpanded, item }">
@@ -81,9 +103,31 @@ en:
               <v-icon
                 v-if="item.vector_layers"
                 class="mx-1"
-                @click="expand(!isExpanded)"
+                @click="expand(expandmode !== (expandmode='layers') || !isExpanded)"
                 v-text="'mdi-layers-search'"
               />
+              <v-tooltip v-if="item.lastImport && item.lastImport.status" bottom>
+                <template #activator="{ on }">
+                  <v-icon
+                    class="mx-1"
+                    :color="{
+                      'done': 'green',
+                      'error': 'error',
+                      'pending': 'blue',
+                      'importing': 'yellow darken-2',
+                    }[item.lastImport.status]"
+                    @click="expand(expandmode !== (expandmode='import') || !isExpanded)"
+                    v-on="on"
+                    v-text="{
+                      'done': 'mdi-checkbox-marked-circle',
+                      'error': 'mdi-close-circle',
+                      'pending': 'mdi-record-circle',
+                      'importing': 'mdi-swap-horizontal-circle',
+                    }[item.lastImport.status]"
+                  />
+                </template>
+                <span v-text="$t('status-tooltip-'+item.lastImport.status)" />
+              </v-tooltip>
               <import-mbtiles :value="item" @change="$fetch" />
               <delete-tileset :value="item" @change="$fetch" />
             </v-row>
@@ -97,14 +141,17 @@ en:
 <script>
   import importMbtiles from '~/components/tileset/import-mbtiles'
   import deleteTileset from '~/components/tileset/delete-dialog'
+  import historyTable from '~/components/tileset/history-table'
   import { mapState } from 'vuex'
   export default {
     components: {
       importMbtiles,
       deleteTileset,
+      historyTable,
     },
     data () {
       return {
+        expandmode: 'layers',
         options: {},
         itemCount: undefined,
         headers: [
@@ -116,7 +163,8 @@ en:
           { text: this.$t('tilesets-table-header-tile-format'), value: 'format' },
           { text: this.$t('tilesets-table-header-tile-count'), value: 'tileCount' },
           { text: this.$t('tilesets-table-header-layer-count'), value: 'vector_layers.length' },
-          { text: '', value: 'data-table-expand', sortable: false, width: '110px' },
+          { text: '', value: 'status' },
+          { text: '', value: 'data-table-expand', sortable: false, width: '150px' },
         ],
         items: [],
       }

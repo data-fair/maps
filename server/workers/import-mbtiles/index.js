@@ -15,9 +15,9 @@ let stopped = false
 const loop = async({ db }) => {
   // eslint-disable-next-line no-unmodified-loop-condition
   while (!stopped) {
-    let importTask = await db.collection('task').findOne({ type: 'import-mbtiles', status: 'pending' })
+    let importTask = await db.collection('import-tilesets').findOne({ status: 'pending' })
     if (!importTask) { await new Promise(resolve => setTimeout(resolve, timeout)); continue }
-    importTask = (await db.collection('task').findOneAndUpdate({ _id: importTask._id, type: 'import-mbtiles', status: 'pending' }, { $set: { status: 'importing' } }, { returnNewDocument: true })).value
+    importTask = (await db.collection('import-tilesets').findOneAndUpdate({ _id: importTask._id, status: 'pending' }, { $set: { status: 'importing' } }, { returnNewDocument: true })).value
     if (!importTask) continue
     try {
       let skip = importTask.tileImported || 0
@@ -37,20 +37,20 @@ const loop = async({ db }) => {
         if (!tiles.length) break
         const insertedCount = (await Promise.all(tiles.map((tile) => importTile(db, importTask, tile)))).reduce((a, b) => a + b)
 
-        skip += batchSize
+        skip += tiles.length
 
         await db.collection('tilesets').updateOne({ _id: ts }, { $inc: { tileCount: insertedCount } })
       }
-      if (stopped) await db.collection('task').updateOne({ _id: importTask._id, type: 'import-mbtiles', status: 'importing' }, { $set: { status: 'pending', tileImported: skip } })
+      if (stopped) await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'importing' }, { $set: { status: 'pending', tileImported: skip } })
       else {
         await sql.close()
         await fs.unlink(filename)
-        await db.collection('task').deleteOne({ _id: importTask._id, type: 'import-mbtiles', status: 'importing' })
+        await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'importing' }, { $set: { status: 'done', tileImported: skip } })
         events.emit(`imported:${ts}`)
       }
     } catch (error) {
       console.error(error)
-      await db.collection('task').updateOne({ _id: importTask._id, type: 'import-mbtiles', status: 'importing' }, { $set: { status: 'error', error } })
+      await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'importing' }, { $set: { status: 'error', error } })
     }
   }
 }
