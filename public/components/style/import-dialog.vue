@@ -86,7 +86,7 @@ en:
               :disabled="!valid"
               color="success"
               @click="dialog.value=false;importStyle()"
-              v-text="newStyle?(id ? `${$('button-import')} / ${$('button-replace')}` : $('button-import')):$('button-replace')"
+              v-text="newStyle?(id ? `${$t('button-import')} / ${$t('button-replace')}` : $t('button-import')):$t('button-replace')"
             />
           </v-card-actions>
         </v-card-text>
