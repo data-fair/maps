@@ -15,8 +15,8 @@
   const MaplibreInspect = require('maplibre-gl-inspect')
   export default {
     props: {
-      mapStyle: { type: Object, required: true },
-      inspect: { type: Boolean, default: false },
+      mapStyle: { type: [Object, String], required: true },
+      inspect: { type: String, default: undefined },
       height: { type: String, default: '300px' },
       width: { type: String, default: '300px' },
     },
@@ -28,14 +28,14 @@
         container: this.$refs.map,
         style: this.mapStyle,
       })
-      if (this.inspect) {
+      if (this.inspect !== undefined && this.inspect !== false) {
         this.map.addControl(new MaplibreInspect({
           popup: new maplibregl.Popup({
             closeButton: false,
             closeOnClick: false,
           }),
-          showInspectMap: true,
-          showInspectButton: false,
+          showInspectMap: this.inspect !== 'toggle',
+          showInspectButton: this.inspect === 'toggle',
         }))
       }
       await this.$nextTick()

@@ -45,6 +45,7 @@ en:
                 <v-spacer />
                 <v-card-actions class="justify-end">
                   <copy-icon :value="`${env.publicUrl}/api/styles/${item._id}.json`" :label="$t('copy-url-tooltip')" />
+                  <preview-dialog :value="item" />
                   <import-dialog
                     v-if="isAdmin"
                     format="json"
@@ -86,12 +87,13 @@ en:
 <script>
   import editDialog from '~/components/style/edit-dialog'
   import deleteDialog from '~/components/style/delete-dialog'
+  import previewDialog from '~/components/style/preview-dialog'
   import importDialog from '~/components/style/import-dialog'
 
   import { mapState } from 'vuex'
   export default {
     components: {
-      editDialog, deleteDialog, importDialog,
+      editDialog, deleteDialog, importDialog, previewDialog,
     },
     data: () => ({
       page: 1,
