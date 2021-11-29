@@ -1,5 +1,5 @@
 <template>
-  <page />
+  <page embed />
 </template>
 
 <script>
@@ -8,6 +8,7 @@
     components: {
       page,
     },
+    layout: 'embed',
   }
 </script>
 

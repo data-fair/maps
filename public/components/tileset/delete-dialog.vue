@@ -15,6 +15,7 @@ en:
 
 <template>
   <v-dialog
+    v-if="isAdmin"
     transition="dialog-bottom-transition"
     max-width="600"
   >
@@ -60,6 +61,10 @@ en:
     },
     computed: {
       ...mapState(['env']),
+      ...mapState(['session']),
+      isAdmin() {
+        return this.session && this.session.user && this.session.user.adminMode
+      },
     },
     methods: {
       async deleteTileset() {

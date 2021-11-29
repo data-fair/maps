@@ -30,7 +30,7 @@ en:
 </i18n>
 
 <template>
-  <v-dialog max-width="600">
+  <v-dialog v-if="adminMode" max-width="600">
     <template #activator="{on:dialog,attrs}">
       <v-tooltip bottom>
         <template #activator="{ on:tooltip }">

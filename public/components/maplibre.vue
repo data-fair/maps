@@ -1,7 +1,7 @@
 <template>
   <div
     ref="map"
-    style="flex-grow:1"
+    :style="`width:${width};height:${height}`"
     class="map"
   >
     <!--  -->
@@ -10,10 +10,15 @@
 
 <script>
   // import maplibregl from 'maplibre-gl'
+  require('maplibre-gl/dist/maplibre-gl.css')
   const maplibregl = require('maplibre-gl')
+  const MaplibreInspect = require('maplibre-gl-inspect')
   export default {
     props: {
-      mapStyle: { type: [String, Object], required: true },
+      mapStyle: { type: Object, required: true },
+      inspect: { type: Boolean, default: false },
+      height: { type: String, default: '300px' },
+      width: { type: String, default: '300px' },
     },
     data: () => ({
       map: undefined,
@@ -23,12 +28,27 @@
         container: this.$refs.map,
         style: this.mapStyle,
       })
+      if (this.inspect) {
+        this.map.addControl(new MaplibreInspect({
+          popup: new maplibregl.Popup({
+            closeButton: false,
+            closeOnClick: false,
+          }),
+          showInspectMap: true,
+          showInspectButton: false,
+        }))
+      }
+      await this.$nextTick()
+      this.map.resize()
+    },
+    async destroy() {
+      this.map.stop()
     },
   }
 </script>
 
 <style>
 
-/* .map { position: absolute; top: 0; bottom: 0; width: 100%; } */
+.map { display: absolute; }
 
 </style>

@@ -1,6 +1,18 @@
 <template>
   <div>
-    <!-- <maplibre :map-style="`${env.publicUrl}/api/styles/default.json`" /> -->
+    <!-- <maplibre
+      :map-style="{
+        version:8,
+        sources:{
+          tileset:{
+            type:'vector',
+            url:env.publicUrl+'/api/tilesets/openmaptiles.json'
+          }
+        },
+        layers:[]
+      }"
+      inspect
+    /> -->
   </div>
 </template>
 
@@ -21,5 +33,5 @@
 </script>
 
 <style>
-body { margin: 0; padding: 0; }
+
 </style>
