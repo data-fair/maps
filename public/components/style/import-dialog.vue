@@ -69,46 +69,47 @@ en:
         <v-card-title>
           {{ $t('card-title') }}
           <v-spacer />
-          <v-file-input
-            v-model="zip"
-            accept=".zip"
-            class="col-6"
-            outlined
-            dense
-            :label="$t('label-zip')"
-            @change="atZipInput"
-          />
+          <v-col cols="6">
+            <v-file-input
+              v-model="zip"
+              accept=".zip"
+              outlined
+              dense
+              :label="$t('label-zip')"
+              @change="atZipInput"
+            />
+          </v-col>
         </v-card-title>
         <v-divider class="mb-4" />
         <v-card-text>
           <v-form>
             <v-row class="ma-0">
-              <v-file-input
-                v-if="!styleJsonZipped"
-                v-model="styleJsonFile"
-                accept=".json"
-                class="col-5"
-                outlined
-                dense
-                :label="$t('label-style-json')"
-                @change="atStyleInput"
-              />
+              <v-col v-if="!styleJsonZipped" cols="5">
+                <v-file-input
+                  v-model="styleJsonFile"
+                  accept=".json"
+                  outlined
+                  dense
+                  :label="$t('label-style-json')"
+                  @change="atStyleInput"
+                />
+              </v-col>
               <span
                 v-if="zip && !styleJsonFile && !styleJsonZipped"
                 class="col-2 text-center"
                 v-text="$t('label-or')"
               />
-              <v-select
-                v-if="zip && !styleJsonFile"
-                v-model="styleJsonZipped"
-                :items="zippedJsonFiles"
-                outlined
-                dense
-                clearable
-                class="col-5"
-                :label="$t('label-style-json-zipped')"
-                @change="atStyleInput"
-              />
+              <v-col v-if="zip && !styleJsonFile" cols="5">
+                <v-select
+                  v-model="styleJsonZipped"
+                  :items="zippedJsonFiles"
+                  outlined
+                  dense
+                  clearable
+                  :label="$t('label-style-json-zipped')"
+                  @change="atStyleInput"
+                />
+              </v-col>
             </v-row>
             <template v-if="styleJson && styleJson.sources && Object.keys(styleJson.sources).length">
               <h4 v-text="$t('data-sources')" />
@@ -123,54 +124,54 @@ en:
             </template>
             <template v-if="styleJson && styleJson.sprite">
               <v-row class="ma-0">
-                <v-file-input
-                  v-if="!spriteJsonZipped"
-                  v-model="spriteJsonFile"
-                  accept=".json"
-                  class="col-5"
-                  outlined
-                  dense
-                  :label="$t('label-sprite-json')"
-                />
+                <v-col v-if="!spriteJsonZipped" cols="5">
+                  <v-file-input
+                    v-model="spriteJsonFile"
+                    accept=".json"
+                    outlined
+                    dense
+                    :label="$t('label-sprite-json')"
+                  />
+                </v-col>
                 <span
                   v-if="zip && !spriteJsonFile && !spriteJsonZipped"
                   class="col-2 text-center"
                   v-text="$t('label-or')"
                 />
-                <v-select
-                  v-if="zip && !spriteJsonFile"
-                  v-model="spriteJsonZipped"
-                  :items="zippedJsonFiles"
-                  outlined
-                  dense
-                  class="col-5"
-                  :label="$t('label-sprite-json-zipped')"
-                />
+                <v-col v-if="zip && !spriteJsonFile" cols="5">
+                  <v-select
+                    v-model="spriteJsonZipped"
+                    :items="zippedJsonFiles"
+                    outlined
+                    dense
+                    :label="$t('label-sprite-json-zipped')"
+                  />
+                </v-col>
               </v-row>
               <v-row class="ma-0">
-                <v-file-input
-                  v-if="!spritePngZipped"
-                  v-model="spritePngFile"
-                  accept=".png"
-                  class="col-5"
-                  outlined
-                  dense
-                  :label="$t('label-sprite-png')"
-                />
+                <v-col v-if="!spritePngZipped" cols="5">
+                  <v-file-input
+                    v-model="spritePngFile"
+                    accept=".png"
+                    outlined
+                    dense
+                    :label="$t('label-sprite-png')"
+                  />
+                </v-col>
                 <span
                   v-if="zip && !spritePngFile && !spritePngZipped"
                   class="col-2 text-center"
                   v-text="$t('label-or')"
                 />
-                <v-select
-                  v-if="zip && !spritePngFile"
-                  v-model="spritePngZipped"
-                  :items="zippedPngFiles"
-                  outlined
-                  dense
-                  class="col-5"
-                  :label="$t('label-sprite-png-zipped')"
-                />
+                <v-col v-if="zip && !spritePngFile" cols="5">
+                  <v-select
+                    v-model="spritePngZipped"
+                    :items="zippedPngFiles"
+                    outlined
+                    dense
+                    :label="$t('label-sprite-png-zipped')"
+                  />
+                </v-col>
               </v-row>
             </template>
           </v-form>
