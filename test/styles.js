@@ -35,7 +35,7 @@ describe('Styles', () => {
     }
   })
 
-  it('Should import zipped open-map-tile style with sprite', async () => {
+  it.skip('Should import zipped openmaptiles style with sprite', async () => {
     const formData = new FormData()
     formData.append('style.zip', fs.createReadStream('./test/resources/styles/openmaptiles-maptiler-basic.zip'))
     formData.append('tileset', 'openmaptiles-world')
