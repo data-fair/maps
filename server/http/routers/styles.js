@@ -1,10 +1,9 @@
 const { escapePublicUrl, injectPublicUrl } = require('../../utils/style')
 const { nanoid } = require('nanoid')
-const importZippedStyle = require('../../utils/import-zipped-style')
 const maplibreStyle = require('@maplibre/maplibre-gl-style-spec')
 const asyncWrap = require('../../utils/async-wrap')
 const multer = require('multer')
-const styleZip = multer().single('style.zip')
+const upload = multer().fields([{ name: 'style.json', maxCount: 1 }, { name: 'sprite.json', maxCount: 1 }, { name: 'sprite.png', maxCount: 1 }])
 
 const router = module.exports = require('express').Router()
 
@@ -65,21 +64,30 @@ require('../api-docs').paths['/styles'].post = {
     },
   },
 }
+router.post('', upload, asyncWrap(async (req, res) => {
+  const _id = nanoid()
 
-router.post('', asyncWrap(async (req, res) => {
   if (req.headers['content-type'] === 'application/json') {
     const errors = maplibreStyle.validate(req.body)
     if (errors.length) { return res.status(400).send(errors) }
     const style = escapePublicUrl(req.body, req.publicBaseUrl)
-    const _id = nanoid()
     await req.app.get('db').collection('styles').insertOne({ _id, style })
     res.send(injectPublicUrl({ style, _id }, req.publicBaseUrl))
   } else if (req.headers['content-type'].match('multipart/form-data')) {
-    styleZip(req, res, async (err) => {
-      if (err) return res.status(500).send(err.message)
-      console.log(req.file.originalname)
-      res.send(await importZippedStyle(req.app.get('db'), req.file.buffer, nanoid(), req.body.tileset))
-    })
+    const mongoDocument = { _id }
+    if (!req.files['style.json']) return res.status(400).send('A style.json file should be present in the body')
+    mongoDocument.style = escapePublicUrl(JSON.parse(req.files['style.json'][0].buffer.toString()), req.publicBaseUrl)
+    mongoDocument.style.glyphs = 'maps://api/fonts/{fontstack}/{range}.pbf'
+    const errors = maplibreStyle.validate(mongoDocument.style)
+    if (errors.length) { return res.status(400).send(errors) }
+    if (!!req.files['sprite.json'] !== !!req.files['sprite.png']) return res.status(400).send('sprite.json and sprite.png should always be sent together')
+    if (req.files['sprite.json']) {
+      mongoDocument.style.sprite = 'maps://api/styles/' + _id + '/sprite'
+      mongoDocument.sprite_json = JSON.parse(req.files['sprite.json'][0].buffer.toString())
+      mongoDocument.sprite_png = req.files['sprite.png'][0].buffer
+    }
+    await req.app.get('db').collection('styles').insertOne(mongoDocument)
+    res.send(injectPublicUrl({ style: mongoDocument.style, _id }, req.publicBaseUrl))
   } else {
     res.status(400).send('Content-type ' + req.headers['content-type'] + 'not supported')
   }
@@ -168,12 +176,26 @@ require('../api-docs').paths['/styles/{style}'] = {
   },
 }
 
-router.put('/:style', asyncWrap(async (req, res) => {
+router.put('/:style', upload, asyncWrap(async (req, res) => {
   if (req.headers['content-type'].match('multipart/form-data')) {
-    styleZip(req, res, async (err) => {
-      if (err) return res.status(500).send(err.message)
-      res.send(await importZippedStyle(req.app.get('db'), req.file.buffer, req.params.style, req.body.tileset))
-    })
+    // styleZip(req, res, async (err) => {
+    //   if (err) return res.status(500).send(err.message)
+    //   res.send(await importZippedStyle(req.app.get('db'), req.file.buffer, req.params.style, req.body.tileset))
+    // })
+    const mongoDocument = { _id: req.params.style }
+    if (!req.files['style.json']) return res.status(400).send('A style.json file should be present in the body')
+    mongoDocument.style = escapePublicUrl(JSON.parse(req.files['style.json'][0].buffer.toString()), req.publicBaseUrl)
+    mongoDocument.style.glyphs = 'maps://api/fonts/{fontstack}/{range}.pbf'
+    const errors = maplibreStyle.validate(mongoDocument.style)
+    if (errors.length) { return res.status(400).send(errors) }
+    if (!!req.files['sprite.json'] !== !!req.files['sprite.png']) return res.status(400).send('sprite.json and sprite.png should always be sent together')
+    if (req.files['sprite.json']) {
+      mongoDocument.style.sprite = 'maps://api/styles/' + req.params.style + '/sprite'
+      mongoDocument.sprite_json = JSON.parse(req.files['sprite.json'][0].buffer.toString())
+      mongoDocument.sprite_png = req.files['sprite.png'][0].buffer
+    }
+    await req.app.get('db').collection('styles').replaceOne({ _id: req.params.style }, mongoDocument, { upsert: true })
+    res.send(injectPublicUrl({ style: mongoDocument.style, _id: req.params.style }, req.publicBaseUrl))
   } else {
     res.status(400).send('Content-type ' + req.headers['content-type'] + 'not supported')
   }

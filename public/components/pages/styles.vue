@@ -15,12 +15,6 @@ en:
         <v-spacer />
         <import-dialog
           v-if="isAdmin"
-          format="json"
-          @change="$fetch"
-        />
-        <import-dialog
-          v-if="isAdmin"
-          format="zip"
           @change="$fetch"
         />
       </v-card-title>
@@ -48,13 +42,6 @@ en:
                   <preview-dialog :value="item" />
                   <import-dialog
                     v-if="isAdmin"
-                    format="json"
-                    :value="item"
-                    @change="$fetch"
-                  />
-                  <import-dialog
-                    v-if="isAdmin"
-                    format="zip"
                     :value="item"
                     @change="$fetch"
                   />
