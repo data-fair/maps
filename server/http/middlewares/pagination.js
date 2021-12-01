@@ -2,17 +2,20 @@
 require('../api-docs').components.parameters.size = {
   name: 'size',
   in: 'query',
-  // description: 'size',
+  description: 'Number of resources requested',
+  schema: { type: 'number' },
 }
 require('../api-docs').components.parameters.skip = {
   name: 'skip',
   in: 'query',
-  // description: 'size',
+  description: 'Number of resources skipped',
+  schema: { type: 'number' },
 }
 require('../api-docs').components.parameters.page = {
   name: 'page',
   in: 'query',
-  // description: 'size',
+  description: 'Page number, page sizes are specified with the "size" query parameter',
+  schema: { type: 'number' },
 }
 module.exports = (defaultSize = 10) => (req, res, next) => {
   req.pagination = { skip: 0, size: defaultSize }

@@ -2,7 +2,11 @@
 require('../api-docs').components.parameters.sort = {
   name: 'sort',
   in: 'query',
-  // description: 'sort',
+  description: 'Sorting field and direction',
+  example: 'field_name:1',
+  schema: {
+    type: 'string',
+  },
 }
 module.exports = (defaultSort) => (req, res, next) => {
   req.sort = defaultSort || {}
