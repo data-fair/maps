@@ -58,10 +58,12 @@ require('../api-docs').paths['/fonts/{fontStack}/{range}.pbf'].get = {
   ],
   responses: {
     200: {
-      description: '',
+      description: 'Requested fonts combined',
       content: { 'application/x-protobuf': {} },
     },
-    404: {},
+    404: {
+      description: 'One of the requested fonts does not exist',
+    },
   },
 }
 

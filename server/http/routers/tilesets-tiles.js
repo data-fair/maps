@@ -32,6 +32,10 @@ require('../api-docs').paths['/tilesets/{tileset}/tiles/{z}/{x}/{y}.{format}'] =
         in: 'path',
         description: 'format of the tile',
         required: true,
+        schema: {
+          type: 'string',
+          enum: ['jpg', 'pbf', 'geojson'],
+        },
       },
     ],
     responses: {

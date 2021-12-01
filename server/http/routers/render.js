@@ -93,6 +93,9 @@ require('../api-docs').paths['/render/{style}/{width}x{height}.{format}'] = {
         in: 'query',
         description: 'Bbox to center on, incompatible with "lon" or "lat"',
         required: false,
+        schema: {
+          type: 'string',
+        },
       },
       //
       {
