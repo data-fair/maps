@@ -4,6 +4,7 @@ require('../api-docs').components.parameters.x = {
   in: 'path',
   description: 'x coordinate of the tile',
   required: true,
+  schema: { type: 'number' },
 }
 
 module.exports.x = asyncWrap(async (req, res, next) => {
@@ -17,6 +18,7 @@ require('../api-docs').components.parameters.y = {
   in: 'path',
   description: 'y coordinate of the tile',
   required: true,
+  schema: { type: 'number' },
 }
 
 module.exports.y = asyncWrap(async (req, res, next) => {
@@ -30,6 +32,7 @@ require('../api-docs').components.parameters.z = {
   in: 'path',
   description: 'z coordinate of the tile',
   required: true,
+  schema: { type: 'number' },
 }
 
 module.exports.z = asyncWrap(async (req, res, next) => {

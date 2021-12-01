@@ -5,6 +5,9 @@ require('../api-docs').components.parameters.style = {
   in: 'path',
   description: 'id of the style',
   required: true,
+  schema: {
+    type: 'string',
+  },
 }
 
 let getCachedStyle

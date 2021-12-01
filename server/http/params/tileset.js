@@ -5,6 +5,7 @@ require('../api-docs').components.parameters.tileset = {
   in: 'path',
   description: 'id of the tileset',
   required: true,
+  schema: { type: 'string' },
 }
 
 let getCachedTilesetInfo
