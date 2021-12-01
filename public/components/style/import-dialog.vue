@@ -284,7 +284,7 @@ en:
         if (!this.valid) return
         try {
           const formData = new FormData()
-          formData.append('style.json', new Blob([JSON.stringify(this.styleJson)]), 'blob')
+          formData.append('style.json', new Blob([JSON.stringify(this.styleJson)], { type: 'application/json' }))
 
           if (this.styleJson.sprite) {
             if (this.spriteJsonFile) {

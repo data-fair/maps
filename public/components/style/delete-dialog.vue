@@ -64,7 +64,7 @@ en:
     methods: {
       async deleteStyle() {
         try {
-          await this.$axios.$delete(`${this.env.publicUrl}/api/styles/${this.value._id}.json`)
+          await this.$axios.$delete(`${this.env.publicUrl}/api/styles/${this.value._id}`)
           this.$emit('change')
         } catch (error) {
           eventBus.$emit('error', error)
