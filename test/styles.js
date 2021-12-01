@@ -26,7 +26,7 @@ describe('Styles', () => {
       assert.equal(error.status, 404)
     }
 
-    await global.ax.superadmin.delete(`/api/styles/${_id}.json`)
+    await global.ax.superadmin.delete(`/api/styles/${_id}`)
     try {
       style = (await global.ax.superadmin.get(`/api/styles/${_id}.json`)).data
       assert.fail()
