@@ -28,7 +28,7 @@ module.exports = {
         // requestBody: {},
         responses: {
           200: {
-            // description: '',
+            description: 'This documentation',
             content: {
               'application/json': {},
             },

@@ -150,8 +150,10 @@ require('../api-docs').paths['/tilesets/{tileset}.json'].get = {
       description: 'The TileJSON of the corresponding tileset',
       content: {
         'application/json': {
-          description: 'https://github.com/mapbox/tilejson-spec',
-          type: 'object',
+          schema: {
+            description: 'https://github.com/mapbox/tilejson-spec',
+            type: 'object',
+          },
         },
       },
     },
@@ -305,6 +307,7 @@ require('../api-docs').paths['/tilesets/{tileset}'].delete = {
   ],
   responses: {
     204: {
+      description: 'The tileset has been deleted',
       content: { 'application/json': {} },
     },
     404: {
@@ -326,24 +329,21 @@ router.delete('/:tileset', asyncWrap(async (req, res) => {
 
 require('../api-docs').paths['/tilesets/{tileset}/import-history'].get = {
   tags: ['Tilesets'],
-  // summary: 'Get a TileJSON',
+  summary: 'Get the importation history of the tileset',
   parameters: [
     { $ref: '#/components/parameters/tileset' },
   ],
-  // responses: {
-  //   200: {
-  //     description: 'The TileJSON of the corresponding tileset',
-  //     content: {
-  //       'application/json': {
-  //         description: 'https://github.com/mapbox/tilejson-spec',
-  //         type: 'object',
-  //       },
-  //     },
-  //   },
-  //   404: {
-  //     description: 'The tileset does not exist',
-  //   },
-  // },
+  responses: {
+    200: {
+      description: 'Importation history',
+      content: {
+        'application/json': {},
+      },
+    },
+    404: {
+      description: 'The tileset does not exist',
+    },
+  },
 }
 
 router.get('/:tileset/import-history', require('../middlewares/pagination')(), require('../middlewares/sort')(), asyncWrap(async (req, res) => {
