@@ -29,6 +29,7 @@ require('../api-docs').paths['/tilesets'].get = {
     { $ref: '#/components/parameters/size' },
     { $ref: '#/components/parameters/skip' },
     { $ref: '#/components/parameters/page' },
+    { $ref: '#/components/parameters/sort' },
   ],
   responses: {
     200: {
@@ -332,6 +333,10 @@ require('../api-docs').paths['/tilesets/{tileset}/import-history'].get = {
   summary: 'Get the importation history of the tileset',
   parameters: [
     { $ref: '#/components/parameters/tileset' },
+    { $ref: '#/components/parameters/size' },
+    { $ref: '#/components/parameters/skip' },
+    { $ref: '#/components/parameters/page' },
+    { $ref: '#/components/parameters/sort' },
   ],
   responses: {
     200: {

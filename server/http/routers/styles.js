@@ -30,6 +30,7 @@ require('../api-docs').paths['/styles'].get = {
     { $ref: '#/components/parameters/size' },
     { $ref: '#/components/parameters/skip' },
     { $ref: '#/components/parameters/page' },
+    { $ref: '#/components/parameters/sort' },
   ],
   responses: {
     200: {
