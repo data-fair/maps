@@ -1,20 +1,9 @@
 module.exports = {
   openapi: '3.0.3',
-  info: {
+  info: Object.assign({
     title: 'data-fair/maps',
-    // description: '',
-    // termsOfService: '',
-    // contact: {
-    //   name: '',
-    //   url: '',
-    //   email: '',
-    // },
-    // license: {
-    //   name: '',
-    //   url: '',
-    // },
     version: require('../../package.json').version,
-  },
+  }, require('config').info),
   components: {
     parameters: {},
   },

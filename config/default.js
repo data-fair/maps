@@ -10,14 +10,14 @@ module.exports = {
   prometheus: true,
   exposePrometheus: true,
   // openapiViewerUrl: 'https://koumoul.com/openapi-viewer/',
-  // info: {
-  //   termsOfService: 'https://koumoul.com/platform/term-of-service',
-  //   contact: {
-  //     name: 'Koumoul',
-  //     url: 'https://koumoul.com',
-  //     email: 'support@koumoul.com',
-  //   },
-  // },
+  info: {
+    termsOfService: 'https://koumoul.com/platform/term-of-service',
+    contact: {
+      name: 'Koumoul',
+      url: 'https://koumoul.com',
+      email: 'support@koumoul.com',
+    },
+  },
   brand: {
     logo: null,
     title: 'DataFair - Maps',
