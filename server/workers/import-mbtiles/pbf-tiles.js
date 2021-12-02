@@ -74,17 +74,18 @@ module.exports = {
       y: tile.tile_row,
       x: tile.tile_column,
     }
-    const area = importTask.area
+    const area = importTask?.options?.area
     const existingTile = await db.collection('tiles').findOne(mongoTileQuery)
     if (!existingTile) {
       const d = vectorTileAsPbfBuffer(prepareVectorTile(tile.tile_data, { area }))
       await db.collection('tiles').insertOne({ ...mongoTileQuery, d })
       return 1
     } else {
+      // console.log(`${tile.zoom_level}/${tile.tile_column}/${tile.tile_row}`)
       const newTile = prepareVectorTile(tile.tile_data, { area })
       const oldTile = prepareVectorTile(existingTile.d.buffer, { })
-      mergeTiles(newTile, oldTile, area)
-      const d = vectorTileAsPbfBuffer(newTile)
+      mergeTiles(oldTile, newTile, area)
+      const d = vectorTileAsPbfBuffer(oldTile)
       await db.collection('tiles').replaceOne(mongoTileQuery, { ...mongoTileQuery, d }, { upsert: true })
       return 0
     }
