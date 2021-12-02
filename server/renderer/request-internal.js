@@ -4,6 +4,7 @@ const zlib = require('zlib')
 const { getFonts } = require('../utils/fonts')
 
 module.exports = async (req, { db, context }) => {
+  context = context || {}
   context.cache = context.cache || {}
   context.cachingSize = Math.max(context.cachingSize || 0, 0)
   if (req.kind === resourceType.Unknown || !req.kind || !req.url) {
@@ -69,8 +70,10 @@ module.exports = async (req, { db, context }) => {
     //
   } else if (req.kind === resourceType.SpriteImage) {
     if (context.spritePng) return { data: Buffer.from(context.spritePng) }
+    else return { data: (await db.collection('styles').findOne({ _id: req.url.split('/').at(-2) })).sprite_png.buffer }
   } else if (req.kind === resourceType.SpriteJSON) {
     if (context.spriteJson) return { data: Buffer.from(JSON.stringify(context.spriteJson)) }
+    else return { data: Buffer.from(JSON.stringify((await db.collection('styles').findOne({ _id: req.url.split('/').at(-2) })).sprite_json)) }
   }
   throw new Error('resource not found : ' + req.url + ' ' + req.kind)
 }
