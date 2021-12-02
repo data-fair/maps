@@ -76,4 +76,55 @@ describe('Tilesets', () => {
     const tiles = await global.app.db.collection('tiles').find({ ts: tileset._id }).toArray()
     assert.equal(tiles.length, 0)
   })
+  it.only('Should merge tiles', async () => {
+    let formData
+
+    formData = new FormData()
+    formData.append('tileset.mbtiles', fs.createReadStream('./test/resources/mbtiles/france-pays-de-la-loire-8-126-89.mbtiles'))
+    formData.append('area', 'pays-de-la-loire')
+    const paysDeLaLoire = (await global.ax.superadmin.put('/api/tilesets/pays-de-la-loire', formData, { headers: formData.getHeaders() })).data
+    await eventToPromise(global.app.workers.importMBTiles.events, `imported:${paysDeLaLoire._id}`)
+    const tilePaysDeLaLoire = (await global.ax.superadmin.get(`/api/tilesets/${paysDeLaLoire._id}/tiles/8/126/89.geojson`)).data
+    assert.ok(tilePaysDeLaLoire)
+
+    formData = new FormData()
+    formData.append('tileset.mbtiles', fs.createReadStream('./test/resources/mbtiles/france-bretagne-8-126-89.mbtiles'))
+    formData.append('area', 'bretagne')
+    const bretagne = (await global.ax.superadmin.put('/api/tilesets/bretagne', formData, { headers: formData.getHeaders() })).data
+    await eventToPromise(global.app.workers.importMBTiles.events, `imported:${bretagne._id}`)
+    const tileBretagne = (await global.ax.superadmin.get(`/api/tilesets/${bretagne._id}/tiles/8/126/89.geojson`)).data
+    assert.ok(tileBretagne)
+
+    formData = new FormData()
+    formData.append('tileset.mbtiles', fs.createReadStream('./test/resources/mbtiles/france-pays-de-la-loire-8-126-89.mbtiles'))
+    formData.append('area', 'pays-de-la-loire')
+    const france = (await global.ax.superadmin.put('/api/tilesets/france', formData, { headers: formData.getHeaders() })).data
+    await eventToPromise(global.app.workers.importMBTiles.events, `imported:${france._id}`)
+
+    formData = new FormData()
+    formData.append('tileset.mbtiles', fs.createReadStream('./test/resources/mbtiles/france-bretagne-8-126-89.mbtiles'))
+    formData.append('area', 'bretagne')
+    const francePatch = (await global.ax.superadmin.patch(`/api/tilesets/${france._id}`, formData, { headers: formData.getHeaders() })).data
+    await eventToPromise(global.app.workers.importMBTiles.events, `imported:${francePatch._id}`)
+    const tileFrance = (await global.ax.superadmin.get(`/api/tilesets/${france._id}/tiles/8/126/89.geojson`)).data
+    assert.ok(tileFrance)
+
+    assert.ok(tileFrance.features.length > tilePaysDeLaLoire.features.length)
+    assert.ok(tileFrance.features.length > tileBretagne.features.length)
+
+    assert.equal(tilePaysDeLaLoire.features.filter((feature, index) => {
+      if (tileFrance.features.find(f => JSON.stringify({ ...f.properties, area: '' }) === JSON.stringify({ ...feature.properties, area: '' }) && JSON.stringify(f.geometry) === JSON.stringify(feature.geometry))) return true
+
+      console.log(feature)
+    }).length, tilePaysDeLaLoire.features.length)
+    assert.equal(tileBretagne.features.filter((feature, index) => {
+      if (tileFrance.features.find(f => JSON.stringify({ ...f.properties, area: '' }) === JSON.stringify({ ...feature.properties, area: '' }) && JSON.stringify(f.geometry) === JSON.stringify(feature.geometry))) {
+        // console.log(feature.properties.layer)
+        return true
+      } else {
+        // console.log('!', feature.properties.layer)
+      }
+    }).length, tileBretagne.features.length)
+    console.log(Object.keys(tileFrance.features[0]))
+  })
 })
