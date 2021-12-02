@@ -76,7 +76,7 @@ describe('Tilesets', () => {
     const tiles = await global.app.db.collection('tiles').find({ ts: tileset._id }).toArray()
     assert.equal(tiles.length, 0)
   })
-  it.only('Should merge tiles', async () => {
+  it('Should merge tiles', async () => {
     let formData
 
     formData = new FormData()
@@ -112,19 +112,16 @@ describe('Tilesets', () => {
     assert.ok(tileFrance.features.length > tilePaysDeLaLoire.features.length)
     assert.ok(tileFrance.features.length > tileBretagne.features.length)
 
-    assert.equal(tilePaysDeLaLoire.features.filter((feature, index) => {
-      if (tileFrance.features.find(f => JSON.stringify({ ...f.properties, area: '' }) === JSON.stringify({ ...feature.properties, area: '' }) && JSON.stringify(f.geometry) === JSON.stringify(feature.geometry))) return true
+    tilePaysDeLaLoire.features = tilePaysDeLaLoire.features.filter((f, i) => i % 2)
+    assert.equal(tilePaysDeLaLoire.features.filter((feature, index) =>
+       (tileFrance.features.find(f => JSON.stringify({ ...f.properties, area: '' }) === JSON.stringify({ ...feature.properties, area: '' }) &&
+       JSON.stringify(f.geometry) === JSON.stringify(feature.geometry))),
+    ).length, tilePaysDeLaLoire.features.length)
 
-      console.log(feature)
-    }).length, tilePaysDeLaLoire.features.length)
-    assert.equal(tileBretagne.features.filter((feature, index) => {
-      if (tileFrance.features.find(f => JSON.stringify({ ...f.properties, area: '' }) === JSON.stringify({ ...feature.properties, area: '' }) && JSON.stringify(f.geometry) === JSON.stringify(feature.geometry))) {
-        // console.log(feature.properties.layer)
-        return true
-      } else {
-        // console.log('!', feature.properties.layer)
-      }
-    }).length, tileBretagne.features.length)
-    console.log(Object.keys(tileFrance.features[0]))
+    tileBretagne.features = tileBretagne.features.filter((f, i) => i % 2)
+    assert.equal(tileBretagne.features.filter((feature, index) =>
+      (tileFrance.features.find(f => JSON.stringify({ ...f.properties, area: '' }) === JSON.stringify({ ...feature.properties, area: '' }) &&
+      JSON.stringify(f.geometry) === JSON.stringify(feature.geometry))),
+    ).length, tileBretagne.features.length)
   })
 })
