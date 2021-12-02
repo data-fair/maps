@@ -16,9 +16,13 @@ en:
     elevation="0"
     tile
     class="mx-2"
+    :loading="$fetchState.pending"
   >
     <v-card-title v-text="$t('title')" />
-    <v-simple-table tile dense>
+    <v-simple-table
+      tile
+      dense
+    >
       <thead>
         <tr>
           <th class="text-left" v-text="$t('table-header-date')" />
@@ -26,9 +30,9 @@ en:
           <th class="text-left" v-text="$t('table-header-tile-imported')" />
         </tr>
       </thead>
-      <tbody>
+      <tbody v-if="!$fetchState.pending">
         <tr v-for="task in history" :key="task._id">
-          <td>{{ task.date }}</td>
+          <td>{{ new Date(task.date) }}</td>
           <td>{{ (task.options && task.options.area) || '' }}</td>
           <td>{{ task.tileImported }}</td>
         </tr>
