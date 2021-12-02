@@ -12,7 +12,7 @@ module.exports = (pool) => ({
     const imageBuffer = await pool.use((resource) => new Promise((resolve, reject) => {
       try {
         events.emit('render', { style, mapOptions, imageProperties, context })
-        const reuseOldStyle = !!(resource.oldStyle && resource.oldStyle === style._id)
+        const reuseOldStyle = !!(style._id && resource.oldStyle && resource.oldStyle === style._id)
         const end = prometheus.maplibre_render_timer.labels(reuseOldStyle).startTimer()
         debug('start render ', renderId)
         // prometheus.maplibre_reuse_style.labels(reuseOldStyle).inc(1)
