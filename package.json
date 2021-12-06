@@ -20,7 +20,7 @@
     "test": "NODE_ENV=test xvfb-run -a mocha --exit --bail --timeout 20000 test/",
     "lint": "eslint --ext js,vue --ignore-path .gitignore .",
     "lint-fix": "eslint --ext js,vue --ignore-path .gitignore --fix .",
-    "dev-server": "NODE_ENV=development DEBUG=renderer:maplibre-gl-native,renderer:pool xvfb-run -a nodemon server",
+    "dev-server": "NODE_ENV=development DEBUG=renderer:maplibre-gl-native,renderer:* xvfb-run -a nodemon --signal SIGTERM server",
     "dev-client": "NODE_ENV=development nuxt",
     "build": "nuxt build",
     "start": "node server",
@@ -78,6 +78,7 @@
     "eslint-plugin-vue": "^7.19.1",
     "form-data": "^4.0.0",
     "http-proxy-middleware": "^2.0.1",
+    "killable": "^1.0.1",
     "mocha": "^9.1.2",
     "nyc": "^15.1.0"
   }
