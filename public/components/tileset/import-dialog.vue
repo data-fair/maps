@@ -119,7 +119,7 @@ en:
       async importMBTiles() {
         const formData = new FormData()
         formData.append('tileset.mbtiles', this.file)
-        formData.append('options', { area: this.area })
+        formData.append('area', this.area)
         if (!this.saveId) {
           await this.$axios.$post(this.env.publicUrl + '/api/tilesets', formData, { headers: 'multipart/form-data' })
         } else {

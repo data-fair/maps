@@ -157,7 +157,7 @@ router.post('', loadmbtiles, asyncWrap(async (req, res) => {
     filename,
     status: 'pending',
     options: {
-      area: req.body?.options?.area || 'default-area',
+      area: req.body.area || 'default-area',
     },
   }
 
@@ -254,7 +254,7 @@ router.put('/:tileset', loadmbtiles, asyncWrap(async (req, res) => {
     date: Date.now(),
     status: 'pending',
     options: {
-      area: req.body?.options?.area || 'default-area',
+      area: req.body.area || 'default-area',
     },
   }
 
@@ -314,7 +314,7 @@ router.patch('/:tileset', loadmbtiles, asyncWrap(async (req, res) => {
     date: Date.now(),
     status: 'pending',
     options: {
-      area: req.body?.options?.area || 'default-area',
+      area: req.body.area || 'default-area',
     },
   }
 
