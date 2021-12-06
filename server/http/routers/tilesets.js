@@ -88,6 +88,36 @@ require('../api-docs').paths['/tilesets'].post = {
   tags: ['Tilesets'],
   summary: 'Create a Tileset from a mbtiles',
   parameters: [],
+  requestBody: {
+    content: {
+      'multipart/form-data': {
+        schema: {
+          type: 'object',
+          required: ['tileset.mbtiles'],
+          properties: {
+            'tileset.mbtiles': {
+              type: 'string',
+              format: 'binary',
+            },
+            options: {
+              type: 'object',
+              properties: {
+                area: {
+                  description: 'Area used during merge, every geometry with the same "area" will be replaced by the new ones',
+                  type: 'string',
+                },
+              },
+            },
+          },
+        },
+        encoding: {
+          'tileset.mbtiles': { contentType: 'application/octet-stream' },
+          options: { contentType: 'application/json' },
+        },
+      },
+    },
+    required: true,
+  },
   responses: {
     200: {
       description: 'The tilejson describing the new tileset',
@@ -127,7 +157,7 @@ router.post('', loadmbtiles, asyncWrap(async (req, res) => {
     filename,
     status: 'pending',
     options: {
-      area: req.body.area || 'default-area',
+      area: req.body?.options?.area || 'default-area',
     },
   }
 
@@ -181,6 +211,7 @@ require('../api-docs').paths['/tilesets/{tileset}'].put = {
   parameters: [
     { $ref: '#/components/parameters/tileset' },
   ],
+  requestBody: require('../api-docs').paths['/tilesets'].post.requestBody,
   responses: {
     200: {
       description: 'The tilejson describing the new tileset',
@@ -223,7 +254,7 @@ router.put('/:tileset', loadmbtiles, asyncWrap(async (req, res) => {
     date: Date.now(),
     status: 'pending',
     options: {
-      area: req.body.area || 'default-area',
+      area: req.body?.options?.area || 'default-area',
     },
   }
 
@@ -242,6 +273,7 @@ require('../api-docs').paths['/tilesets/{tileset}'].patch = {
   parameters: [
     { $ref: '#/components/parameters/tileset' },
   ],
+  requestBody: require('../api-docs').paths['/tilesets'].post.requestBody,
   responses: {
     200: {
       description: 'The tilejson describing the updated tileset',
@@ -282,7 +314,7 @@ router.patch('/:tileset', loadmbtiles, asyncWrap(async (req, res) => {
     date: Date.now(),
     status: 'pending',
     options: {
-      area: req.body.area || 'default-area',
+      area: req.body?.options?.area || 'default-area',
     },
   }
 
