@@ -311,6 +311,6 @@ require('../api-docs').paths['/styles/{style}/sprite.png'].get = {
 router.get('/:style/sprite.png', (req, res) => {
   if (req.style.sprite_png) {
     res.set({ 'Content-Type': 'image/png' })
-    res.send(req.style.sprite_png)
+    res.send(req.style.sprite_png.buffer)
   } else res.sendStatus(404)
 })
