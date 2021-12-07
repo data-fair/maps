@@ -99,20 +99,15 @@ require('../api-docs').paths['/tilesets'].post = {
               type: 'string',
               format: 'binary',
             },
-            options: {
-              type: 'object',
-              properties: {
-                area: {
-                  description: 'Area used during merge, every geometry with the same "area" will be replaced by the new ones',
-                  type: 'string',
-                },
-              },
+            area: {
+              description: 'Area used during merge, every geometry with the same "area" will be replaced by the new ones',
+              type: 'text/plain',
             },
           },
         },
         encoding: {
           'tileset.mbtiles': { contentType: 'application/octet-stream' },
-          options: { contentType: 'application/json' },
+          area: { contentType: 'application/json' },
         },
       },
     },
