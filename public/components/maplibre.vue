@@ -1,7 +1,7 @@
 <template>
   <div
     ref="map"
-    :style="`width:${width};height:${height}`"
+    :style="`width:${width};height:calc(100vh-60px);`"
     class="map"
   >
     <!--  -->
@@ -19,6 +19,7 @@
       inspect: { type: String, default: undefined },
       height: { type: String, default: '300px' },
       width: { type: String, default: '300px' },
+      hash: { type: Boolean, default: false },
     },
     data: () => ({
       map: undefined,
@@ -27,6 +28,7 @@
       this.map = new maplibregl.Map({
         container: this.$refs.map,
         style: this.mapStyle,
+        hash: this.hash,
       })
       if (this.inspect !== undefined && this.inspect !== false) {
         this.map.addControl(new MaplibreInspect({

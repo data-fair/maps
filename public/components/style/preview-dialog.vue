@@ -8,7 +8,7 @@ en:
 </i18n>
 
 <template>
-  <v-dialog>
+  <v-dialog fullscreen>
     <template #activator="{on:dialog,attrs}">
       <v-tooltip bottom>
         <template #activator="{ on:tooltip }">

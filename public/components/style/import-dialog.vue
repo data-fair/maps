@@ -52,14 +52,25 @@ en:
 <template>
   <v-dialog max-width="800">
     <template #activator="{on:dialog,attrs}">
-      <v-tooltip bottom>
+      <v-tooltip :bottom="icon" :left="!icon">
         <template #activator="{ on:tooltip }">
           <v-icon
+            v-if="icon"
             v-bind="attrs"
             class="mx-1"
             v-on="{...dialog,...tooltip}"
             v-text="'mdi-file-upload'"
           />
+          <v-list-item
+            v-else
+            v-bind="attrs"
+            v-on="{...dialog,...tooltip}"
+          >
+            <v-list-item-icon>
+              <v-icon color="primary" v-text="'mdi-file-upload'" />
+            </v-list-item-icon>
+            <v-list-item-title v-t="'card-title'" />
+          </v-list-item>
         </template>
         <span v-text="$t('icon-tooltip')" />
       </v-tooltip>
@@ -69,7 +80,7 @@ en:
         <v-card-title>
           {{ $t('card-title') }}
           <v-spacer />
-          <v-col cols="6">
+          <v-col cols="6" class="pa-0">
             <v-file-input
               v-model="zip"
               accept=".zip"
@@ -214,6 +225,7 @@ en:
     },
     props: {
       value: { type: Object, default: undefined },
+      icon: { type: Boolean, default: false },
     },
     data: () => ({
       zip: undefined,
