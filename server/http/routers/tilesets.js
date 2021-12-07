@@ -101,13 +101,13 @@ require('../api-docs').paths['/tilesets'].post = {
             },
             area: {
               description: 'Area used during merge, every geometry with the same "area" will be replaced by the new ones',
-              type: 'text/plain',
+              type: 'string',
             },
           },
         },
         encoding: {
           'tileset.mbtiles': { contentType: 'application/octet-stream' },
-          area: { contentType: 'application/json' },
+          area: { contentType: 'text/plain' },
         },
       },
     },
