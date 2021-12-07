@@ -10,10 +10,7 @@ fr:
   tilesets-table-header-tile-count: Nombre de tuile
   tilesets-table-header-layer-count: Nombre de couche
 
-  layers-table-title: Formats des couches
-  layers-table-header-id: Identifiant
-  layers-table-header-description: Description
-  layers-table-header-fields: Champs
+  inspect-tooltip: Inspecter
 
 en:
   title: Tilesets
@@ -26,10 +23,7 @@ en:
   tilesets-table-header-tile-count: Tile count
   tilesets-table-header-layer-count: Layer count
 
-  layers-table-title: Layer formats
-  layers-table-header-id: Id
-  layers-table-header-description: Description
-  layers-table-header-fields: Fields
+  inspect-tooltip: Inspect
 
 </i18n>
 
@@ -62,44 +56,26 @@ en:
           </template>
           <template #expanded-item="{ item }">
             <td :colspan="headers.length" class="pa-0 primary">
-              <v-card
-                v-if="expandmode==='layers'"
-                tile
-                class="mx-2"
-              >
-                <v-card-title v-text="$t('layers-table-title')" />
-                <v-simple-table
-                  dense
-                >
-                  <thead>
-                    <tr>
-                      <th class="text-left" v-text="$t('layers-table-header-id')" />
-                      <th class="text-left" v-text="$t('layers-table-header-description')" />
-                      <th class="text-left" v-text="$t('layers-table-header-fields')" />
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="layer in item.vector_layers" :key="layer.id">
-                      <td>{{ layer.id }}</td>
-                      <td>{{ layer.description }}</td>
-                      <td>{{ layer.fields }}</td>
-                    </tr>
-                  </tbody>
-                </v-simple-table>
-              </v-card>
-              <history-table v-if="expandmode==='import'" :value="item._id" />
+              <history-table :value="item._id" />
             </td>
           </template>
           <template #item.data-table-expand="{ expand, isExpanded, item }">
             <v-row class="justify-end">
-              <v-icon
-                v-if="item.vector_layers"
-                class="mx-1"
-                @click="expand(expandmode !== (expandmode='layers') || !isExpanded)"
-                v-text="'mdi-layers-search'"
-              />
-              <preview-dialog :value="item" />
-              <status-icon :value="item" @click="expand(expandmode !== (expandmode='import') || !isExpanded)" />
+              <v-tooltip bottom>
+                <template #activator="{ on }">
+                  <v-btn
+                    class="mx-1"
+                    :to="{name:embed?'embed-tilesets-id':'tilesets-id',params:{id:item._id}}"
+                    nuxt
+                    icon
+                    v-on="on"
+                  >
+                    <v-icon>mdi-map-search</v-icon>
+                  </v-btn>
+                </template>
+                <span v-text="$t('inspect-tooltip')" />
+              </v-tooltip>
+              <status-icon :value="item" @click="expand(!isExpanded)" />
               <import-dialog :value="item" @change="$fetch" />
               <delete-tileset :value="item" @change="$fetch" />
             </v-row>
@@ -112,7 +88,6 @@ en:
 
 <script>
   import importDialog from '~/components/tileset/import-dialog'
-  import previewDialog from '~/components/tileset/preview-dialog'
   import deleteTileset from '~/components/tileset/delete-dialog'
   import historyTable from '~/components/tileset/history-table'
   import statusIcon from '~/components/tileset/status-icon.vue'
@@ -122,12 +97,13 @@ en:
       importDialog,
       deleteTileset,
       historyTable,
-      previewDialog,
       statusIcon,
+    },
+    props: {
+      embed: { type: Boolean, default: false },
     },
     data () {
       return {
-        expandmode: 'layers',
         options: {},
         itemCount: undefined,
         headers: [
