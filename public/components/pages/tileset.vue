@@ -17,6 +17,7 @@ en:
   <v-container>
     <v-card :loading="$fetchState.pending" flat>
       <v-card-title v-if="tileset">
+        <status-icon :value="tileset" />
         {{ $t('title')+': '+tileset.name }}
       </v-card-title>
       <v-card-subtitle v-if="tileset" v-text="env.publicUrl+'/api/tilesets/'+tileset._id+'.json'" />
@@ -109,6 +110,11 @@ en:
             </v-card>
           </v-col>
         </v-row>
+        <v-row>
+          <v-col>
+            <history-table :value="tileset._id" />
+          </v-col>
+        </v-row>
       </v-card-text>
     </v-card>
   </v-container>
@@ -116,10 +122,14 @@ en:
 
 <script>
   import maplibre from '~/components/maplibre'
+  import historyTable from '~/components/tileset/history-table'
+  import statusIcon from '~/components/tileset/status-icon.vue'
   import { mapState } from 'vuex'
   export default {
     components: {
       maplibre,
+      historyTable,
+      statusIcon,
     },
     props: {
       tilesetId: { type: String, required: true },

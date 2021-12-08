@@ -54,12 +54,7 @@ en:
             <v-icon v-if="item.format==='jpg'" v-text="'mdi-image'" />
             <v-icon v-if="item.format==='pbf'" v-text="'mdi-vector-square'" />
           </template>
-          <template #expanded-item="{ item }">
-            <td :colspan="headers.length" class="pa-0 primary">
-              <history-table :value="item._id" />
-            </td>
-          </template>
-          <template #item.data-table-expand="{ expand, isExpanded, item }">
+          <template #item.data-table-expand="{ item }">
             <v-row class="justify-end">
               <v-tooltip bottom>
                 <template #activator="{ on }">
@@ -75,7 +70,7 @@ en:
                 </template>
                 <span v-text="$t('inspect-tooltip')" />
               </v-tooltip>
-              <status-icon :value="item" @click="expand(!isExpanded)" />
+              <status-icon :value="item" />
               <import-dialog :value="item" @change="$fetch" />
               <delete-tileset :value="item" @change="$fetch" />
             </v-row>
@@ -89,14 +84,12 @@ en:
 <script>
   import importDialog from '~/components/tileset/import-dialog'
   import deleteTileset from '~/components/tileset/delete-dialog'
-  import historyTable from '~/components/tileset/history-table'
   import statusIcon from '~/components/tileset/status-icon.vue'
   import { mapState } from 'vuex'
   export default {
     components: {
       importDialog,
       deleteTileset,
-      historyTable,
       statusIcon,
     },
     props: {

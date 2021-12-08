@@ -191,10 +191,12 @@ require('../api-docs').paths['/tilesets/{tileset}.json'].get = {
 }
 
 router.get('/:tileset.json', asyncWrap(async (req, res) => {
-  req.tilesetInfo.tiles = [
-    `${req.publicBaseUrl}/api/tilesets/${req.params.tileset}/tiles/{z}/{x}/{y}.${req.tilesetInfo.format}`,
+  const tileset = Object.assign({}, req.tilesetInfo)
+  tileset.tiles = [
+    `${req.publicBaseUrl}/api/tilesets/${req.params.tileset}/tiles/{z}/{x}/{y}.${tileset.format}`,
   ]
-  res.send(req.tilesetInfo)
+  tileset.lastImport = await req.app.get('db').collection('import-tilesets').findOne({ _id: req.tilesetInfo.lastImport })
+  res.send(tileset)
 }))
 
 //
