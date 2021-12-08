@@ -4,11 +4,15 @@ fr:
   copy-url-tooltip: Copier l'adresse du style
   add-style: Ajouter un style
   preview-tooltip: Aperçu
+  search: Rechercher
+  noResult: Aucun style ne correspond aux critères de recherche.
 en:
   title: Styles
   copy-url-tooltip: Copy style url to clipboard
   add-style: Add a style
   preview-tooltip: Preview
+  search: Search
+  noResult: No style matches your search criterias.
 </i18n>
 
 <template>
@@ -20,7 +24,7 @@ en:
             {{ $t('title') }}
           </v-card-title>
           <v-card-text v-if="!$fetchState.pending">
-            <v-row>
+            <v-row v-if="items.length">
               <v-col
                 v-for="item in items"
                 :key="item._id"
@@ -53,7 +57,6 @@ en:
                       </template>
                       <span v-text="$t('preview-tooltip')" />
                     </v-tooltip>
-                    <!-- <preview-dialog :value="item" /> -->
                     <import-dialog
                       v-if="isAdmin"
                       :value="item"
@@ -72,6 +75,14 @@ en:
                     />
                   </v-card-actions>
                 </v-card>
+              </v-col>
+            </v-row>
+            <v-row v-else align="center">
+              <v-col class="text-center">
+                <div
+                  v-t="'noResult'"
+                  class="text-h6"
+                />
               </v-col>
             </v-row>
             <v-pagination
@@ -103,6 +114,21 @@ en:
               @change="$fetch"
             />
           </v-list>
+          <v-row class="px-2">
+            <v-col>
+              <v-text-field
+                v-model="q"
+                :placeholder="$t('search')"
+                outlined
+                dense
+                color="primary"
+                append-icon="mdi-magnify"
+                hide-details
+                @keyup.enter.native="page=1;$fetch()"
+                @click:append="page=1;$fetch()"
+              />
+            </v-col>
+          </v-row>
         </v-navigation-drawer>
       </v-container>
     </v-col>
@@ -123,12 +149,13 @@ en:
       embed: { type: Boolean, default: false },
     },
     data: () => ({
+      q: '',
       page: 1,
       itemCount: undefined,
       items: [],
     }),
     async fetch() {
-      const { results, count } = await this.$axios.$get(this.env.publicUrl + '/api/styles?size=12&page=' + this.page)
+      const { results, count } = await this.$axios.$get(this.env.publicUrl + '/api/styles?size=12&page=' + this.page + '&q=' + this.q)
       this.items = results
       this.itemCount = count
     },

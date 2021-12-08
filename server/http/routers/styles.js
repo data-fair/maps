@@ -42,6 +42,7 @@ require('../api-docs').paths['/styles'].get = {
 
 router.get('', require('../middlewares/pagination')(), require('../middlewares/sort')(), asyncWrap(async (req, res) => {
   const query = {}
+  if (req.query.q) query.$text = { $search: req.query.q }
   const [styles, count] = await Promise.all([
     req.pagination.size > 0
       ? req.app.get('db').collection('styles').find(query).sort(req.sort).limit(req.pagination.size).skip(req.pagination.skip).toArray()
