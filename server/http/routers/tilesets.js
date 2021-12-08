@@ -60,6 +60,7 @@ require('../api-docs').paths['/tilesets'].get = {
 
 router.get('', require('../middlewares/pagination')(), require('../middlewares/sort')(), asyncWrap(async (req, res) => {
   const query = {}
+  if (req.query.format) query.format = req.query.format
   const [tilesets, count] = await Promise.all([
     req.pagination.size > 0
       ? req.app.get('db').collection('tilesets').find(query).sort(req.sort).limit(req.pagination.size).skip(req.pagination.skip).toArray()
