@@ -215,7 +215,7 @@ en:
 </template>
 
 <script>
-  import selectTileset from '~/components/tileset/select.vue'
+  import selectTileset from '~/components/style/source-select.vue'
   import { unzip } from 'unzipit'
   import eventBus from '~/assets/event-bus'
   import { mapState } from 'vuex'
