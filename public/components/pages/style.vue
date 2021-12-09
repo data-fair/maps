@@ -1,7 +1,8 @@
 <template>
   <div>
     <v-btn
-      :to="embed?{name:'embed-styles'}:{name:'styles'}"
+      v-if="$nuxt?.context?.from?.path !== $nuxt?.context?.route?.path"
+      :to="$nuxt?.context?.from?.path"
       nuxt
       style="left:10px;top:10px;z-index:100"
       fab
