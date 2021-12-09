@@ -8,6 +8,7 @@ fr:
   tilesets-description: "Un Tileset est un ensemble de tuile regroupant des couches de données géographiques préparées pour être intégrées facilement dans une carte. <br/>\
     Nos Tilesets sont présentés sous le format standard des <a href=\"https://www.mapbox.com/vector-tiles/\">tuiles vectorielles</a> et intégrés dans nos styles de carte."
   inspect-tileset: Détails
+  see-more: Voir plus
 en:
   styles: Styles
   styles-description: "A MapLibre style is a document that defines the visual appearance of a map: what data to draw, the order to draw it in, and how to style the data when drawing it. <br/>\
@@ -16,6 +17,7 @@ en:
   tilesets: Tilesets
   tilesets-description: " "
   inspect-tileset: Details
+  see-more: See more
 </i18n>
 
 <template>
