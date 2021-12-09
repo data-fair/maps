@@ -4,8 +4,11 @@ const mercator = new (require('@mapbox/sphericalmercator'))()
 module.exports = {
   getBBoxFromGeojsonStyleSource(sources) {
     const geojsonSources = Object.values(sources).filter(s => s.type === 'geojson')
-    const bbox = geojsonSources.map(source => geojsonBounds.extent(source.data))
-    return bbox.reduce((acc, bbox) => {
+    const bboxes = geojsonSources.map(source => geojsonBounds.extent(source.data))
+    return module.exports.mergeBBoxes(bboxes)
+  },
+  mergeBBoxes(bboxes) {
+    return bboxes.reduce((acc, bbox) => {
       acc[0] = Math.min(bbox[0], acc[0])
       acc[1] = Math.min(bbox[1], acc[1])
       acc[2] = Math.max(bbox[2], acc[2])

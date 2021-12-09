@@ -1,34 +1,13 @@
 <template>
-  <div>
-    <!-- <maplibre
-      :map-style="{
-        version:8,
-        sources:{
-          tileset:{
-            type:'vector',
-            url:env.publicUrl+'/api/tilesets/openmaptiles.json'
-          }
-        },
-        layers:[]
-      }"
-      inspect
-    /> -->
-  </div>
+  <page />
 </template>
 
 <script>
-  // import maplibre from '~/components/maplibre'
-  import { mapState } from 'vuex'
+  import page from '~/components/pages/index'
   export default {
     components: {
-      // maplibre,
+      page,
     },
-    middleware: 'auth',
-    data: () => ({}),
-    computed: {
-      ...mapState(['env']),
-    },
-    async mounted() {},
   }
 </script>
 
