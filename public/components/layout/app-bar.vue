@@ -7,6 +7,7 @@ fr:
   change-account: Changer de compte
   logout: Se déconnecter
   admin-mode: mode admin
+  doc: Documentation d'API
 en:
   title-styles: Styles
   title-tilesets: Tilesets
@@ -15,6 +16,7 @@ en:
   change-account: Change account
   logout: Logout
   admin-mode: admin mode
+  doc: API Documentation
 </i18n>
 
 <template>
@@ -26,6 +28,19 @@ en:
   >
     <v-toolbar-items>
       <v-btn
+        text
+        nuxt
+        style="min-width: 0px;"
+        :to="{name: 'index'}"
+      >
+        <img
+          src="https://koumoul.com/s/tileserver/app/_nuxt/img/koumoul-square.624294b.svg"
+          height="48px"
+          style="min-width: 0px;"
+        >
+      </v-btn>
+      <v-btn
+
         text
         nuxt
         :to="{name: 'styles'}"
@@ -44,6 +59,12 @@ en:
     /> -->
     <v-spacer />
     <v-toolbar-items>
+      <!-- v-if="openapiViewerUrl" -->
+      <v-btn
+        v-t="'doc'"
+        :href="openapiViewerUrl"
+        text
+      />
       <template v-if="initialized">
         <v-btn
           v-if="!user"
@@ -146,6 +167,10 @@ en:
     computed: {
       ...mapState(['breadcrumbs']),
       ...mapState('session', ['user', 'initialized', 'directoryUrl']),
+      ...mapState(['env']),
+      openapiViewerUrl() {
+        return this.env.openapiViewerUrl ? this.env.openapiViewerUrl + '?proxy=false&url=' + this.env.publicUrl + '/api/api-docs.json' : undefined
+      },
       ...mapGetters('session', ['activeAccount']),
     // directoryUrl() {
     //   return this.$store.getters.directoryUrl
@@ -161,6 +186,10 @@ en:
 </script>
 
 <style lang="css">
+.main-app-bar .v-toolbar__content {
+  padding-left: 0;
+  padding-right: 0;
+}
 .main-app-bar .v-toolbar__content {
   padding-left: 0;
   padding-right: 0;

@@ -104,7 +104,7 @@ module.exports = {
     // contribRole: config.contribRole,
     // map: config.map,
     // brand: config.brand,
-    // openapiViewerUrl: config.openapiViewerUrl,
+    openapiViewerUrl: config.openapiViewerUrl,
     // browserLogLevel: config.browserLogLevel,
     // analytics: config.analytics,
     // captureUrl: config.captureUrl,

@@ -9,7 +9,7 @@ module.exports = {
   fontsPath: './fonts',
   prometheus: true,
   exposePrometheus: true,
-  // openapiViewerUrl: 'https://koumoul.com/openapi-viewer/',
+  openapiViewerUrl: 'https://koumoul.com/openapi-viewer/',
   info: {
     termsOfService: 'https://koumoul.com/platform/term-of-service',
     contact: {
