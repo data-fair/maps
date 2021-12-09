@@ -27,6 +27,11 @@ module.exports = {
       // Ignore all locale files of moment.js, those we want are loaded in plugins/moment.js
       config.plugins.push(new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/))
     },
+    loaders: {
+      vue: {
+        compiler: require('vue-template-babel-compiler'),
+      },
+    },
   },
   loading: { color: '#1e88e5' }, // Customize the progress bar color
   plugins: [
