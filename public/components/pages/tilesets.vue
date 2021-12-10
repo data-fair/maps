@@ -11,6 +11,7 @@ fr:
   format-vector: Tuile vectorielle
 
   inspect-tooltip: Inspecter
+  no-result: Aucun tileset ne correspond aux critères de recherche.
 
 en:
   title: Tilesets
@@ -24,6 +25,7 @@ en:
   format-vector: Vector tile
 
   inspect-tooltip: Inspect
+  no-result: No tileset matches your search criterias.
 
 </i18n>
 
@@ -113,7 +115,7 @@ en:
             <v-row v-else align="center">
               <v-col class="text-center">
                 <div
-                  v-t="'noResult'"
+                  v-t="'no-result'"
                   class="text-h6"
                 />
               </v-col>
