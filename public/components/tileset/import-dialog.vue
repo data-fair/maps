@@ -32,14 +32,25 @@ en:
 <template>
   <v-dialog v-if="adminMode" max-width="600">
     <template #activator="{on:dialog,attrs}">
-      <v-tooltip bottom>
+      <v-tooltip :bottom="icon" :left="!icon">
         <template #activator="{ on:tooltip }">
           <v-icon
+            v-if="icon"
             class="mx-1"
             v-bind="attrs"
             v-on="{...dialog,...tooltip}"
-            v-text="newTileset?'mdi-plus':'mdi-upload'"
+            v-text="'mdi-upload'"
           />
+          <v-list-item
+            v-else
+            v-bind="attrs"
+            v-on="{...dialog,...tooltip}"
+          >
+            <v-list-item-icon>
+              <v-icon color="primary" v-text="'mdi-upload'" />
+            </v-list-item-icon>
+            <v-list-item-title v-t="'title'" />
+          </v-list-item>
         </template>
         <span v-if="newTileset" v-text="$t('import-tileset')" />
         <span v-else v-text="$t('import-tiles')" />
@@ -95,6 +106,7 @@ en:
   export default {
     props: {
       value: { type: Object, default: undefined },
+      icon: { type: Boolean, default: false },
     },
     data: () => ({
       id: undefined,

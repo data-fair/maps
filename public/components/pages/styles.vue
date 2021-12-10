@@ -36,10 +36,10 @@ en:
                     height="240"
                   />
                   <v-card-title class="pa-2" v-text="item.name" />
-                  <v-card-subtitle
+                  <!-- <v-card-subtitle
                     class="px-2 py-2"
                     v-text="item._id"
-                  />
+                  /> -->
                   <v-card-actions class="justify-end">
                     <copy-icon :value="`${env.publicUrl}/api/styles/${item._id}.json`" :label="$t('copy-url-tooltip')" />
 
