@@ -26,6 +26,8 @@ en:
           <v-col cols="6">
             <maplibre
               :map-style="tileset.vector_layers?{
+                center: [tileset.center?.[0],tileset.center?.[1]],
+                zoom: tileset.center?.[2],
                 version:8,
                 sources:{
                   tileset:{
