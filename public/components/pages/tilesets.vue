@@ -98,11 +98,6 @@ en:
                       icon
                       @change="$fetch"
                     />
-                    <edit-dialog
-                      v-if="isAdmin"
-                      :value="item"
-                      @change="$fetch"
-                    />
                     <delete-dialog
                       v-if="isAdmin"
                       :value="item"

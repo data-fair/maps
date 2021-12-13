@@ -61,7 +61,7 @@ en:
       items: [],
     }),
     async fetch() {
-      this.items = (await this.$axios.$get(this.env.publicUrl + '/api/tilesets?size=50' + (this.type ? '&format=' + this.type : ''))).results
+      this.items = (await this.$axios.$get(this.env.publicUrl + '/api/tilesets?size=50' + (this.type ? '&type=' + this.type : ''))).results
     },
     computed: {
       ...mapState(['env']),
