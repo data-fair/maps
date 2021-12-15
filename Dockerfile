@@ -6,7 +6,7 @@ RUN \
   apt-get -qq update\ 
   && apt-get install -y --no-install-recommends\
     wget unzip\
-    git\build-essential liblua5.1-0 liblua5.1-0-dev libprotobuf-dev\
+    git build-essential liblua5.1-0 liblua5.1-0-dev libprotobuf-dev\
     libsqlite3-dev protobuf-compiler shapelib libshp-dev\
     libboost-program-options-dev libboost-filesystem-dev\
     libboost-system-dev libboost-iostreams-dev rapidjson-dev\
