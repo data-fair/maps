@@ -1,7 +1,8 @@
-node_modules
 .nuxt
-nuxt-dist
-mbtiles
+.nyc_output
 fonts
 lib
-.nyc_output
+node_modules
+nuxt-dist
+mbtiles
+tilemaker

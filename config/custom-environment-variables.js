@@ -1,4 +1,24 @@
 module.exports = {
+  http: {
+    enabled: 'HTTP_ENABLED',
+    renderedTiles: 'HTTP_RENDERED_TILES',
+  },
+  worker: {
+    enabled: 'WORKER_ENABLED',
+    importMbtiles: {
+      enabled: 'WORKER_IMPORT_MBTILES_ENABLED',
+      // pool: 'WORKER_IMPORT_POOL',
+      // batchSize: 'WORKER_IMPORT_BATCHSIZE',
+      // sleepTime: 'WORKER_IMPORT_SLEEPTIME',
+    },
+    deleteMbtiles: {
+      enabled: 'WORKER_DELETE_MBTILES_ENABLED',
+    },
+    generateMbtiles: {
+      enable: 'WORKER_GENERATE_MBTILES_ENABLED',
+    },
+  },
+
   port: 'PORT',
   publicUrl: 'PUBLIC_URL',
   directoryUrl: 'DIRECTORY_URL',
@@ -7,9 +27,23 @@ module.exports = {
   mongoUrl: 'MONGO_URL',
   maplibrePool: 'MAPLIBRE_POOL',
   imageSizeLimit: 'IMAGE_SIZE_LIMIT',
+  fontsPath: 'FONTS_PATH',
   prometheus: 'PROMETHEUS',
   exposePrometheus: 'EXPOSE_PROMETHEUS',
-  fontsPath: 'FONTS_PATH',
+  info: {
+    termsOfService: 'INFO_TOS',
+    contact: {
+      __name: 'INFO_CONTACT',
+      __format: 'json',
+    },
+  },
+  brand: {
+    logo: 'BRAND_LOGO',
+    title: 'BRAND_TITLE',
+    description: 'BRAND_DESCRIPTION',
+    url: 'BRAND_URL',
+    embed: 'BRAND_EMBED',
+  },
   theme: {
     dark: {
       __name: 'THEME_DARK',
@@ -36,8 +70,8 @@ module.exports = {
     cssUrl: 'THEME_CSS_URL',
     cssText: 'THEME_CSS_TEXT',
   },
-  darkModeSwitch: {
-    __name: 'DARK_MODE_SWITCH',
-    __format: 'json',
+  i18n: {
+    locales: 'I18N_LOCALES',
+    defaultLocale: 'I18N_DEFAULT_LOCALE',
   },
 }

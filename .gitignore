@@ -1,9 +1,10 @@
-/node_modules
-/config/local-*
 /.nuxt/
-/dist/
-/nuxt-dist
-/lib
-/mbtiles
-/fonts
 /.nyc_output
+/config/local-*
+/dist/
+/fonts
+/lib
+/node_modules
+/nuxt-dist
+/mbtiles
+/tilemaker

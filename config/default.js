@@ -1,15 +1,35 @@
 
 module.exports = {
+  http: {
+    enabled: true,
+    // renderedTiles: false,
+  },
+  worker: {
+    enabled: true,
+    importMbtiles: {
+      enable: true,
+      // pool: 2,
+      // sleepTime: 200,
+      // batchSize: 100,
+    },
+    deleteTileset: {
+      enable: true,
+    },
+    generateMbtiles: {
+      enabled: true,
+    },
+  },
+
   port: 7400,
   publicUrl: 'http://localhost:7400',
   directoryUrl: 'http://localhost:7400/simple-directory',
+  openapiViewerUrl: 'https://koumoul.com/openapi-viewer/',
   mongoUrl: 'mongodb://localhost:27017/data-fair-maps-' + (process.env.NODE_ENV || 'development'),
   maplibrePool: 10,
   imageSizeLimit: 1000 * 1000,
   fontsPath: './fonts',
   prometheus: true,
   exposePrometheus: true,
-  openapiViewerUrl: 'https://koumoul.com/openapi-viewer/',
   info: {
     termsOfService: 'https://koumoul.com/platform/term-of-service',
     contact: {
