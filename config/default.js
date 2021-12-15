@@ -4,18 +4,18 @@ module.exports = {
     enabled: true,
     // renderedTiles: false,
   },
-  worker: {
+  workers: {
     enabled: true,
-    importMbtiles: {
-      enable: true,
+    importMBTiles: {
+      enabled: true,
       // pool: 2,
       // sleepTime: 200,
       // batchSize: 100,
     },
     deleteTileset: {
-      enable: true,
+      enabled: true,
     },
-    generateMbtiles: {
+    generateMBTiles: {
       enabled: true,
     },
   },

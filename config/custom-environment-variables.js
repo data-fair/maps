@@ -3,19 +3,19 @@ module.exports = {
     enabled: 'HTTP_ENABLED',
     renderedTiles: 'HTTP_RENDERED_TILES',
   },
-  worker: {
+  workers: {
     enabled: 'WORKER_ENABLED',
-    importMbtiles: {
+    importMBTiles: {
       enabled: 'WORKER_IMPORT_MBTILES_ENABLED',
       // pool: 'WORKER_IMPORT_POOL',
       // batchSize: 'WORKER_IMPORT_BATCHSIZE',
       // sleepTime: 'WORKER_IMPORT_SLEEPTIME',
     },
-    deleteMbtiles: {
-      enabled: 'WORKER_DELETE_MBTILES_ENABLED',
+    deleteTileset: {
+      enabled: 'WORKER_DELETE_TILESET_ENABLED',
     },
-    generateMbtiles: {
-      enable: 'WORKER_GENERATE_MBTILES_ENABLED',
+    generateMBTiles: {
+      enabled: 'WORKER_GENERATE_MBTILES_ENABLED',
     },
   },
 
