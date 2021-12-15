@@ -8,6 +8,7 @@ module.exports = (filename) => new Promise((resolve, reject) => {
     const asyncMBTiles = {
       getInfo: promisify(mbtiles.getInfo.bind(mbtiles)),
       getTile: promisify((z, x, y, callback) => mbtiles.getTile(z, x, y, (err, data, headers) => callback(err, { data, headers }))),
+      close: promisify(mbtiles.close.bind(mbtiles)),
     }
 
     resolve(asyncMBTiles)
