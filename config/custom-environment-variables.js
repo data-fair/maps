@@ -1,21 +1,36 @@
 module.exports = {
   http: {
-    enabled: 'HTTP_ENABLED',
+    enabled: {
+      __name: 'HTTP_ENABLED',
+      __format: 'json',
+    },
     renderedTiles: 'HTTP_RENDERED_TILES',
   },
   workers: {
-    enabled: 'WORKERS_ENABLED',
+    enabled: {
+      __name: 'WORKERS_ENABLED',
+      __format: 'json',
+    },
     importMBTiles: {
-      enabled: 'WORKER_IMPORT_MBTILES_ENABLED',
+      enabled: {
+        __name: 'WORKER_IMPORT_MBTILES_ENABLED',
+        __format: 'json',
+      },
       // pool: 'WORKER_IMPORT_POOL',
       // batchSize: 'WORKER_IMPORT_BATCHSIZE',
       // sleepTime: 'WORKER_IMPORT_SLEEPTIME',
     },
     deleteTileset: {
-      enabled: 'WORKER_DELETE_TILESET_ENABLED',
+      enabled: {
+        __name: 'WORKER_DELETE_TILESET_ENABLED',
+        __format: 'json',
+      },
     },
     generateMBTiles: {
-      enabled: 'WORKER_GENERATE_MBTILES_ENABLED',
+      enabled: {
+        __name: 'WORKER_GENERATE_MBTILES_ENABLED',
+        __format: 'json',
+      },
     },
   },
 
