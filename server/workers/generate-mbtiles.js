@@ -21,7 +21,7 @@ module.exports.executeGenerateTask = async (db, generateTask) => {
       await fs.mkdir(`./task-${id}/coastline`)
       await exec(`\
         cd ./task-${id} &&
-        wget -nv -O ./water-polygons-split-4326.zip  https://osmdata.openstreetmap.de/download/water-polygons-split-4326.zip &&
+        wget --no-check-certificate -nv -O ./water-polygons-split-4326.zip  https://osmdata.openstreetmap.de/download/water-polygons-split-4326.zip &&
         unzip -q ./water-polygons-split-4326.zip &&
         mv ./water-polygons-split-4326/* ./coastline
       `)
@@ -30,7 +30,7 @@ module.exports.executeGenerateTask = async (db, generateTask) => {
     await fs.mkdir(`./task-${id}/store`)
     await exec(`
       cd ./task-${id} &&
-      wget -nv -O ./input.osm.pbf http://download.geofabrik.de/${area}-latest.osm.pbf &&
+      wget --no-check-certificate -nv -O ./input.osm.pbf http://download.geofabrik.de/${area}-latest.osm.pbf &&
       ../tilemaker/tilemaker\
         --store ./store\
         --input ./input.osm.pbf\
