@@ -4,7 +4,7 @@ module.exports = {
     renderedTiles: 'HTTP_RENDERED_TILES',
   },
   workers: {
-    enabled: 'WORKER_ENABLED',
+    enabled: 'WORKERS_ENABLED',
     importMBTiles: {
       enabled: 'WORKER_IMPORT_MBTILES_ENABLED',
       // pool: 'WORKER_IMPORT_POOL',
