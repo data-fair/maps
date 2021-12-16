@@ -11,21 +11,21 @@ const timeout = process.env.NODE_ENV === 'test' ? 100 : 1000
 let stopped = false
 
 module.exports.executeGenerateTask = async (db, generateTask) => {
-  generateTask = (await db.collection('task').findOneAndUpdate({ _id: generateTask._id, status: 'pending', type: 'generate-mbtiles' }, { $set: { status: 'working' } }, { returnNewDocument: true })).value
-  if (!generateTask) return
   try {
     const area = generateTask.area
     const tileset = generateTask.tileset
     const id = nanoid()
 
     await fs.mkdir(`./task-${id}`)
-    // await fs.mkdir(`./task-${id}/coastline`)
-    // await exec(`\
-    //   cd ./task-${id} &&\
-    //   wget -nv -O ./water-polygons-split-4326.zip  https://osmdata.openstreetmap.de/download/water-polygons-split-4326.zip
-    //   unzip -q ./water-polygons-split-4326.zip
-    //   mv ./water-polygons-split-4326/* ./coastline
-    // `)
+    if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
+      await fs.mkdir(`./task-${id}/coastline`)
+      await exec(`\
+        cd ./task-${id} &&
+        wget -nv -O ./water-polygons-split-4326.zip  https://osmdata.openstreetmap.de/download/water-polygons-split-4326.zip &&
+        unzip -q ./water-polygons-split-4326.zip &&
+        mv ./water-polygons-split-4326/* ./coastline
+      `)
+    }
 
     await fs.mkdir(`./task-${id}/store`)
     await exec(`
@@ -53,8 +53,10 @@ module.exports.executeGenerateTask = async (db, generateTask) => {
 const loop = async({ db }) => {
   // eslint-disable-next-line no-unmodified-loop-condition
   while (!stopped) {
-    const generateTask = await db.collection('task').findOne({ status: 'pending', type: 'generate-mbtiles' })
+    let generateTask = await db.collection('task').findOne({ status: 'pending', type: 'generate-mbtiles' })
     if (!generateTask) { await new Promise(resolve => setTimeout(resolve, timeout)); continue }
+    generateTask = (await db.collection('task').findOneAndUpdate({ _id: generateTask._id, status: 'pending', type: 'generate-mbtiles' }, { $set: { status: 'working' } }, { returnNewDocument: true })).value
+    if (!generateTask) return
     await module.exports.executeGenerateTask(db, generateTask)
   }
 }
