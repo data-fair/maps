@@ -12,6 +12,7 @@ async function importMBTiles({ db }, { tileset, filename, options }) {
     $min: { minzoom: info.minzoom },
     $max: { maxzoom: info.maxzoom },
   }
+  if (JSON.stringify(document.bounds) !== JSON.stringify(info.bounds)) update.$unset = { bounds: undefined }
   await db.collection('tilesets').findOneAndUpdate({ _id: tileset, format: info.format }, update, { returnNewDocument: true })
 
   const importTask = {
