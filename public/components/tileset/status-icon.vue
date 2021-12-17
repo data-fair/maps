@@ -1,18 +1,18 @@
 <i18n lang="yaml">
 fr:
   tooltip-error: Une erreur a eu lieu pendant l'importation
-  tooltip-pending: Une tache d'importation est en attente
-  tooltip-importing: Une tache d'importation est en cours
-  tooltip-done: Le tileset est à jour
+  tooltip-pending: Cette tache d'importation est en attente
+  tooltip-working: Cette tache d'importation est en cours
+  tooltip-done: Cette tache d'importation est terminée
 en:
   tooltip-error: An error has occured
-  tooltip-pending: An import task is pending
-  tooltip-importing: An import task is running
-  tooltip-done: Tileset is up to date
+  tooltip-pending: This import task is pending
+  tooltip-working: This import task is running
+  tooltip-done: This import task has ended
 </i18n>
 
 <template>
-  <v-tooltip v-if="value.lastImport && value.lastImport.status" bottom>
+  <v-tooltip v-if="value.status" bottom>
     <template #activator="{ on }">
       <v-icon
         class="mx-1"
@@ -20,19 +20,19 @@ en:
           'done': 'green',
           'error': 'error',
           'pending': 'blue',
-          'importing': 'yellow darken-2',
-        }[value.lastImport.status]"
+          'working': 'yellow darken-2',
+        }[value.status]"
         @click="$emit('click')"
         v-on="on"
         v-text="{
           'done': 'mdi-checkbox-marked-circle',
           'error': 'mdi-close-circle',
           'pending': 'mdi-record-circle',
-          'importing': 'mdi-swap-horizontal-circle',
-        }[value.lastImport.status]"
+          'working': 'mdi-swap-horizontal-circle',
+        }[value.status]"
       />
     </template>
-    <span v-text="$t('tooltip-'+value.lastImport.status)" />
+    <span v-text="$t('tooltip-'+value.status)" />
   </v-tooltip>
 </template>
 

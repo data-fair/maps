@@ -74,14 +74,10 @@ router.get('', require('../middlewares/pagination')(), require('../middlewares/s
     req.app.get('db').collection('tilesets').countDocuments(query),
   ])
 
-  const lastImports = (await req.app.get('db').collection('import-tilesets').find({ _id: { $in: tilesets.map(t => t.lastImport) } }).toArray()).reduce((acc, lastImportDocument) =>
-    Object.assign(acc, { [lastImportDocument.tileset]: lastImportDocument })
-  , {})
   res.send({
     count,
     results: tilesets.map((tileset) => {
       tileset.tiles = [`${req.publicBaseUrl}/tilesets/${tileset._id}/tiles/{z}/{x}/{y}.pbf`]
-      tileset.lastImport = lastImports[tileset._id]
       return tileset
     }),
   })
@@ -149,9 +145,10 @@ router.post('', loadmbtiles, asyncWrap(async (req, res) => {
   const tileset = JSON.parse(JSON.stringify(info))
   tileset._id = _id
   tileset.tileCount = 0
-  tileset.lastImport = _id
   delete tileset.basename
   delete tileset.filesize
+
+  await req.app.get('db').collection('tilesets').insertOne(tileset)
 
   const options = {}
   if (req.body.area) options.area = req.body.area
@@ -162,7 +159,6 @@ router.post('', loadmbtiles, asyncWrap(async (req, res) => {
     options,
   })
 
-  await req.app.get('db').collection('tilesets').insertOne(tileset)
   return res.send(tileset)
 }))
 
@@ -199,7 +195,6 @@ router.get('/:tileset.json', asyncWrap(async (req, res) => {
   tileset.tiles = [
     `${req.publicBaseUrl}/api/tilesets/${req.params.tileset}/tiles/{z}/{x}/{y}.${tileset.format}`,
   ]
-  tileset.lastImport = await req.app.get('db').collection('import-tilesets').findOne({ _id: req.tilesetInfo.lastImport })
   res.send(tileset)
 }))
 
@@ -245,9 +240,9 @@ router.put('/:tileset', loadmbtiles, asyncWrap(async (req, res) => {
   const tileset = JSON.parse(JSON.stringify(info))
   tileset._id = _id
   tileset.tileCount = 0
-  tileset.lastImport = _id
   delete tileset.basename
   delete tileset.filesize
+  await req.app.get('db').collection('tilesets').insertOne(tileset)
 
   const options = {}
   if (req.body.area) options.area = req.body.area
@@ -258,7 +253,6 @@ router.put('/:tileset', loadmbtiles, asyncWrap(async (req, res) => {
     options,
   })
 
-  await req.app.get('db').collection('tilesets').insertOne(tileset)
   return res.send(tileset)
 }))
 
@@ -291,37 +285,23 @@ require('../api-docs').paths['/tilesets/{tileset}'].patch = {
 }
 
 router.patch('/:tileset', loadmbtiles, asyncWrap(async (req, res) => {
-  const lastImport = await req.app.get('db').collection('import-tilesets').findOne({ _id: req.tilesetInfo.lastImport })
-  if (!['done', 'error'].includes(lastImport.status)) return res.status(400).send('An import task is already running on this tileset')
-
   const _id = nanoid()
   const filename = `./mbtiles/${_id}.mbtiles`
   await fs.writeFile(filename, req.file.buffer)
-  const info = await (await asyncMBTiles(filename)).getInfo()
-  const $set = { lastImport: _id }
-  if (info.format !== req.tilesetInfo.format) res.status(400).send('The tile format does not match the original tile format')
-  if (req.headersSent) return await fs.unlink(filename)
-
-  if (info.minzoom < req.tilesetInfo.minzoom) $set.minzoom = info.minzoom
-  if (info.maxzoom > req.tilesetInfo.maxzoom) $set.maxzoom = info.maxzoom
-
-  const { modifiedCount } = await req.app.get('db').collection('tilesets').updateOne({ _id: req.params.tileset, lastImport: req.tilesetInfo.lastImport }, { $set, $unset: { bounds: undefined } })
-  // lastImport as been modified as we were checking everything
-  if (!modifiedCount) {
+  try {
+    const options = {}
+    if (req.body.area) options.area = req.body.area
+    await importMBTiles({ db: req.app.get('db') }, {
+      _id,
+      tileset: req.params.tileset,
+      options,
+      filename,
+    })
+    return res.send(req.tilesetInfo)
+  } catch (error) {
     await fs.unlink(filename)
-    return res.status(400).send('An import task is already running on this tileset')
+    return res.status(400).send(error.message)
   }
-
-  const options = {}
-  if (req.body.area) options.area = req.body.area
-  await importMBTiles({ db: req.app.get('db') }, {
-    _id,
-    tileset: req.params.tileset,
-    options,
-    filename,
-  })
-
-  return res.send(req.tilesetInfo)
 }))
 
 //
