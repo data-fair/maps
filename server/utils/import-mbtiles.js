@@ -1,4 +1,5 @@
 const asyncMBTiles = require('./async-MBTiles')
+const { nanoid } = require('nanoid')
 
 async function importMBTiles({ db }, { tileset, filename, options }) {
   const MBTiles = await asyncMBTiles(filename)
@@ -29,4 +30,17 @@ async function importMBTiles({ db }, { tileset, filename, options }) {
   await MBTiles.close()
 }
 
-module.exports = { importMBTiles }
+async function createTilesetFromMBTiles({ db }, { _id = nanoid(10), filename }) {
+  const MBTiles = await asyncMBTiles(filename)
+  const info = await MBTiles.getInfo()
+  const tileset = JSON.parse(JSON.stringify(info))
+  tileset._id = _id
+  tileset.tileCount = 0
+  delete tileset.basename
+  delete tileset.filesize
+  await db.collection('tilesets').insertOne(tileset)
+  await MBTiles.close()
+  return tileset
+}
+
+module.exports = { importMBTiles, createTilesetFromMBTiles }

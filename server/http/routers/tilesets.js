@@ -1,4 +1,3 @@
-const asyncMBTiles = require('../../utils/async-MBTiles')
 const fs = require('fs/promises')
 const { nanoid } = require('nanoid')
 const asyncWrap = require('../../utils/async-wrap')
@@ -7,7 +6,7 @@ const bboxUtils = require('../../utils/bbox')
 const loadmbtiles = multer().single('tileset.mbtiles')
 const config = require('config')
 const { generateInspectStyle } = require('../../utils/style')
-const { importMBTiles } = require('../../utils/import-mbtiles')
+const { importMBTiles, createTilesetFromMBTiles } = require('../../utils/import-mbtiles')
 const lastModifiedMiddleware = require('../middlewares/last-modified')
 
 const router = module.exports = require('express').Router()
@@ -135,27 +134,16 @@ require('../api-docs').paths['/tilesets'].post = {
 }
 
 router.post('', loadmbtiles, asyncWrap(async (req, res) => {
-  const _id = nanoid(10)
-
-  const filename = `./mbtiles/${_id}.mbtiles`
+  const filename = `./mbtiles/${nanoid(10)}.mbtiles`
   await fs.writeFile(filename, req.file.buffer)
 
-  const MBTiles = await asyncMBTiles(filename)
-  const info = await MBTiles.getInfo()
-
-  const tileset = JSON.parse(JSON.stringify(info))
-  tileset._id = _id
-  tileset.tileCount = 0
-  delete tileset.basename
-  delete tileset.filesize
-
-  await req.app.get('db').collection('tilesets').insertOne(tileset)
+  const tileset = await createTilesetFromMBTiles({ db: req.app.get('db') }, { filename })
 
   const options = {}
   if (req.body.area) options.area = req.body.area
   await importMBTiles({ db: req.app.get('db') }, {
-    _id,
-    tileset: _id,
+    _id: tileset._id,
+    tileset: tileset._id,
     filename,
     options,
   })
@@ -235,15 +223,7 @@ router.put('/:tileset', loadmbtiles, asyncWrap(async (req, res) => {
   const filename = `./mbtiles/${_id}.mbtiles`
   await fs.writeFile(filename, req.file.buffer)
 
-  const MBTiles = await asyncMBTiles(filename)
-  const info = await MBTiles.getInfo()
-
-  const tileset = JSON.parse(JSON.stringify(info))
-  tileset._id = _id
-  tileset.tileCount = 0
-  delete tileset.basename
-  delete tileset.filesize
-  await req.app.get('db').collection('tilesets').insertOne(tileset)
+  const tileset = await createTilesetFromMBTiles({ db: req.app.get('db') }, { _id, filename })
 
   const options = {}
   if (req.body.area) options.area = req.body.area
