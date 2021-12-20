@@ -59,15 +59,15 @@ const loop = async({ db }) => {
         })
       }
       await sql.close()
-      if (stopped) await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { status: 'pending' } })
+      if (stopped) await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { status: 'pending' }, $unset: { lockDate: undefined } })
       else {
         await fs.unlink(filename)
-        await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { status: 'done', tileImported: skip } })
+        await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { status: 'done', tileImported: skip }, $unset: { lockDate: undefined } })
         events.emit(`imported:${ts}`)
       }
     } catch (error) {
       console.error(error)
-      await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { status: 'error', error } })
+      await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { status: 'error', error }, $unset: { lockDate: undefined } })
     }
   }
 }
