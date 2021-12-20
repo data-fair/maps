@@ -9,12 +9,13 @@ const pbfTiles = require('./pbf-tiles')
 
 const batchSize = 200
 const timeout = process.env.NODE_ENV === 'test' ? 100 : 5000
-
+const lockDuration = 10 * 60 * 1000
 let stopped = false
 
 const loop = async({ db }) => {
   // eslint-disable-next-line no-unmodified-loop-condition
   while (!stopped) {
+    await db.collection('import-tilesets').updateMany({ status: 'working', lockDate: { $lt: (new Date(Date.now() - lockDuration)) } }, { $set: { status: 'pending' }, $unset: { lockDate: undefined } })
     let importTask = (await db.collection('import-tilesets').aggregate([
       { $match: { status: { $in: ['pending', 'working'] } } },
       { $sort: { date: 1 } },
@@ -29,7 +30,7 @@ const loop = async({ db }) => {
       { $limit: 1 },
     ]).toArray())[0]
     if (!importTask) { await new Promise(resolve => setTimeout(resolve, timeout)); continue }
-    importTask = (await db.collection('import-tilesets').findOneAndUpdate({ _id: importTask.tast_id, status: 'pending' }, { $set: { status: 'working' } }, { returnNewDocument: true })).value
+    importTask = (await db.collection('import-tilesets').findOneAndUpdate({ _id: importTask.tast_id, status: 'pending' }, { $set: { status: 'working', lockDate: new Date() } }, { returnNewDocument: true })).value
     if (!importTask) continue
     try {
       let skip = importTask.tileImported || 0
@@ -51,11 +52,15 @@ const loop = async({ db }) => {
 
         skip += tiles.length
 
-        await db.collection('tilesets').updateOne({ _id: ts }, { $inc: { tileCount: insertedCount }, $set: { lastModified: Date.now() } })
+        await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { tileImported: skip, lockDate: new Date() } })
+        await db.collection('tilesets').updateOne({ _id: ts }, {
+          $inc: { tileCount: insertedCount },
+          $set: { lastModified: new Date() },
+        })
       }
-      if (stopped) await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { status: 'pending', tileImported: skip } })
+      await sql.close()
+      if (stopped) await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { status: 'pending' } })
       else {
-        await sql.close()
         await fs.unlink(filename)
         await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { status: 'done', tileImported: skip } })
         events.emit(`imported:${ts}`)
