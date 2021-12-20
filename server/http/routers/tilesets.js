@@ -3,7 +3,7 @@ const { nanoid } = require('nanoid')
 const asyncWrap = require('../../utils/async-wrap')
 const multer = require('multer')
 const bboxUtils = require('../../utils/bbox')
-const loadmbtiles = multer().single('tileset.mbtiles')
+const loadmbtiles = multer({ storage: multer.diskStorage({ destination: './mbtiles/' }) }).single('tileset.mbtiles')
 const config = require('config')
 const { generateInspectStyle } = require('../../utils/style')
 const { importMBTiles, createTilesetFromMBTiles } = require('../../utils/import-mbtiles')
@@ -134,8 +134,7 @@ require('../api-docs').paths['/tilesets'].post = {
 }
 
 router.post('', loadmbtiles, asyncWrap(async (req, res) => {
-  const filename = `./mbtiles/${nanoid(10)}.mbtiles`
-  await fs.writeFile(filename, req.file.buffer)
+  const filename = req.file.path
 
   const tileset = await createTilesetFromMBTiles({ db: req.app.get('db') }, { filename })
 
@@ -218,10 +217,11 @@ require('../api-docs').paths['/tilesets/{tileset}'].put = {
 router.put('/:tileset', loadmbtiles, asyncWrap(async (req, res) => {
   const _id = req.params.tileset
   const existingTileset = await req.app.get('db').collection('tilesets').findOne({ _id })
-  if (existingTileset) return res.status(400).send('This tileset already exist')
-
-  const filename = `./mbtiles/${_id}.mbtiles`
-  await fs.writeFile(filename, req.file.buffer)
+  const filename = req.file.path
+  if (existingTileset) {
+    await fs.unlink(filename)
+    return res.status(400).send('This tileset already exist')
+  }
 
   const tileset = await createTilesetFromMBTiles({ db: req.app.get('db') }, { _id, filename })
 
@@ -267,8 +267,7 @@ require('../api-docs').paths['/tilesets/{tileset}'].patch = {
 
 router.patch('/:tileset', loadmbtiles, asyncWrap(async (req, res) => {
   const _id = nanoid()
-  const filename = `./mbtiles/${_id}.mbtiles`
-  await fs.writeFile(filename, req.file.buffer)
+  const filename = req.file.path
   try {
     const options = {}
     if (req.body.area) options.area = req.body.area
