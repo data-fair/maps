@@ -8,6 +8,7 @@ const loadmbtiles = multer().single('tileset.mbtiles')
 const config = require('config')
 const { generateInspectStyle } = require('../../utils/style')
 const { importMBTiles } = require('../../utils/import-mbtiles')
+const lastModifiedMiddleware = require('../middlewares/last-modified')
 
 const router = module.exports = require('express').Router()
 
@@ -413,7 +414,7 @@ require('../api-docs').paths['/tilesets/{tileset}/preview/{width}x{height}.png']
   },
 }
 
-router.get('/:tileset/preview/:width(\\d+)x:height(\\d+).png', asyncWrap(async (req, res) => {
+router.get('/:tileset/preview/:width(\\d+)x:height(\\d+).png', lastModifiedMiddleware((req) => req?.tilesetInfo?.lastModified), asyncWrap(async (req, res) => {
   const mapOptions = {
     height: parseInt(req.params.height),
     width: parseInt(req.params.width),

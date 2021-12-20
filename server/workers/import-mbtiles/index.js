@@ -51,7 +51,7 @@ const loop = async({ db }) => {
 
         skip += tiles.length
 
-        await db.collection('tilesets').updateOne({ _id: ts }, { $inc: { tileCount: insertedCount } })
+        await db.collection('tilesets').updateOne({ _id: ts }, { $inc: { tileCount: insertedCount }, $set: { lastModified: Date.now() } })
       }
       if (stopped) await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { status: 'pending', tileImported: skip } })
       else {

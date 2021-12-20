@@ -3,6 +3,7 @@ const Protobuf = require('pbf')
 const tiletype = require('@mapbox/tiletype')
 const asyncWrap = require('../../utils/async-wrap')
 const zlib = require('zlib')
+const lastModifiedMiddleware = require('../middlewares/last-modified')
 
 const router = module.exports = require('express').Router({ mergeParams: true })
 
@@ -54,7 +55,7 @@ require('../api-docs').paths['/tilesets/{tileset}/tiles/{z}/{x}/{y}.{format}'] =
   },
 }
 
-router.get('/:z/:x/:y.geojson', asyncWrap(async (req, res) => {
+router.get('/:z/:x/:y.geojson', lastModifiedMiddleware((req) => req?.tilesetInfo?.lastModified), asyncWrap(async (req, res) => {
   if (req.tilesetInfo.format !== 'pbf') return res.status(400).send('Wrong format')
   const query = {
     ts: req.params.tileset,
@@ -83,7 +84,7 @@ router.get('/:z/:x/:y.geojson', asyncWrap(async (req, res) => {
   res.send(geojson)
 }))
 
-router.get('/:z/:x/:y.:tileFormat', asyncWrap(async (req, res) => {
+router.get('/:z/:x/:y.:tileFormat', lastModifiedMiddleware((req) => req?.tilesetInfo?.lastModified), asyncWrap(async (req, res) => {
   if (req.tilesetInfo && req.params.tileFormat !== req.tilesetInfo.format) return res.status(400).send('Wrong tile format')
 
   const query = {
