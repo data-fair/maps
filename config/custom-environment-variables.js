@@ -16,9 +16,10 @@ module.exports = {
         __name: 'WORKER_IMPORT_MBTILES_ENABLED',
         __format: 'json',
       },
-      // pool: 'WORKER_IMPORT_POOL',
-      // batchSize: 'WORKER_IMPORT_BATCHSIZE',
-      // sleepTime: 'WORKER_IMPORT_SLEEPTIME',
+      pool: 'WORKER_IMPORT_POOL',
+      batchSize: 'WORKER_IMPORT_BATCHSIZE',
+      sleepTime: 'WORKER_IMPORT_SLEEPTIME',
+      lockTime: 'WORKER_IMPORT_LOCKTIME',
     },
     deleteTileset: {
       enabled: {

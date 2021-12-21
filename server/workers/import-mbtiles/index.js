@@ -1,21 +1,20 @@
-const asyncSqlite = require('../../utils/async-sqlite3')
-const asyncMBTiles = require('../../utils/async-MBTiles')
-
+const config = require('config')
 const fs = require('fs/promises')
 const events = new (require('events').EventEmitter)()
 
+const asyncSqlite = require('../../utils/async-sqlite3')
+const asyncMBTiles = require('../../utils/async-MBTiles')
 const defaultTiles = require('./default-tiles')
 const pbfTiles = require('./pbf-tiles')
 
-const batchSize = 200
-const timeout = process.env.NODE_ENV === 'test' ? 100 : 5000
-const lockDuration = 10 * 60 * 1000
+const { batchSize, pool: poolSize, sleepTime, lockTime } = config.workers.importMBTiles
+
 let stopped = false
 
 const loop = async({ db }) => {
   // eslint-disable-next-line no-unmodified-loop-condition
   while (!stopped) {
-    await db.collection('import-tilesets').updateMany({ status: 'working', lockDate: { $lt: (new Date(Date.now() - lockDuration)) } }, { $set: { status: 'pending' }, $unset: { lockDate: undefined } })
+    await db.collection('import-tilesets').updateMany({ status: 'working', lockDate: { $lt: (new Date(Date.now() - lockTime)) } }, { $set: { status: 'pending' }, $unset: { lockDate: undefined } })
     let importTask = (await db.collection('import-tilesets').aggregate([
       { $match: { status: { $in: ['pending', 'working'] } } },
       { $sort: { date: 1 } },
@@ -29,7 +28,7 @@ const loop = async({ db }) => {
       { $match: { status: 'pending' } },
       { $limit: 1 },
     ]).toArray())[0]
-    if (!importTask) { await new Promise(resolve => setTimeout(resolve, timeout)); continue }
+    if (!importTask) { await new Promise(resolve => setTimeout(resolve, sleepTime)); continue }
     importTask = (await db.collection('import-tilesets').findOneAndUpdate({ _id: importTask.tast_id, status: 'pending' }, { $set: { status: 'working', lockDate: new Date() } }, { returnNewDocument: true })).value
     if (!importTask) continue
     try {
@@ -74,7 +73,7 @@ const loop = async({ db }) => {
 
 const pool = []
 module.exports.start = async ({ db }) => {
-  for (let i = 0; i < 4; i++) pool.push(loop({ db }))
+  for (let i = 0; i < poolSize; i++) pool.push(loop({ db }))
   return { events }
 }
 

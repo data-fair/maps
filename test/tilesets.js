@@ -70,9 +70,9 @@ describe('Tilesets', () => {
     assert.equal(tileset.tileCount, 1)
 
     await global.ax.superadmin.delete('/api/tilesets/' + tileset._id)
+    await eventToPromise(global.app.workers.deleteTileset.events, `deleted:${tileset._id}`)
     await assert.rejects(global.ax.superadmin.get(`/api/tilesets/${tileset._id}.json`))
 
-    await eventToPromise(global.app.workers.deleteTileset.events, `deleted:${tileset._id}`)
     const tiles = await global.app.db.collection('tiles').find({ ts: tileset._id }).toArray()
     assert.equal(tiles.length, 0)
   })

@@ -8,9 +8,10 @@ module.exports = {
     enabled: true,
     importMBTiles: {
       enabled: true,
-      // pool: 2,
-      // sleepTime: 200,
-      // batchSize: 100,
+      pool: 4,
+      sleepTime: 5000,
+      batchSize: 20,
+      lockTime: 10 * 60 * 1000,
     },
     deleteTileset: {
       enabled: true,

@@ -6,4 +6,9 @@ module.exports = {
   noUI: true,
   prometheus: false,
   fontsPath: './test/resources/fonts',
+  workers: {
+    importMBTiles: {
+      sleepTime: 100,
+    },
+  },
 }
