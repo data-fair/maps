@@ -16,9 +16,9 @@ module.exports = {
     deleteTileset: {
       enabled: true,
     },
-    generateMBTiles: {
-      enabled: true,
-    },
+    // generateMBTiles: {
+    //   enabled: true,
+    // },
   },
 
   port: 7400,

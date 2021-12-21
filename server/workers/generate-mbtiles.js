@@ -6,9 +6,9 @@ const exec = util.promisify(require('child_process').exec)
 const { nanoid } = require('nanoid')
 const { importMBTiles } = require('../utils/import-mbtiles')
 
-const events = new (require('events').EventEmitter)()
-const timeout = process.env.NODE_ENV === 'test' ? 100 : 1000
-let stopped = false
+// const events = new (require('events').EventEmitter)()
+// const timeout = process.env.NODE_ENV === 'test' ? 100 : 1000
+// const stopped = false
 
 module.exports.executeGenerateTask = async (db, generateTask) => {
   const area = generateTask.area
@@ -42,30 +42,30 @@ module.exports.executeGenerateTask = async (db, generateTask) => {
   await importMBTiles({ db }, { tileset, filename: `./mbtiles/${id}.mbtiles`, options: { area } })
 }
 
-const loop = async({ db }) => {
-  // eslint-disable-next-line no-unmodified-loop-condition
-  while (!stopped) {
-    let generateTask = await db.collection('task').findOne({ status: 'pending', type: 'generate-mbtiles' })
-    if (!generateTask) { await new Promise(resolve => setTimeout(resolve, timeout)); continue }
-    generateTask = (await db.collection('task').findOneAndUpdate({ _id: generateTask._id, status: 'pending', type: 'generate-mbtiles' }, { $set: { status: 'working' } }, { returnNewDocument: true })).value
-    if (!generateTask) return
-      try {
-      await module.exports.executeGenerateTask(db, generateTask)
-      await db.collection('task').updateOne({ _id: generateTask._id, status: 'working' }, { $set: { status: 'done' } })
-    } catch (error) {
-      console.error(error)
-      await db.collection('task').updateOne({ _id: generateTask._id, status: 'working' }, { $set: { status: 'error', error } })
-    }
-  }
-}
+// const loop = async({ db }) => {
+//   // eslint-disable-next-line no-unmodified-loop-condition
+//   while (!stopped) {
+//     let generateTask = await db.collection('task').findOne({ status: 'pending', type: 'generate-mbtiles' })
+//     if (!generateTask) { await new Promise(resolve => setTimeout(resolve, timeout)); continue }
+//     generateTask = (await db.collection('task').findOneAndUpdate({ _id: generateTask._id, status: 'pending', type: 'generate-mbtiles' }, { $set: { status: 'working' } }, { returnNewDocument: true })).value
+//     if (!generateTask) return
+//       try {
+//       await module.exports.executeGenerateTask(db, generateTask)
+//       await db.collection('task').updateOne({ _id: generateTask._id, status: 'working' }, { $set: { status: 'done' } })
+//     } catch (error) {
+//       console.error(error)
+//       await db.collection('task').updateOne({ _id: generateTask._id, status: 'working' }, { $set: { status: 'error', error } })
+//     }
+//   }
+// }
 
-const pool = []
-module.exports.start = async ({ db }) => {
-  for (let i = 0; i < 2; i++) pool.push(loop({ db }))
-  return { events }
-}
+// const pool = []
+// module.exports.start = async ({ db }) => {
+//   for (let i = 0; i < 2; i++) pool.push(loop({ db }))
+//   return { events }
+// }
 
-module.exports.stop = async () => {
-  stopped = true
-  await Promise.all(pool)
-}
+// module.exports.stop = async () => {
+//   stopped = true
+//   await Promise.all(pool)
+// }

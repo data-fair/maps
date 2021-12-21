@@ -22,7 +22,7 @@ en:
       <v-card-subtitle v-if="tileset" v-text="env.publicUrl+'/api/tilesets/'+tileset._id+'.json'" />
       <v-card-text v-if="tileset">
         <v-row>
-          <v-col cols="6">
+          <v-col cols="12">
             <maplibre
               :map-style="tileset.vector_layers?{
                 center: [tileset.center?.[0],tileset.center?.[1]],
@@ -55,7 +55,7 @@ en:
               inspect
             />
           </v-col>
-          <v-col v-if="tileset.vector_layers" cols="6">
+          <v-col v-if="tileset.vector_layers" cols="12">
             <v-card-title v-t="'layers-title'" />
             <v-card outlined>
               <v-tabs

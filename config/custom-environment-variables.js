@@ -27,12 +27,12 @@ module.exports = {
         __format: 'json',
       },
     },
-    generateMBTiles: {
-      enabled: {
-        __name: 'WORKER_GENERATE_MBTILES_ENABLED',
-        __format: 'json',
-      },
-    },
+    // generateMBTiles: {
+    //   enabled: {
+    //     __name: 'WORKER_GENERATE_MBTILES_ENABLED',
+    //     __format: 'json',
+    //   },
+    // },
   },
 
   port: 'PORT',
