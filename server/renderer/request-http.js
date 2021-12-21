@@ -1,5 +1,16 @@
 
-const axios = require('axios')
+const http = require('http')
+const https = require('https')
+const cacheableLookup = new (require('cacheable-lookup'))()
+
+const httpAgent = new http.Agent()
+const httpsAgent = new https.Agent()
+cacheableLookup.install(httpAgent)
+cacheableLookup.install(httpsAgent)
+
+const axios = require('axios').create({
+    httpAgent, httpsAgent,
+})
 
 module.exports = async (req, { db, context }) => {
     const axiosOption = {
