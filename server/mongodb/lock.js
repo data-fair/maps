@@ -1,5 +1,4 @@
 const { nanoid } = require('nanoid')
-const config = require('config')
 const pid = nanoid()
 
 let interval
