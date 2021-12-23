@@ -1,5 +1,13 @@
 const lock = require('./lock')
 
+async function ensureSharding(db, collection, key) {
+  try {
+    await db.admin().command({ shardCollection: db.collection(collection).namespace, key })
+  } catch (error) {
+    if (error.codeName !== 'LockBusy') throw error
+  }
+}
+
 module.exports = async (db) => {
   try {
     await db.command({ isdbgrid: 1 })
@@ -15,7 +23,7 @@ module.exports = async (db) => {
   }
   await db.admin().command({ enableSharding: db.namespace })
   await Promise.all([
-    db.admin().command({ shardCollection: db.collection('tiles').namespace, key: { ts: 1, z: 1, x: 1, y: 1 } }),
+    ensureSharding(db, 'tiles', { ts: 1, z: 1, x: 1, y: 1 }),
   ])
   await lock.release(db, 'sharding')
 }
