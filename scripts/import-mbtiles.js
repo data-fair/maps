@@ -37,14 +37,16 @@ program
         console.error(error.message)
         process.exit(-1)
       }
-      if (!tileset) {
-        process.stdout.write('Creating tileset ... ')
-        tileset = await createTilesetFromMBTiles({ db }, { tileset: options.tileset, filename: options.file })
-        console.log('ok')
-      }
+      process.stdout.write('Copy mbtiles ... ')
       const file = `./mbtiles/${nanoid()}.mbtiles`
       await fs.cp(options.file, file)
       options.file = file
+      console.log('ok')
+      if (!tileset) {
+        process.stdout.write('Creating tileset ... ')
+        tileset = await createTilesetFromMBTiles({ db }, { _id: options.tileset, filename: options.file })
+        console.log('ok')
+      }
       process.stdout.write('Create import task ... ')
       await importMBTiles({ db }, {
         tileset: tileset._id,
