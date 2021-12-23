@@ -15,7 +15,7 @@ module.exports = async (db) => {
   }
   await db.admin().command({ enableSharding: db.namespace })
   await Promise.all([
-    db.admin.command({ shardCollection: db.collection('tiles').namespace, key: { ts: 1, z: 1, x: 1, y: 1 } }),
+    db.admin().command({ shardCollection: db.collection('tiles').namespace, key: { ts: 1, z: 1, x: 1, y: 1 } }),
   ])
   await lock.release(db, 'sharding')
 }
