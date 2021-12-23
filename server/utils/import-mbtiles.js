@@ -19,9 +19,7 @@ async function importMBTiles({ db }, { tileset, filename, options }) {
   const importTask = {
     tileset,
     filename,
-    options: Object.assign({
-      area: 'default-area',
-    }, options),
+    options,
     tilejson: JSON.parse(JSON.stringify(info)),
     date: Date.now(),
     status: 'pending',
