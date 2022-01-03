@@ -41,8 +41,10 @@ program
       const file = `./mbtiles/${nanoid()}.mbtiles`
       await fs.cp(options.file, file)
       options.file = file
+      const filehandler = await fs.open(options.file)
+      await filehandler.sync()
+      await filehandler.close()
       console.log('ok')
-      await new Promise((resolve) => setTimeout(resolve, 5000))
       if (!tileset) {
         console.log('Creating tileset ... ')
         tileset = await createTilesetFromMBTiles({ db }, { _id: options.tileset, filename: options.file })
