@@ -16,17 +16,17 @@ program
   // .addOption(new Option('--description <description>', ''))
   .action(async(options) => {
     try {
-      process.stdout.write('Connecting to mongodb ... ')
+      console.log('Connecting to mongodb ... ')
       const db = await require('../server/mongodb').start()
       console.log('ok')
       let tileset = options.tileset ? await db.collection('tilesets').findOne({ _id: options.tileset }) : undefined
       try {
         console.log('Validating Options :', options)
         if (tileset) {
-          if (!options['insert-method']) throw new Error('the given tileset exist but no insertion methods has been specified')
+          if (!options.insertMethod) throw new Error('the given tileset exist but no insertion methods has been specified')
           // merge/replace
         } else {
-          options['insert-method'] = 'replace'
+          options.insertMethod = 'replace'
           if (!options.create) {
             if (options.tileset) throw new Error('the given tileset does not exist, use "--create" to create it from the given mbtiles')
             else throw new Error('no tileset has been specified, use "--create" to create a new tileset or/and "--tileset <tileset>" to specify a tileset id')
@@ -37,23 +37,24 @@ program
         console.error(error.message)
         process.exit(-1)
       }
-      process.stdout.write('Copy mbtiles ... ')
+      console.log('Copy mbtiles ... ')
       const file = `./mbtiles/${nanoid()}.mbtiles`
       await fs.cp(options.file, file)
       options.file = file
       console.log('ok')
+      await new Promise((resolve) => setTimeout(resolve, 5000))
       if (!tileset) {
-        process.stdout.write('Creating tileset ... ')
+        console.log('Creating tileset ... ')
         tileset = await createTilesetFromMBTiles({ db }, { _id: options.tileset, filename: options.file })
         console.log('ok')
       }
-      process.stdout.write('Create import task ... ')
+      console.log('Create import task ... ')
       await importMBTiles({ db }, {
         tileset: tileset._id,
         filename: options.file,
         options: {
           area: options.area,
-          method: options['insert-method'],
+          method: options.insertMethod,
         },
       })
       console.log('ok')
