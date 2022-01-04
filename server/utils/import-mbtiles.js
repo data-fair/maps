@@ -2,8 +2,9 @@ const asyncMBTiles = require('./async-MBTiles')
 const { nanoid } = require('nanoid')
 
 async function importMBTiles({ db }, { tileset, filename, options }) {
-  const MBTiles = await asyncMBTiles(filename)
+  const MBTiles = await asyncMBTiles(filename + '?mode=ro')
   const info = await MBTiles.getInfo()
+  await MBTiles.close()
 
   const document = await db.collection('tilesets').findOne({ _id: tileset })
   if (!document) throw new Error('The original tileset does not exist')
@@ -25,19 +26,18 @@ async function importMBTiles({ db }, { tileset, filename, options }) {
     status: 'pending',
   }
   await db.collection('import-tilesets').insertOne(importTask)
-  await MBTiles.close()
 }
 
 async function createTilesetFromMBTiles({ db }, { _id = nanoid(10), filename }) {
-  const MBTiles = await asyncMBTiles(filename)
+  const MBTiles = await asyncMBTiles(filename + '?mode=ro')
   const info = await MBTiles.getInfo()
+  await MBTiles.close()
   const tileset = JSON.parse(JSON.stringify(info))
   tileset._id = _id
   tileset.tileCount = 0
   delete tileset.basename
   delete tileset.filesize
   await db.collection('tilesets').insertOne(tileset)
-  await MBTiles.close()
   return tileset
 }
 
