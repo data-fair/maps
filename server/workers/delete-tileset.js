@@ -1,4 +1,4 @@
-
+const semver = require('semver')
 const events = new (require('events').EventEmitter)()
 
 const timeout = process.env.NODE_ENV === 'test' ? 100 : 5000
@@ -13,10 +13,11 @@ const loop = async({ db }) => {
     deleteTask = (await db.collection('task').findOneAndUpdate({ _id: deleteTask._id, type: 'delete-tileset', status: 'pending' }, { $set: { status: 'working' } }, { returnNewDocument: true })).value
     if (!deleteTask) continue
     try {
-      const ts = deleteTask.tileset
-      await db.collection('tiles').deleteMany({ ts })
+      const query = { ts: deleteTask.tileset }
+      if (deleteTask.version) query.v = semver.major(deleteTask.version)
+      await db.collection('tiles').deleteMany(query)
       await db.collection('task').deleteOne({ _id: deleteTask._id, type: 'delete-tileset', status: 'working' })
-      events.emit(`deleted:${ts}`)
+      events.emit(`deleted:${deleteTask.tileset}`)
     } catch (error) {
       console.error(error)
       await db.collection('task').updateOne({ _id: deleteTask._id, type: 'delete-tileset', status: 'working' }, { $set: { status: 'error', error } })

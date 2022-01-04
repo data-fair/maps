@@ -65,15 +65,7 @@ const mergeTiles = (target, origin, area) => {
 }
 
 module.exports = {
-  importTile: async (db, importTask, tile) => {
-    // even if tileJSON.format equals xyz, mbtiles are tms
-    tile.tile_row = (1 << tile.zoom_level) - 1 - tile.tile_row
-    const mongoTileQuery = {
-      ts: importTask.tileset,
-      z: tile.zoom_level,
-      y: tile.tile_row,
-      x: tile.tile_column,
-    }
+  importTile: async (db, mongoTileQuery, importTask, tile) => {
     const area = importTask?.options?.area
     const existingTile = await db.collection('tiles').findOne(mongoTileQuery)
     if (!existingTile) {

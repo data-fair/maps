@@ -10,7 +10,9 @@ module.exports.start = async ({ db }) => {
 }
 
 module.exports.stop = async () => {
-  if (workers.importMBTiles) await require('./import-mbtiles').stop()
+  const promises = []
+  if (workers.importMBTiles) promises.push(require('./import-mbtiles').stop())
   // if (workers.generateMBTiles) await require('./generate-mbtiles').stop()
-  if (workers.deleteTileset) await require('./delete-tileset').stop()
+  if (workers.deleteTileset) promises.push(require('./delete-tileset').stop())
+  await Promise.all(promises)
 }
