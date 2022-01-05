@@ -1,5 +1,7 @@
 const asyncMBTiles = require('./async-MBTiles')
 const { nanoid } = require('nanoid')
+const path = require('path')
+const fs = require('fs/promises')
 
 async function importMBTiles({ db }, { tileset, filename, options }) {
   const MBTiles = await asyncMBTiles(filename + '?mode=ro')
@@ -16,7 +18,11 @@ async function importMBTiles({ db }, { tileset, filename, options }) {
   }
   if (JSON.stringify(document.bounds) !== JSON.stringify(info.bounds)) update.$unset = { bounds: undefined }
   await db.collection('tilesets').findOneAndUpdate({ _id: tileset, format: info.format }, update, { returnNewDocument: true })
-
+  if (path.dirname(filename) !== './mbtiles') {
+    const newpath = `./mbtiles/${nanoid()}`
+    await fs.cp(filename, newpath)
+    filename = newpath
+  }
   const importTask = {
     tileset,
     filename,

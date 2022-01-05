@@ -1,7 +1,5 @@
 const { Command, Option } = require('commander')
 const { importMBTiles, createTilesetFromMBTiles } = require('../server/utils/import-mbtiles')
-const fs = require('fs/promises')
-const { nanoid } = require('nanoid')
 
 const program = new Command()
 program.version(require('../package').version)
@@ -37,19 +35,13 @@ program
         console.error(error.message)
         process.exit(-1)
       }
-      console.log('Copy mbtiles ... ')
-      const file = `./mbtiles/${nanoid()}.mbtiles`
-      await fs.cp(options.file, file)
-      options.file = file
-      const filehandler = await fs.open(options.file)
-      await filehandler.sync()
-      await filehandler.close()
-      console.log('ok')
+
       if (!tileset) {
         console.log('Creating tileset ... ')
         tileset = await createTilesetFromMBTiles({ db }, { _id: options.tileset, filename: options.file })
         console.log('ok')
       }
+
       console.log('Create import task ... ')
       await importMBTiles({ db }, {
         tileset: tileset._id,
