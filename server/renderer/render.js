@@ -24,6 +24,8 @@ module.exports = (pool) => ({
 
         for (const source in context.additionalSources || {}) resource.map.addSource(source, context.additionalSources[source])
         for (const layer of (context.additionalLayers || []).flat()) resource.map.addLayer(layer)
+        for (const filter in context.filters || {}) resource.map.setFilter(filter, style.layers.find(l => l.id === filter)?.filter ? ['all', style.layers.find(l => l.id === filter).filter, context.filters[filter]] : context.filters[filter])
+        if (Object.keys(context.filters || {}).length) resource.oldStyle = undefined
 
         resource.map.render(mapOptions, (err, buffer) => {
           for (const layer of (context.additionalLayers || []).flat()) resource.map.removeLayer(layer.id)

@@ -135,6 +135,15 @@ require('../api-docs').paths['/render/{style}/{width}x{height}.{format}'] = {
           type: 'number',
         },
       },
+      {
+        name: 'filters',
+        in: 'query',
+        description: 'Additionnal filter for layers, formated as filters=<layer1>:<filter1>;<layer2>:<filter2>',
+        required: false,
+        schema: {
+          type: 'string',
+        },
+      },
     ],
     responses: {
       200: {
@@ -284,6 +293,21 @@ async function getOrPost(req, res) {
   }
   //
 
+  const filters = {}
+  if (req.query.filters) {
+    for (const layerFilter of req.query.filters.split(';').filter(f => f)) {
+      const layer = layerFilter.split(':')[0]
+      if (!layer) return res.status(400).send('wrong filter format')
+      try {
+        const filter = JSON.parse(`[${layerFilter.split(':').slice(1).join(':')}]`)
+        filters[layer] = filter
+        console.log(filter)
+      } catch (error) {
+        return res.status(400).send(error.message)
+      }
+    }
+  }
+
   //
   try {
     const context = {
@@ -292,6 +316,7 @@ async function getOrPost(req, res) {
       cachingSize: 0,
       additionalSources,
       additionalLayers,
+      filters,
     }
 
     if (req.style.sprite_png) context.spritePng = req.style.sprite_png.buffer
