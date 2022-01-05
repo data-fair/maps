@@ -1,6 +1,7 @@
 const config = require('config')
 const fs = require('fs/promises')
 const events = new (require('events').EventEmitter)()
+const debug = require('debug')('workers:import-mbtiles')
 const semver = require('semver')
 
 const asyncSqlite = require('../../utils/async-sqlite3')
@@ -38,12 +39,14 @@ const loop = async({ db }) => {
     try {
       let skip = importTask.tileImported || 0
       let importedSize = importTask.importedSize || 0
+      let insertedTiles = importTask.insertedTiles || 0
       const ts = importTask.tileset
       const filename = importTask.filename
       const { method } = importTask.options
 
       const tileset = await db.collection('tilesets').findOne({ _id: ts })
-      const v = semver.inc(tileset.version || '0.0.0', method === 'merge' ? 'minor' : 'major')
+      const v = semver.inc(semver.valid(tileset.version) ? tileset.version : '0.0.0', method === 'merge' ? 'minor' : 'major')
+      debug(`${skip > 0 ? 'resume' : 'start'} importation of ${ts} v${v}`)
 
       const mbtiles = await asyncMBTiles(filename)
       const info = await mbtiles.getInfo()
@@ -76,19 +79,24 @@ const loop = async({ db }) => {
         }, { insertedCount: 0, sizeDiff: 0 })
 
         skip += tiles.length
+        insertedTiles += insertedCount
         importedSize += sizeDiff
 
-        await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { tileImported: skip } })
+        await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { tileImported: skip, insertedTiles } })
         if (method !== 'replace') {
           await db.collection('tilesets').updateOne({ _id: ts }, {
             $inc: { tileCount: insertedCount, filesize: sizeDiff },
             $set: { lastModified: new Date() },
           })
         }
+        debug(`importation of ${ts} v${v} : ${skip} tiles processed, ${insertedCount} tile inserted, ${sizeDiff / 1000}KB added`)
       }
       await sql.close()
-      if (stopped) await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { status: 'pending' }, $unset: { lockDate: undefined } })
-      else {
+      if (stopped) {
+        debug(`pausing importation of ${ts} v${v}`)
+        await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { status: 'pending' }, $unset: { lockDate: undefined } })
+      } else {
+        debug(`ending importation of ${ts} v${v} : ${insertedTiles} tile inserted, ${importedSize / 1000}KB added`)
         await fs.unlink(filename)
 
         const $set = { version: v, lastModified: new Date() }

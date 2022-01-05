@@ -10,7 +10,7 @@ module.exports = {
       enabled: true,
       pool: 4,
       sleepTime: 5000,
-      batchSize: 20,
+      batchSize: 100,
       lockTime: 10 * 60 * 1000,
     },
     deleteTileset: {
