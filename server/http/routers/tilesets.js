@@ -3,7 +3,7 @@ const { nanoid } = require('nanoid')
 const asyncWrap = require('../../utils/async-wrap')
 const multer = require('multer')
 const bboxUtils = require('../../utils/bbox')
-const loadmbtiles = multer({ storage: multer.diskStorage({ destination: './mbtiles/' }) }).single('tileset.mbtiles')
+const loadmbtiles = multer({ storage: multer.diskStorage({ destination: './local/' }) }).single('tileset.mbtiles')
 const config = require('config')
 const { generateInspectStyle } = require('../../utils/style')
 const { importMBTiles, createTilesetFromMBTiles } = require('../../utils/import-mbtiles')
@@ -135,19 +135,22 @@ require('../api-docs').paths['/tilesets'].post = {
 
 router.post('', loadmbtiles, asyncWrap(async (req, res) => {
   const filename = req.file.path
+  try {
+    const tileset = await createTilesetFromMBTiles({ db: req.app.get('db') }, { filename })
 
-  const tileset = await createTilesetFromMBTiles({ db: req.app.get('db') }, { filename })
+    const options = {}
+    if (req.body.area) options.area = req.body.area
+    await importMBTiles({ db: req.app.get('db') }, {
+      _id: tileset._id,
+      tileset: tileset._id,
+      filename,
+      options,
+    })
 
-  const options = {}
-  if (req.body.area) options.area = req.body.area
-  await importMBTiles({ db: req.app.get('db') }, {
-    _id: tileset._id,
-    tileset: tileset._id,
-    filename,
-    options,
-  })
-
-  return res.send(tileset)
+    return res.send(tileset)
+  } finally {
+    await fs.unlink(filename)
+  }
 }))
 
 //
@@ -218,23 +221,27 @@ router.put('/:tileset', loadmbtiles, asyncWrap(async (req, res) => {
   const _id = req.params.tileset
   const existingTileset = await req.app.get('db').collection('tilesets').findOne({ _id })
   const filename = req.file.path
-  if (existingTileset) {
+  try {
+    if (existingTileset) {
+      await fs.unlink(filename)
+      return res.status(400).send('This tileset already exist')
+    }
+
+    const tileset = await createTilesetFromMBTiles({ db: req.app.get('db') }, { _id, filename })
+
+    const options = {}
+    if (req.body.area) options.area = req.body.area
+    await importMBTiles({ db: req.app.get('db') }, {
+      _id,
+      tileset: _id,
+      filename,
+      options,
+    })
+
+    return res.send(tileset)
+  } finally {
     await fs.unlink(filename)
-    return res.status(400).send('This tileset already exist')
   }
-
-  const tileset = await createTilesetFromMBTiles({ db: req.app.get('db') }, { _id, filename })
-
-  const options = {}
-  if (req.body.area) options.area = req.body.area
-  await importMBTiles({ db: req.app.get('db') }, {
-    _id,
-    tileset: _id,
-    filename,
-    options,
-  })
-
-  return res.send(tileset)
 }))
 
 //
@@ -279,8 +286,9 @@ router.patch('/:tileset', loadmbtiles, asyncWrap(async (req, res) => {
     })
     return res.send(req.tilesetInfo)
   } catch (error) {
-    await fs.unlink(filename)
     return res.status(400).send(error.message)
+  } finally {
+    await fs.unlink(filename)
   }
 }))
 
