@@ -1,6 +1,6 @@
 module.exports = {
   importTile: async (db, mongoTileQuery, importTask, tile) => {
     const replaceOne = await db.collection('tiles').replaceOne(mongoTileQuery, { ...mongoTileQuery, d: tile.tile_data }, { upsert: true })
-    return 1 - replaceOne.matchedCount
+    return { new: !replaceOne.matchedCount }
   },
 }

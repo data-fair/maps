@@ -2,7 +2,7 @@ const { VectorTile } = require('@mapbox/vector-tile')
 const Protobuf = require('pbf')
 const vtpbf = require('vt-pbf')
 const zlib = require('zlib')
-
+const BSON = require('bson')
 // functions from https://github.com/koumoul-dev/openmaptiles-world/blob/master/lib/mbtiles.js
 const prepareVectorTile = (tileData, addProps) => {
   const tile = new VectorTile(new Protobuf(zlib.gunzipSync(tileData)))
@@ -67,19 +67,22 @@ const mergeTiles = (target, origin, area) => {
 module.exports = {
   importTile: async (db, mongoTileQuery, importTask, tile) => {
     const area = importTask?.options?.area
-    const existingTile = await db.collection('tiles').findOne(mongoTileQuery)
-    if (!existingTile) {
-      const d = vectorTileAsPbfBuffer(prepareVectorTile(tile.tile_data, { area }))
-      await db.collection('tiles').insertOne({ ...mongoTileQuery, d })
-      return 1
+    const existingDocument = await db.collection('tiles').findOne(mongoTileQuery)
+    let d
+    if (!existingDocument) {
+      d = vectorTileAsPbfBuffer(prepareVectorTile(tile.tile_data, { area }))
     } else {
-      // console.log(`${tile.zoom_level}/${tile.tile_column}/${tile.tile_row}`)
       const newTile = prepareVectorTile(tile.tile_data, { area })
-      const oldTile = prepareVectorTile(existingTile.d.buffer, { })
+      const oldTile = prepareVectorTile(existingDocument.d.buffer, { })
       mergeTiles(oldTile, newTile, area)
-      const d = vectorTileAsPbfBuffer(oldTile)
-      await db.collection('tiles').replaceOne(mongoTileQuery, { ...mongoTileQuery, d }, { upsert: true })
-      return 0
+      d = vectorTileAsPbfBuffer(oldTile)
+    }
+    const newDocument = { ...mongoTileQuery, d }
+    await db.collection('tiles').replaceOne(mongoTileQuery, newDocument, { upsert: true })
+    const existingDocumentSize = existingDocument ? BSON.calculateObjectSize(existingDocument) : 0
+    return {
+      new: !existingDocument,
+      sizeDiff: BSON.calculateObjectSize(newDocument) - existingDocumentSize,
     }
   },
 }

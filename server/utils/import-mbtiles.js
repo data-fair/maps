@@ -41,8 +41,8 @@ async function createTilesetFromMBTiles({ db }, { _id = nanoid(10), filename }) 
   const tileset = JSON.parse(JSON.stringify(info))
   tileset._id = _id
   tileset.tileCount = 0
+  tileset.filesize = 0
   delete tileset.basename
-  delete tileset.filesize
   await db.collection('tilesets').insertOne(tileset)
   return tileset
 }

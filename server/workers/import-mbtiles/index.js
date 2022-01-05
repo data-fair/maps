@@ -37,6 +37,7 @@ const loop = async({ db }) => {
 
     try {
       let skip = importTask.tileImported || 0
+      let importedSize = importTask.importedSize || 0
       const ts = importTask.tileset
       const filename = importTask.filename
       const { method } = importTask.options
@@ -58,7 +59,7 @@ const loop = async({ db }) => {
       while (!stopped) {
         const tiles = await sql.all(`SELECT * FROM tiles LIMIT ${batchSize} OFFSET ${skip}`)
         if (!tiles.length) break
-        const insertedCount = (await Promise.all(tiles.map((tile) => {
+        const { insertedCount, sizeDiff } = (await Promise.all(tiles.map((tile) => {
           // even if tileJSON.format equals xyz, mbtiles are tms
           tile.tile_row = (1 << tile.zoom_level) - 1 - tile.tile_row
           const query = {
@@ -68,14 +69,19 @@ const loop = async({ db }) => {
             x: tile.tile_column,
           }
           return importTile(db, query, importTask, tile)
-        }))).reduce((a, b) => a + b)
+        }))).reduce((acc, b) => {
+          if (b.new) acc.insertedCount++
+          acc.sizeDiff += b.sizeDiff || 0
+          return acc
+        }, { insertedCount: 0, sizeDiff: 0 })
 
         skip += tiles.length
+        importedSize += sizeDiff
 
         await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { tileImported: skip } })
         if (method !== 'replace') {
           await db.collection('tilesets').updateOne({ _id: ts }, {
-            $inc: { tileCount: insertedCount },
+            $inc: { tileCount: insertedCount, filesize: sizeDiff },
             $set: { lastModified: new Date() },
           })
         }
@@ -86,7 +92,7 @@ const loop = async({ db }) => {
         await fs.unlink(filename)
 
         const $set = { version: v, lastModified: new Date() }
-        if (method === 'replace') $set.tileCount = skip
+        if (method === 'replace') Object.assign($set, { tileCount: skip, filesize: importedSize })
         await db.collection('tilesets').updateOne({ _id: ts }, { $set })
 
         if (method === 'replace') await db.collection('task').insertOne({ type: 'delete-tileset', status: 'pending', ts, version: tileset.version })
