@@ -70,9 +70,10 @@ module.exports = {
     const existingDocument = await db.collection('tiles').findOne(mongoTileQuery)
     let d
     if (!existingDocument) {
-      d = vectorTileAsPbfBuffer(prepareVectorTile(tile.tile_data, { area }))
+      if (area) d = vectorTileAsPbfBuffer(prepareVectorTile(tile.tile_data, { area }))
+      else d = tile.tile_data
     } else {
-      const newTile = prepareVectorTile(tile.tile_data, { area })
+      const newTile = prepareVectorTile(tile.tile_data, area ? { area } : {})
       const oldTile = prepareVectorTile(existingDocument.d.buffer, { })
       mergeTiles(oldTile, newTile, area)
       d = vectorTileAsPbfBuffer(oldTile)
