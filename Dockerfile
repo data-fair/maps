@@ -23,7 +23,8 @@ RUN mkdir ./tippecanoe &&\
   mv ./tippecanoe/tippecanoe-1.36.0/* ./tippecanoe &&\
   cd ./tippecanoe &&\
   make &&\
-  make install
+  make install &&\
+  rm -rf ./tests ./*.cpp ./*.hpp ./*.o
 
 RUN mkdir ./tilemaker &&\
   wget --no-check-certificate -nv -O tilemaker.zip https://github.com/systemed/tilemaker/archive/27b3a7bc5eef1aeeed663c061c0cdcedb62099e5.zip &&\
@@ -32,7 +33,8 @@ RUN mkdir ./tilemaker &&\
   mv ./tilemaker/tilemaker-27b3a7bc5eef1aeeed663c061c0cdcedb62099e5/* ./tilemaker &&\
   cd ./tilemaker &&\
   make &&\
-  make install
+  make install &&\
+  rm -rf ./server
 
 RUN mkdir ./fonts &&\
   wget --no-check-certificate -nv -O fonts.zip https://github.com/openmaptiles/fonts/releases/download/v2.0/v2.0.zip &&\
