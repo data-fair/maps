@@ -2,6 +2,7 @@ const asyncMBTiles = require('./async-MBTiles')
 const { nanoid } = require('nanoid')
 const path = require('path')
 const fs = require('fs/promises')
+const semver = require('semver')
 
 async function importMBTiles({ db }, { tileset, filename, options }) {
   const MBTiles = await asyncMBTiles(filename + '?mode=ro')
@@ -39,6 +40,7 @@ async function createTilesetFromMBTiles({ db }, { _id = nanoid(10), filename }) 
   const info = await MBTiles.getInfo()
   await MBTiles.close()
   const tileset = JSON.parse(JSON.stringify(info))
+  tileset.version = semver.valid(tileset.version) ? tileset.version : '0.0.0'
   tileset._id = _id
   tileset.tileCount = 0
   tileset.filesize = 0

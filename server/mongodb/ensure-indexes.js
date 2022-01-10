@@ -14,7 +14,7 @@ async function ensureIndex(db, collection, key, options = {}) {
 
 module.exports = async (db) => {
   await Promise.all([
-    ensureIndex(db, 'tiles', { ts: 1, z: 1, x: 1, y: 1 }, { name: 'primary-keys', unique: true }),
+    ensureIndex(db, 'tiles', { ts: 1, z: 1, x: 1, y: 1, v: 1 }, { name: 'primary-keys', unique: true }),
 
     ensureIndex(db, 'styles', { _id: 'text', 'style.name': 'text' }, { name: 'fulltext' }),
 

@@ -4,6 +4,7 @@ const tiletype = require('@mapbox/tiletype')
 const asyncWrap = require('../../utils/async-wrap')
 const zlib = require('zlib')
 const lastModifiedMiddleware = require('../middlewares/last-modified')
+const semver = require('semver')
 
 const router = module.exports = require('express').Router({ mergeParams: true })
 
@@ -63,6 +64,7 @@ router.get('/:z/:x/:y.geojson', lastModifiedMiddleware((req) => req?.tilesetInfo
     y: req.params.y,
     z: req.params.z,
   }
+  if (semver.valid(req.tilesetInfo.version)) query.v = semver.major(req.tilesetInfo.version)
 
   const tile = await req.app.get('db').collection('tiles').findOne(query)
   if (!tile) { return res.sendStatus(404) }
@@ -93,6 +95,7 @@ router.get('/:z/:x/:y.:tileFormat', lastModifiedMiddleware((req) => req?.tileset
     y: req.params.y,
     z: req.params.z,
   }
+  if (semver.valid(req.tilesetInfo.version)) query.v = semver.major(req.tilesetInfo.version)
 
   const tile = await req.app.get('db').collection('tiles').findOne(query)
   if (!tile) { return res.sendStatus(404) }

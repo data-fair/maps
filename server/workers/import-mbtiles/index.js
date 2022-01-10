@@ -47,6 +47,7 @@ const loop = async({ db }) => {
 
       const tileset = await db.collection('tilesets').findOne({ _id: ts })
       const v = semver.inc(semver.valid(tileset.version) ? tileset.version : '0.0.0', method === 'merge' ? 'minor' : 'major')
+      const major = semver.major(v)
       debug(`${skip > 0 ? 'resume' : 'start'} importation of ${ts} v${v}`)
 
       await fs.cp(importTask.filename, filename)
@@ -73,6 +74,7 @@ const loop = async({ db }) => {
             z: tile.zoom_level,
             y: tile.tile_row,
             x: tile.tile_column,
+            v: major,
           }
           return importTile(db, query, importTask, tile)
         }))).reduce((acc, b) => {
