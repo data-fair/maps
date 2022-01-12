@@ -46,7 +46,7 @@ const loop = async({ db }) => {
       const { method } = importTask.options
 
       const tileset = await db.collection('tilesets').findOne({ _id: ts })
-      const v = semver.inc(semver.valid(tileset.version) ? tileset.version : '0.0.0', method === 'merge' ? 'minor' : 'major')
+      const v = semver.inc(semver.valid(tileset.version) ? tileset.version : '0.0.0', method !== 'replace' ? 'minor' : 'major')
       const major = semver.major(v)
       debug(`${skip > 0 ? 'resume' : 'start'} importation of ${ts} v${v}`)
 
