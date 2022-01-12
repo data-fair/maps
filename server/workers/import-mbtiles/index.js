@@ -107,7 +107,7 @@ const loop = async({ db }) => {
         await fs.unlink(importTask.filename)
 
         const $set = { version: v, lastModified: new Date() }
-        if (method === 'replace') Object.assign($set, { tileCount: skip, filesize: importedSize })
+        if (method === 'replace') Object.assign($set, { tileCount: skip, filesize: importedSize, name: info.name, description: info.description, minzoom: info.minzoom, maxzoom: info.maxzoom, center: info.center, bounds: info.bounds, vector_layers: info.vector_layers })
         await db.collection('tilesets').updateOne({ _id: ts }, { $set })
 
         if (method === 'replace') await db.collection('task').insertOne({ type: 'delete-tileset', status: 'pending', ts, version: tileset.version })
