@@ -11,6 +11,7 @@
 <script>
   // import maplibregl from 'maplibre-gl'
   require('maplibre-gl/dist/maplibre-gl.css')
+  require('maplibre-gl-inspect/dist/maplibre-gl-inspect.css')
   const maplibregl = require('maplibre-gl')
   const MaplibreInspect = require('maplibre-gl-inspect')
   export default {
@@ -35,7 +36,7 @@
           popup: new maplibregl.Popup({
             closeButton: false,
             closeOnClick: false,
-          }),
+          }).setMaxWidth('100vw'),
           showInspectMap: this.inspect !== 'toggle',
           showInspectButton: this.inspect === 'toggle',
         }))
