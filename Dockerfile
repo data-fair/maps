@@ -10,6 +10,7 @@ RUN \
     libsqlite3-dev protobuf-compiler shapelib libshp-dev\
     libboost-program-options-dev libboost-filesystem-dev\
     libboost-system-dev libboost-iostreams-dev rapidjson-dev\
+    gdal-bin\
   && rm -rf /var/lib/apt/lists/*
 
 RUN ln -s /maplibre-gl-native/lib /webapp/lib
