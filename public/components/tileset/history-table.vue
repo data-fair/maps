@@ -4,11 +4,15 @@ fr:
   table-header-date: Date
   table-header-area: Zone
   table-header-tile-imported: Tuiles importées
+  table-header-version: Version
+  table-header-size: Taille des données importées
 en:
   title: Importation history
   table-header-date: Date
   table-header-area: Area
   table-header-tile-imported: Imported tiles
+  table-header-version: Version
+  table-header-size: Imported data size
 </i18n>
 
 <template>
@@ -26,17 +30,21 @@ en:
       <thead>
         <tr>
           <th class="text-left" />
+          <th class="text-left" v-text="$t('table-header-version')" />
           <th class="text-left" v-text="$t('table-header-date')" />
           <th class="text-left" v-text="$t('table-header-area')" />
           <th class="text-left" v-text="$t('table-header-tile-imported')" />
+          <th class="text-left" v-text="$t('table-header-size')" />
         </tr>
       </thead>
       <tbody v-if="!$fetchState.pending">
         <tr v-for="task in history" :key="task._id">
           <td><status-icon :value="task" /></td>
+          <td>{{ task.version }}</td>
           <td>{{ new Date(task.date) }}</td>
           <td>{{ (task.options && task.options.area) || '' }}</td>
           <td>{{ task.tileImported }}</td>
+          <td>{{ task.importedSize/1000 }} KB</td>
         </tr>
       </tbody>
     </v-simple-table>

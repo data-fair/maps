@@ -1,13 +1,13 @@
 <i18n lang="yaml">
 fr:
   title: Tileset
-  layers-title: Détail des couches
+  details: Détails
   header-field: Champ
   header-type: Type
 
 en:
   title: Tileset
-  layers-title: Layers
+  details: Details
   header-field: Field
   header-type: Type
 
@@ -16,9 +16,7 @@ en:
 <template>
   <v-container>
     <v-card :loading="$fetchState.pending" flat>
-      <v-card-title v-if="tileset">
-        {{ $t('title')+': '+tileset.name }}
-      </v-card-title>
+      <v-card-title v-if="tileset" v-text="tileset.name" />
       <v-card-subtitle v-if="tileset" v-text="env.publicUrl+'/api/tilesets/'+tileset._id+'.json'" />
       <v-card-text v-if="tileset">
         <v-row>
@@ -56,7 +54,8 @@ en:
             />
           </v-col>
           <v-col v-if="tileset.vector_layers" cols="12">
-            <v-card-title v-t="'layers-title'" />
+            <v-card-title v-t="'details'" />
+            <v-card-subtitle v-if="tileset?.description" v-text="tileset?.description" />
             <v-card outlined>
               <v-tabs
                 vertical
