@@ -2,7 +2,7 @@
 module.exports = {
   http: {
     enabled: true,
-    // renderedTiles: false,
+    // renderedTiles: true,
   },
   workers: {
     enabled: true,
@@ -16,9 +16,6 @@ module.exports = {
     deleteTileset: {
       enabled: true,
     },
-    // generateMBTiles: {
-    //   enabled: true,
-    // },
   },
 
   port: 7400,
@@ -30,7 +27,6 @@ module.exports = {
   imageSizeLimit: 1000 * 1000,
   fontsPath: './fonts',
   prometheus: true,
-  exposePrometheus: true,
   info: {
     termsOfService: 'https://koumoul.com/platform/term-of-service',
     contact: {

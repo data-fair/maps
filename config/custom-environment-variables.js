@@ -4,7 +4,7 @@ module.exports = {
       __name: 'HTTP_ENABLED',
       __format: 'json',
     },
-    renderedTiles: 'HTTP_RENDERED_TILES',
+    // renderedTiles: 'HTTP_RENDERED_TILES',
   },
   workers: {
     enabled: {
@@ -27,12 +27,6 @@ module.exports = {
         __format: 'json',
       },
     },
-    // generateMBTiles: {
-    //   enabled: {
-    //     __name: 'WORKER_GENERATE_MBTILES_ENABLED',
-    //     __format: 'json',
-    //   },
-    // },
   },
 
   port: 'PORT',
@@ -45,7 +39,6 @@ module.exports = {
   imageSizeLimit: 'IMAGE_SIZE_LIMIT',
   fontsPath: 'FONTS_PATH',
   prometheus: 'PROMETHEUS',
-  exposePrometheus: 'EXPOSE_PROMETHEUS',
   info: {
     termsOfService: 'INFO_TOS',
     contact: {
