@@ -16,7 +16,11 @@ en:
 <template>
   <v-container>
     <v-card :loading="$fetchState.pending" flat>
-      <v-card-title v-if="tileset" v-text="tileset.name" />
+      <v-card-title v-if="tileset">
+        {{ tileset.name }}
+        <v-spacer />
+        <patch-tilejson-dialog :tilejson="tileset" @change="$fetch" />
+      </v-card-title>
       <v-card-subtitle v-if="tileset" v-text="env.publicUrl+'/api/tilesets/'+tileset._id+'.json'" />
       <v-card-text v-if="tileset">
         <v-row>
@@ -51,6 +55,7 @@ en:
               }"
               style="height:80vh;width:100%"
               inspect
+              hash
             />
           </v-col>
           <v-col v-if="tileset.vector_layers" cols="12">
@@ -123,11 +128,13 @@ en:
 <script>
   import maplibre from '~/components/maplibre'
   import historyTable from '~/components/tileset/history-table'
+  import patchTilejsonDialog from '~/components/tileset/patch-tilejson-dialog'
   import { mapState } from 'vuex'
   export default {
     components: {
       maplibre,
       historyTable,
+      patchTilejsonDialog,
     },
     props: {
       tilesetId: { type: String, required: true },

@@ -36,9 +36,11 @@ router.get('/:style/:z/:x/:y.png', asyncWrap(async (req, res) => {
     widht: size,
     height: size,
   }
+  const style = req.style.style
+  style._id = req.style._id
 
   try {
-    const { buffer /* info */ } = await req.app.get('renderer').render(req.style, mapOptions, imageFormat, { cookie: req.headers.cookie, publicBaseUrl: req.publicBaseUrl })
+    const { buffer /* info */ } = await req.app.get('renderer').render(style, mapOptions, imageFormat, { cookie: req.headers.cookie, publicBaseUrl: req.publicBaseUrl })
 
     if (!buffer) return res.status(404).send('Not found')
     res.set({

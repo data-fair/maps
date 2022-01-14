@@ -1,5 +1,5 @@
 {
   "verbose": false,
   "ext": "js json",
-  "watch": ["server/", "config/", "package.json", "contract/", "nuxt.config.js", "i18n/"]
+  "watch": ["server/", "config/", "package.json", "contracts/", "nuxt.config.js"]
 }

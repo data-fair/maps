@@ -15,7 +15,7 @@ const router = module.exports = require('express').Router()
 
 router.param('tileset', require('../params/tileset'))
 require('../api-docs').paths['/tilesets'] = { get: {}, post: {} }
-require('../api-docs').paths['/tilesets/{tileset}.json'] = { get: {} }
+require('../api-docs').paths['/tilesets/{tileset}.json'] = { get: {}, patch: {} }
 require('../api-docs').paths['/tilesets/{tileset}'] = { put: {}, patch: {}, delete: {} }
 require('../api-docs').paths['/tilesets/{tileset}/preview/{width}x{height}.png'] = { get: {} }
 require('../api-docs').paths['/tilesets/{tileset}/import-history'] = { get: {} }
@@ -188,6 +188,57 @@ router.get('/:tileset.json', asyncWrap(async (req, res) => {
   ]
   res.send(tileset)
 }))
+
+//
+
+//
+
+require('../api-docs').paths['/tilesets/{tileset}.json'].patch = {
+  tags: ['Tilesets'],
+  summary: 'Patch a TileJSON',
+  parameters: [
+    { $ref: '#/components/parameters/tileset' },
+  ],
+  requestBody: {
+    content: {
+      'application/json': {
+        schema: require('../../../contracts/patch-tilejson'),
+      },
+    },
+    required: true,
+  },
+  responses: {
+    200: {
+      description: 'The patched TileJSON of the corresponding tileset',
+      content: {
+        'application/json': {
+          schema: {
+            description: 'https://github.com/mapbox/tilejson-spec',
+            type: 'object',
+          },
+        },
+      },
+    },
+    404: {
+      description: 'The tileset does not exist',
+    },
+  },
+}
+
+router.patch('/:tileset.json',
+  require('../middlewares/validate-json-body')(require('../../../contracts/patch-tilejson')),
+  asyncWrap(async (req, res) => {
+    const tileset = await req.app.get('db').collection('tilesets').findOneAndUpdate(
+      { _id: req.params.tileset },
+      { $set: req.body },
+      { returnNewDocument: true })
+
+    tileset.tiles = [
+      `${req.publicBaseUrl}/api/tilesets/${req.params.tileset}/tiles/{z}/{x}/{y}.${tileset.format}`,
+    ]
+    res.send(tileset)
+  }),
+)
 
 //
 
@@ -433,7 +484,6 @@ router.get('/:tileset/preview/:width(\\d+)x:height(\\d+).png', lastModifiedMiddl
         ...req.tilesetInfo,
         type: req.tilesetInfo.format === 'pbf' ? 'vector' : 'raster',
         tiles: ['maps://api/tilesets/' + req.params.tileset + '/tiles/{z}/{x}/{y}.' + req.tilesetInfo.format],
-        // url: 'maps://api/tilesets/' + req.params.tileset + '.json',
       },
     },
     layers: [],

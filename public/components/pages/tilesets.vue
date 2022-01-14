@@ -98,6 +98,7 @@ en:
                       icon
                       @change="$fetch"
                     />
+                    <patch-tilejson-dialog :tilejson="item" @change="$fetch" />
                     <delete-dialog
                       v-if="isAdmin"
                       :value="item"
@@ -184,6 +185,7 @@ en:
 </template>
 
 <script>
+  import patchTilejsonDialog from '~/components/tileset/patch-tilejson-dialog'
   import importDialog from '~/components/tileset/import-dialog'
   import deleteDialog from '~/components/tileset/delete-dialog'
   // import statusIcon from '~/components/tileset/status-icon.vue'
@@ -192,6 +194,7 @@ en:
     components: {
       importDialog,
       deleteDialog,
+      patchTilejsonDialog,
       // statusIcon,
     },
     props: {
