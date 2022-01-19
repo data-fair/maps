@@ -2,7 +2,7 @@
 const { Resource: resourceType } = require('../utils/maplibre-gl-native')
 const zlib = require('zlib')
 const { getFonts } = require('../utils/fonts')
-
+const semver = require('semver')
 module.exports = async (req, { db, context }) => {
   context = context || {}
   context.cache = context.cache || {}
@@ -18,19 +18,21 @@ module.exports = async (req, { db, context }) => {
     if (!req.url.match('^maps://api/tilesets/[\\w\\-]*\\.json$')) throw new Error(req.url)
     const tileInfo = await db.collection('tilesets').findOne({ _id: req.url.split('/').pop().split('.')[0] })
     if (!tileInfo) throw new Error('Tileset does not exist : ' + req.url)
-    tileInfo.tiles = ['maps://api/tilesets/' + tileInfo._id + '/tiles/{z}/{x}/{y}.' + tileInfo.format]
+    tileInfo.tiles = ['maps://api/tilesets/' + tileInfo._id + ':' + semver.major(tileInfo.version) + '/tiles/{z}/{x}/{y}.' + tileInfo.format]
     return { data: Buffer.from(JSON.stringify(tileInfo)) }// callback(null, { data:  })
 
     //
   } else if (req.kind === resourceType.Tile) {
-    if (!req.url.match('^maps://api/tilesets/[\\w\\-]*/tiles/\\d*/\\d*/\\d*\\.(pbf)|(png)|(jpg)$')) throw new Error(req.url)
+    if (!req.url.match('^maps://api/tilesets/[\\w\\-]*:[0-9]*/tiles/\\d*/\\d*/\\d*\\.(pbf)|(png)|(jpg)$')) throw new Error(req.url)
 
     const args = req.url.split('/')
     const x = parseInt(args[7])
     const y = parseInt(args[8].split('.')[0])
     const z = parseInt(args[6])
+    const v = parseInt(args[4].split(':')[1])
+    const ts = parseInt(args[4].split(':')[0])
     const format = req.url.split('.').pop()
-    const query = { ts: args[4], z, x, y }
+    const query = { ts, z, x, y, v }
     context.cachingSize = Math.max(context.cachingSize || 0, 0)
 
     // if (true === true) {
