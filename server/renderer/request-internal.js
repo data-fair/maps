@@ -30,7 +30,7 @@ module.exports = async (req, { db, context }) => {
     const y = parseInt(args[8].split('.')[0])
     const z = parseInt(args[6])
     const v = parseInt(args[4].split(':')[1])
-    const ts = parseInt(args[4].split(':')[0])
+    const ts = args[4].split(':')[0]
     const format = req.url.split('.').pop()
     const query = { ts, z, x, y, v }
     context.cachingSize = Math.max(context.cachingSize || 0, 0)
