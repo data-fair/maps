@@ -1,7 +1,7 @@
 #!/bin/bash
 
 handle_SIGTERM() {
-  kill -s SIGTERM $(pidof node)
+  kill -TERM $(pidof node)
 }
 
 trap handle_SIGTERM SIGTERM
