@@ -58,4 +58,5 @@ COPY server server
 COPY scripts scripts
 
 
-CMD xvfb-run -a node server
+COPY docker-entrypoint.sh .
+CMD bash docker-entrypoint.sh
