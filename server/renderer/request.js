@@ -25,7 +25,7 @@ function createRequester({ db, resource }) {
       console.error(req, error.stack)
       return callback(error, null)
     } finally {
-      end({ internal, kind: kinds[req.kind] })
+      end({ protocol, kind: kinds[req.kind] })
     }
   }
 }
