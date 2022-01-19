@@ -59,4 +59,5 @@ COPY scripts scripts
 
 
 COPY docker-entrypoint.sh .
-CMD bash docker-entrypoint.sh
+ENTRYPOINT [ "bash" ]
+CMD ["/webapp/docker-entrypoint.sh"]

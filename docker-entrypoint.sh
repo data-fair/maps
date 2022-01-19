@@ -8,4 +8,5 @@ trap handle_SIGTERM SIGTERM
 
 xvfb-run -a -- node server &
 wait $! || RETVAL=$?
+wait
 exit ${RETVAL}
