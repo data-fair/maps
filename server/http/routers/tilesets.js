@@ -1,13 +1,16 @@
 const fs = require('fs/promises')
 const { nanoid } = require('nanoid')
-const asyncWrap = require('../../utils/async-wrap')
 const multer = require('multer')
-const bboxUtils = require('../../utils/bbox')
-const loadmbtiles = multer({ storage: multer.diskStorage({ destination: './local/' }) }).single('tileset.mbtiles')
 const config = require('config')
+const semver = require('semver')
+
+const asyncWrap = require('../../utils/async-wrap')
+const bboxUtils = require('../../utils/bbox')
 const { generateInspectStyle } = require('../../utils/style')
 const { importMBTiles, createTilesetFromMBTiles } = require('../../utils/import-mbtiles')
 const lastModifiedMiddleware = require('../middlewares/last-modified')
+
+const loadmbtiles = multer({ storage: multer.diskStorage({ destination: './local/' }) }).single('tileset.mbtiles')
 
 const router = module.exports = require('express').Router()
 
@@ -483,7 +486,7 @@ router.get('/:tileset/preview/:width(\\d+)x:height(\\d+).png', lastModifiedMiddl
       tileset: {
         ...req.tilesetInfo,
         type: req.tilesetInfo.format === 'pbf' ? 'vector' : 'raster',
-        tiles: ['maps://api/tilesets/' + req.params.tileset + '/tiles/{z}/{x}/{y}.' + req.tilesetInfo.format],
+        tiles: ['maps://api/tilesets/' + req.tilesetInfo._id + ':' + semver.major(req.tilesetInfo.version) + '/tiles/{z}/{x}/{y}.' + req.tilesetInfo.format],
       },
     },
     layers: [],
