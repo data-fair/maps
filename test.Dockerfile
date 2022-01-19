@@ -21,6 +21,7 @@ COPY config config
 COPY scripts scripts
 COPY .nycrc .
 COPY nuxt.config.js .
+COPY contracts contracts
 
 
 CMD npm run lint && npm run test-cover
