@@ -4,6 +4,7 @@ module.exports = {
       __name: 'HTTP_ENABLED',
       __format: 'json',
     },
+    tileMaxAge: 'TILE_MAX_AGE',
     // renderedTiles: 'HTTP_RENDERED_TILES',
   },
   workers: {

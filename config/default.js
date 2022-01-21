@@ -2,7 +2,7 @@
 module.exports = {
   http: {
     enabled: true,
-    // renderedTiles: true,
+    tileMaxAge: 0,
   },
   workers: {
     enabled: true,

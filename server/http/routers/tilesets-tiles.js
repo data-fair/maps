@@ -1,10 +1,12 @@
 const { VectorTile } = require('@mapbox/vector-tile')
 const Protobuf = require('pbf')
 const tiletype = require('@mapbox/tiletype')
-const asyncWrap = require('../../utils/async-wrap')
-const zlib = require('zlib')
-const lastModifiedMiddleware = require('../middlewares/last-modified')
 const semver = require('semver')
+const zlib = require('zlib')
+const config = require('config')
+
+const asyncWrap = require('../../utils/async-wrap')
+const lastModifiedMiddleware = require('../middlewares/last-modified')
 
 const router = module.exports = require('express').Router({ mergeParams: true })
 
@@ -83,6 +85,8 @@ router.get('/:z/:x/:y.geojson', lastModifiedMiddleware((req) => req?.tilesetInfo
       geojson.features.push(featureGeoJSON)
     }
   }
+
+  res.set({ 'Cache-Control': `public, max-age=${config?.http?.tileMaxAge || 0}` })
   res.send(geojson)
 }))
 
@@ -104,5 +108,6 @@ router.get('/:z/:x/:y.:tileFormat', lastModifiedMiddleware((req) => req?.tileset
   delete headers.ETag
 
   res.set(headers)
+  res.set({ 'Cache-Control': `public, max-age=${config?.http?.tileMaxAge || 0}` })
   res.send(tile.d.buffer)
 }))
