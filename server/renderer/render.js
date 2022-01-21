@@ -40,7 +40,7 @@ module.exports = (pool) => ({
           else resolve(buffer)
         })
       } catch (error) {
-        console.log(error)
+        console.error(error)
         reject(error)
       }
     }))

@@ -36,17 +36,17 @@ module.exports = async (req, { db, context }) => {
     context.cachingSize = Math.max(context.cachingSize || 0, 0)
 
     // if (true === true) {
-    if (!context.cache[`${z}/${x}/${y}`]) {
+    if (!context.cache[`${ts}/${z}/${x}/${y}`]) {
       query.x = { $gte: x - context.cachingSize, $lte: x + context.cachingSize }
       const promise = db.collection('tiles').find(query).toArray()
       for (let index = -context.cachingSize; index <= context.cachingSize; index++) {
-        context.cache[`${z}/${x + index}/${y}`] = promise.then((tiles) => {
+        context.cache[`${ts}/${z}/${x + index}/${y}`] = promise.then((tiles) => {
           return tiles.find((t) => t.x === x + index)
         })
       }
     }
 
-    const tile = await context.cache[`${z}/${x}/${y}`]
+    const tile = await context.cache[`${ts}/${z}/${x}/${y}`]
 
     if (!tile) {
       return { data: Buffer.from('') }

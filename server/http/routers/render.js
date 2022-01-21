@@ -301,7 +301,6 @@ async function getOrPost(req, res) {
       try {
         const filter = JSON.parse(`[${layerFilter.split(':').slice(1).join(':')}]`)
         filters[layer] = filter
-        console.log(filter)
       } catch (error) {
         return res.status(400).send(error.message)
       }
