@@ -103,7 +103,7 @@ module.exports = {
     // adminRole: config.adminRole,
     // contribRole: config.contribRole,
     // map: config.map,
-    // brand: config.brand,
+    brand: config.brand,
     openapiViewerUrl: config.openapiViewerUrl,
     // browserLogLevel: config.browserLogLevel,
     // analytics: config.analytics,

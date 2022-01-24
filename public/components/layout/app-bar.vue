@@ -34,13 +34,12 @@ en:
         :to="{name: 'index'}"
       >
         <img
-          src="https://koumoul.com/s/tileserver/app/_nuxt/img/koumoul-square.624294b.svg"
+          :src="env?.brand?.logo"
           height="48px"
           style="min-width: 0px;"
         >
       </v-btn>
       <v-btn
-
         text
         nuxt
         :to="{name: 'styles'}"
@@ -59,8 +58,8 @@ en:
     /> -->
     <v-spacer />
     <v-toolbar-items>
-      <!-- v-if="openapiViewerUrl" -->
       <v-btn
+        v-if="openapiViewerUrl"
         v-t="'doc'"
         :href="openapiViewerUrl"
         text

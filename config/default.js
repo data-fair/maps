@@ -36,7 +36,7 @@ module.exports = {
     },
   },
   brand: {
-    logo: null,
+    logo: 'https://koumoul.com/static/logo-square.png',
     title: 'DataFair - Maps',
     description: 'Find, Access, Interoperate, Reuse data on the Web',
     url: null,
