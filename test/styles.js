@@ -6,33 +6,23 @@ const config = require('config')
 
 describe('Styles', () => {
   it('Should import json styles', async () => {
-    let style
-
-    const _id = (await global.ax.superadmin.post('/api/styles', publicUrlStyle)).data._id
-    style = (await global.ax.superadmin.get(`/api/styles/${_id}.json`)).data
+    const style = (await global.ax.superadmin.post('/api/styles', publicUrlStyle)).data
     assert.ok(style)
 
-    try {
-      await global.ax.superadmin.get(`/api/styles/${_id}/sprite.json`)
-      assert.fail()
-    } catch (error) {
-      assert.equal(error.status, 404)
-    }
+    await assert.rejects(global.ax.superadmin.get(`/api/styles/${style._id}/sprite.json`), (err) => {
+      assert.equal(err.status, 404)
+      return true
+    })
+    await assert.rejects(global.ax.superadmin.get(`/api/styles/${style._id}/sprite.png`), (err) => {
+      assert.equal(err.status, 404)
+      return true
+    })
 
-    try {
-      await global.ax.superadmin.get(`/api/styles/${_id}/sprite.png`)
-      assert.fail()
-    } catch (error) {
-      assert.equal(error.status, 404)
-    }
-
-    await global.ax.superadmin.delete(`/api/styles/${_id}`)
-    try {
-      style = (await global.ax.superadmin.get(`/api/styles/${_id}.json`)).data
-      assert.fail()
-    } catch (error) {
-      assert.equal(error.status, 404)
-    }
+    await global.ax.superadmin.delete(`/api/styles/${style._id}`)
+    await assert.rejects(global.ax.superadmin.get(`/api/styles/${style._id}.json`), (err) => {
+      assert.equal(err.status, 404)
+      return true
+    })
   })
 
   it.skip('Should import zipped openmaptiles style with sprite', async () => {
