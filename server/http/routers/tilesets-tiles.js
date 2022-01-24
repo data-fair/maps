@@ -69,7 +69,7 @@ router.get('/:z/:x/:y.geojson', lastModifiedMiddleware((req) => req?.tilesetInfo
   if (semver.valid(req.tilesetInfo.version)) query.v = semver.major(req.tilesetInfo.version)
 
   const tile = await req.app.get('db').collection('tiles').findOne(query)
-  if (!tile) { return res.sendStatus(404) }
+  if (!tile) { return res.sendStatus(204) }
   const pbf = zlib.gunzipSync(tile.d.buffer)
   const vectorTile = new VectorTile(new Protobuf(pbf))
   const geojson = {
@@ -102,7 +102,7 @@ router.get('/:z/:x/:y.:tileFormat', lastModifiedMiddleware((req) => req?.tileset
   if (semver.valid(req.tilesetInfo.version)) query.v = semver.major(req.tilesetInfo.version)
 
   const tile = await req.app.get('db').collection('tiles').findOne(query)
-  if (!tile) { return res.sendStatus(404) }
+  if (!tile) { return res.sendStatus(204) }
 
   const headers = tiletype.headers(tile.d.buffer)
   delete headers.ETag

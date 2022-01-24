@@ -30,14 +30,14 @@ describe('Tilesets', () => {
     assert.equal(tileset.minzoom, 0)
     assert.equal(tileset.maxzoom, 0)
     assert.ok(await global.ax.superadmin.get(`/api/tilesets/${tileset._id}/tiles/0/0/0.pbf`))
-    await assert.rejects(global.ax.superadmin.get(`/api/tilesets/${tileset._id}/tiles/1/0/0.pbf`))
+    assert.ok(!(await global.ax.superadmin.get(`/api/tilesets/${tileset._id}/tiles/1/0/0.pbf`)).data)
 
     tileset = await patchTileset('./test/resources/mbtiles/zoom1.mbtiles', tileset._id)
     assert.equal(tileset.tileCount, 3)
     assert.equal(tileset.minzoom, 0)
     assert.equal(tileset.maxzoom, 1)
     assert.ok(await global.ax.superadmin.get(`/api/tilesets/${tileset._id}/tiles/0/0/0.pbf`))
-    assert.ok(await global.ax.superadmin.get(`/api/tilesets/${tileset._id}/tiles/1/0/0.pbf`))
+    assert.ok((await global.ax.superadmin.get(`/api/tilesets/${tileset._id}/tiles/1/0/0.pbf`)).data)
   })
 
   it('Should delete tileset and tiles', async () => {
