@@ -32,6 +32,7 @@
         hash: this.hash,
       })
       if (this.inspect !== undefined && this.inspect !== false) {
+        this.map.showTileBoundaries = true
         this.map.addControl(new MaplibreInspect({
           popup: new maplibregl.Popup({
             closeButton: false,
