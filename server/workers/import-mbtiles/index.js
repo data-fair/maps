@@ -5,7 +5,7 @@ const debug = require('debug')('workers:import-mbtiles')
 const semver = require('semver')
 const { nanoid } = require('nanoid')
 
-const asyncSqlite = require('../../utils/async-sqlite3')
+const betterSQLite = require('better-sqlite3')
 const asyncMBTiles = require('../../utils/async-MBTiles')
 const { createTimer } = require('../../utils/timer')
 const defaultTiles = require('./default-tiles')
@@ -67,12 +67,20 @@ const loop = async({ db }) => {
         importTiles = pbfTiles.importTiles
       }
 
-      const sql = await asyncSqlite(filename)
-      if (!importTask.tileCount) await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { tileCount: (await sql.get('SELECT COUNT(*) FROM tiles'))['COUNT(*)'] } })
+      const sql = betterSQLite(filename, { readonly: true })
+
+      if (!importTask.tileCount) await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { tileCount: sql.prepare('SELECT COUNT(*) FROM tiles').get()['COUNT(*)'] } })
       timer.step('countTiles')
+      const stmt = sql.prepare(`SELECT * FROM tiles LIMIT -1 OFFSET ${skip}`)
+      const iterator = stmt.iterate()
       // eslint-disable-next-line no-unmodified-loop-condition
       while (!stopped) {
-        const tiles = await sql.all(`SELECT * FROM tiles LIMIT ${batchSize} OFFSET ${skip}`)
+        const tiles = []
+        while (tiles.length < batchSize) {
+          const next = iterator.next()
+          if (next.done) break
+          tiles.push(next.value)
+        }
         timer.step('readTilesBatch')
         if (!tiles.length) break
         const baseQuery = {
