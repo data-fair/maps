@@ -1,7 +1,7 @@
 const BSON = require('bson')
 
 module.exports = {
-  importTiles: async(db, importTask, baseQuery, tiles) => { // TODO use bulkWrite
+  importTiles: async(db, importTask, baseQuery, tiles, timer) => { // TODO use bulkWrite
     let insertedSize = 0
     let insertedCount = 0
 
@@ -19,6 +19,7 @@ module.exports = {
         insertedSize += BSON.calculateObjectSize(newDocument) - existingDocumentSize
       })
     }))
+    timer.step('importTiles')
 
     return {
       insertedSize,

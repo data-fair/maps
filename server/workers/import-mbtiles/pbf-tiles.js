@@ -3,6 +3,7 @@ const Protobuf = require('pbf')
 const vtpbf = require('vt-pbf')
 const zlib = require('zlib')
 const BSON = require('bson')
+
 // functions from https://github.com/koumoul-dev/openmaptiles-world/blob/master/lib/mbtiles.js
 const prepareVectorTile = (tileData, addProps) => {
   const tile = new VectorTile(new Protobuf(zlib.gunzipSync(tileData)))
@@ -32,7 +33,17 @@ function rawGeometry (tile) {
   return pbf.readBytes()
 }
 
-const mergeTiles = (target, origin, area) => {
+const compareFeaturesProperties = (f1, f2) => {
+  f1.keys = f1.keys || Object.keys(f1.properties).filter(key => key !== 'area')
+  f2.keys = f2.keys || Object.keys(f2.properties).filter(key => key !== 'area')
+  if (f1.keys.length !== f2.keys.length) return false
+  for (const key of f1.keys) {
+    if (f1.properties[key] !== f2.properties[key]) return false
+  }
+  return true
+}
+
+const mergeTiles = (target, origin, area, timer) => {
   for (const layer in origin.layers) {
     if (!target.layers[layer]) {
       // debug(`Layer ${layer} does not exist yet in target tile, add it whole`)
@@ -42,17 +53,28 @@ const mergeTiles = (target, origin, area) => {
       // remove previous features from same area
       target.layers[layer].features = target.layers[layer].features
         .filter(f => f.properties.area !== area)
+      timer.step('filterExistingFeaturesByArea')
       // do not add matching features already present (case of overlapping tiles)
       origin.layers[layer].features = origin.layers[layer].features
         .filter(f => {
-          const sameFeature = target.layers[layer].features.find(tf => {
-            if (JSON.stringify({ ...f.properties, area: '' }) !== JSON.stringify({ ...tf.properties, area: '' })) return false
-            if (!rawGeometry(f).equals(rawGeometry(tf))) return false
+          const sameFeature = target.layers[layer].features.some(tf => {
+            if (!compareFeaturesProperties(f, tf)) {
+              timer.step('compareSameProperties')
+              return false
+            }
+            timer.step('compareSameProperties')
+            if (!rawGeometry(f).equals(rawGeometry(tf))) {
+              timer.step('compareSameGeometry')
+              return false
+            }
+            timer.step('compareSameGeometry')
             return true
           })
           return !sameFeature
         })
+      timer.step('filterSameFeature')
       target.layers[layer].features = target.layers[layer].features.concat(origin.layers[layer].features)
+      timer.step('concatFeatures')
 
       // sort features by area so that order is kept between iteration and the buffers are not changes unnecessarily
       target.layers[layer].features.sort((a, b) => {
@@ -60,39 +82,49 @@ const mergeTiles = (target, origin, area) => {
         if (a.properties.area < b.properties.area) return -1
         return 1
       })
+      timer.step('sortFeatures')
     }
   }
 }
 
 module.exports = {
-  importTiles: async(db, importTask, baseQuery, tiles) => {
+  importTiles: async(db, importTask, baseQuery, tiles, timer) => {
     const area = importTask?.options?.area
-    tiles.forEach(tile => {
+    for (const tile of tiles) {
       tile.tile_row = (1 << tile.zoom_level) - 1 - tile.tile_row
       tile.query = Object.assign({
         z: tile.zoom_level,
         y: tile.tile_row,
         x: tile.tile_column,
       }, baseQuery)
-    })
-    const existingTiles = await db.collection('tiles').find({ $or: tiles.map(t => t.query) }).toArray()
+    }
+    const existingTiles = (await db.collection('tiles').find({ $or: tiles.map(t => t.query) }).toArray())
+      .reduce((acc, tile) => {
+        acc[`${tile.x}/${tile.y}/${tile.z}`] = tile
+        return acc
+      }, {})
+    timer.step('readExistingTiles')
 
     let insertedSize = 0
     let insertedCount = 0
     const bulkOperation = []
 
-    tiles.forEach(tile => {
-      const existingDocument = existingTiles.find(existing => existing.x === tile.query.x && existing.y === tile.query.y && existing.z === tile.query.z)
+    for (const tile of tiles) {
+      const existingDocument = existingTiles[`${tile.query.x}/${tile.query.y}/${tile.query.z}`]
+      timer.step('findExistingDocument')
       let d
       if (!existingDocument) {
         insertedCount++
         if (area) d = vectorTileAsPbfBuffer(prepareVectorTile(tile.tile_data, { area }))
         else d = tile.tile_data
+        timer.step('preparNewVectorTile')
       } else {
         const newTile = prepareVectorTile(tile.tile_data, area ? { area } : {})
         const oldTile = prepareVectorTile(existingDocument.d.buffer, { })
-        mergeTiles(oldTile, newTile, area)
+        timer.step('prepareVectorTile')
+        mergeTiles(oldTile, newTile, area, timer)
         d = vectorTileAsPbfBuffer(oldTile)
+        timer.step('tileAsBuffer')
       }
       const newDocument = Object.assign({ d }, tile.query)
       const existingDocumentSize = existingDocument ? BSON.calculateObjectSize(existingDocument) : 0
@@ -104,32 +136,13 @@ module.exports = {
           upsert: true,
         },
       })
-    })
+      timer.step('addBulkOperation')
+    }
     await db.collection('tiles').bulkWrite(bulkOperation, { ordered: false })
+    timer.step('writeBulk')
     return {
       insertedSize,
       insertedCount,
-    }
-  },
-  importTile: async (db, mongoTileQuery, importTask, tile) => {
-    const area = importTask?.options?.area
-    const existingDocument = await db.collection('tiles').findOne(mongoTileQuery)
-    let d
-    if (!existingDocument) {
-      if (area) d = vectorTileAsPbfBuffer(prepareVectorTile(tile.tile_data, { area }))
-      else d = tile.tile_data
-    } else {
-      const newTile = prepareVectorTile(tile.tile_data, area ? { area } : {})
-      const oldTile = prepareVectorTile(existingDocument.d.buffer, { })
-      mergeTiles(oldTile, newTile, area)
-      d = vectorTileAsPbfBuffer(oldTile)
-    }
-    const newDocument = { ...mongoTileQuery, d }
-    await db.collection('tiles').replaceOne(mongoTileQuery, newDocument, { upsert: true })
-    const existingDocumentSize = existingDocument ? BSON.calculateObjectSize(existingDocument) : 0
-    return {
-      new: !existingDocument,
-      sizeDiff: BSON.calculateObjectSize(newDocument) - existingDocumentSize,
     }
   },
 }

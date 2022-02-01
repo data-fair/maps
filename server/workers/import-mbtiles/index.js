@@ -7,6 +7,7 @@ const { nanoid } = require('nanoid')
 
 const asyncSqlite = require('../../utils/async-sqlite3')
 const asyncMBTiles = require('../../utils/async-MBTiles')
+const { createTimer } = require('../../utils/timer')
 const defaultTiles = require('./default-tiles')
 const pbfTiles = require('./pbf-tiles')
 
@@ -37,6 +38,8 @@ const loop = async({ db }) => {
 
     const keeplockInterval = setInterval(() => db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { lockDate: new Date() } }), lockTime / 2)
 
+    const timer = createTimer()
+
     try {
       let skip = importTask.tileImported || 0
       let importedSize = importTask.importedSize || 0
@@ -49,12 +52,15 @@ const loop = async({ db }) => {
       const v = semver.inc(semver.valid(tileset.version) ? tileset.version : '0.0.0', method !== 'replace' ? 'minor' : 'major')
       const major = semver.major(v)
       debug(`${skip > 0 ? 'resume' : 'start'} importation of ${ts} v${v}`)
+      timer.step('readTilesetDB')
 
       await fs.cp(importTask.filename, filename)
+      timer.step('cpMbtiles')
 
       const mbtiles = await asyncMBTiles(filename)
       const info = await mbtiles.getInfo()
       await mbtiles.close()
+      timer.step('getMBTilesInfo')
 
       let importTiles = defaultTiles.importTiles
       if (info.format === 'pbf') {
@@ -62,16 +68,18 @@ const loop = async({ db }) => {
       }
 
       const sql = await asyncSqlite(filename)
-      // if(!importTask.tileCount) tile
+      if (!importTask.tileCount) await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { tileCount: (await sql.get('SELECT COUNT(*) FROM tiles'))['COUNT(*)'] } })
+      timer.step('countTiles')
       // eslint-disable-next-line no-unmodified-loop-condition
       while (!stopped) {
         const tiles = await sql.all(`SELECT * FROM tiles LIMIT ${batchSize} OFFSET ${skip}`)
+        timer.step('readTilesBatch')
         if (!tiles.length) break
         const baseQuery = {
           ts,
           v: major,
         }
-        const { insertedCount, insertedSize } = await importTiles(db, importTask, baseQuery, tiles)
+        const { insertedCount, insertedSize } = await importTiles(db, importTask, baseQuery, tiles, timer)
 
         skip += tiles.length
         insertedTiles += insertedCount
@@ -85,6 +93,8 @@ const loop = async({ db }) => {
           })
         }
         debug(`importation of ${ts} v${v} : ${skip} tiles processed, ${insertedCount} tile inserted, ${insertedSize / 1000}KB added`)
+        timer.step('updateWorkingTileset')
+        debug('timer', timer)
       }
       await sql.close()
       if (stopped) {
