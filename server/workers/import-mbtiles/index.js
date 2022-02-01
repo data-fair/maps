@@ -56,45 +56,35 @@ const loop = async({ db }) => {
       const info = await mbtiles.getInfo()
       await mbtiles.close()
 
-      let importTile = defaultTiles.importTile
+      let importTiles = defaultTiles.importTiles
       if (info.format === 'pbf') {
-        importTile = pbfTiles.importTile
+        importTiles = pbfTiles.importTiles
       }
 
       const sql = await asyncSqlite(filename)
+      // if(!importTask.tileCount) tile
       // eslint-disable-next-line no-unmodified-loop-condition
       while (!stopped) {
         const tiles = await sql.all(`SELECT * FROM tiles LIMIT ${batchSize} OFFSET ${skip}`)
         if (!tiles.length) break
-        const { insertedCount, sizeDiff } = (await Promise.all(tiles.map((tile) => {
-          // even if tileJSON.format equals xyz, mbtiles are tms
-          tile.tile_row = (1 << tile.zoom_level) - 1 - tile.tile_row
-          const query = {
-            ts,
-            z: tile.zoom_level,
-            y: tile.tile_row,
-            x: tile.tile_column,
-            v: major,
-          }
-          return importTile(db, query, importTask, tile)
-        }))).reduce((acc, b) => {
-          if (b.new) acc.insertedCount++
-          acc.sizeDiff += b.sizeDiff || 0
-          return acc
-        }, { insertedCount: 0, sizeDiff: 0 })
+        const baseQuery = {
+          ts,
+          v: major,
+        }
+        const { insertedCount, insertedSize } = await importTiles(db, importTask, baseQuery, tiles)
 
         skip += tiles.length
         insertedTiles += insertedCount
-        importedSize += sizeDiff
+        importedSize += insertedSize
 
         await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { tileImported: skip, insertedTiles } })
         if (method !== 'replace') {
           await db.collection('tilesets').updateOne({ _id: ts }, {
-            $inc: { tileCount: insertedCount, filesize: sizeDiff },
+            $inc: { tileCount: insertedCount, filesize: insertedSize },
             $set: { lastModified: new Date() },
           })
         }
-        debug(`importation of ${ts} v${v} : ${skip} tiles processed, ${insertedCount} tile inserted, ${sizeDiff / 1000}KB added`)
+        debug(`importation of ${ts} v${v} : ${skip} tiles processed, ${insertedCount} tile inserted, ${insertedSize / 1000}KB added`)
       }
       await sql.close()
       if (stopped) {

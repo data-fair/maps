@@ -65,6 +65,52 @@ const mergeTiles = (target, origin, area) => {
 }
 
 module.exports = {
+  importTiles: async(db, importTask, baseQuery, tiles) => {
+    const area = importTask?.options?.area
+    tiles.forEach(tile => {
+      tile.tile_row = (1 << tile.zoom_level) - 1 - tile.tile_row
+      tile.query = Object.assign({
+        z: tile.zoom_level,
+        y: tile.tile_row,
+        x: tile.tile_column,
+      }, baseQuery)
+    })
+    const existingTiles = await db.collection('tiles').find({ $or: tiles.map(t => t.query) }).toArray()
+
+    let insertedSize = 0
+    let insertedCount = 0
+    const bulkOperation = []
+
+    tiles.forEach(tile => {
+      const existingDocument = existingTiles.find(existing => existing.x === tile.query.x && existing.y === tile.query.y && existing.z === tile.query.z)
+      let d
+      if (!existingDocument) {
+        insertedCount++
+        if (area) d = vectorTileAsPbfBuffer(prepareVectorTile(tile.tile_data, { area }))
+        else d = tile.tile_data
+      } else {
+        const newTile = prepareVectorTile(tile.tile_data, area ? { area } : {})
+        const oldTile = prepareVectorTile(existingDocument.d.buffer, { })
+        mergeTiles(oldTile, newTile, area)
+        d = vectorTileAsPbfBuffer(oldTile)
+      }
+      const newDocument = Object.assign({ d }, tile.query)
+      const existingDocumentSize = existingDocument ? BSON.calculateObjectSize(existingDocument) : 0
+      insertedSize += BSON.calculateObjectSize(newDocument) - existingDocumentSize
+      bulkOperation.push({
+        replaceOne: {
+          filter: tile.query,
+          replacement: newDocument,
+          upsert: true,
+        },
+      })
+    })
+    await db.collection('tiles').bulkWrite(bulkOperation, { ordered: false })
+    return {
+      insertedSize,
+      insertedCount,
+    }
+  },
   importTile: async (db, mongoTileQuery, importTask, tile) => {
     const area = importTask?.options?.area
     const existingDocument = await db.collection('tiles').findOne(mongoTileQuery)
