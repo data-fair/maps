@@ -93,7 +93,7 @@ const loop = async({ db }) => {
         insertedTiles += insertedCount
         importedSize += insertedSize
 
-        await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { tileImported: skip, insertedTiles } })
+        await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { tileImported: skip, insertedTiles, importedSize } })
         if (method !== 'replace') {
           await db.collection('tilesets').updateOne({ _id: ts }, {
             $inc: { tileCount: insertedCount, filesize: insertedSize },
@@ -104,11 +104,11 @@ const loop = async({ db }) => {
         timer.step('updateWorkingTileset')
         debug('timer', timer)
       }
-      await sql.close()
+      sql.close()
       if (stopped) {
         debug(`pausing importation of ${ts} v${v}`)
         await fs.unlink(filename)
-        await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { status: 'pending', importedSize }, $unset: { lockDate: undefined } })
+        await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { status: 'pending' }, $unset: { lockDate: undefined } })
       } else {
         debug(`ending importation of ${ts} v${v} : ${insertedTiles} tile inserted, ${importedSize / 1000}KB added`)
         await fs.unlink(filename)
