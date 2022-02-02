@@ -56,6 +56,7 @@ RUN npm run build
 
 COPY server server
 COPY scripts scripts
+COPY upgrade upgrade
 
 
 COPY docker-entrypoint.sh .
