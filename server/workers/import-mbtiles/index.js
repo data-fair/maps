@@ -104,6 +104,7 @@ const loop = async({ db }) => {
         timer.step('updateWorkingTileset')
         debug('timer', timer)
       }
+      iterator.return()
       sql.close()
       if (stopped) {
         debug(`pausing importation of ${ts} v${v}`)
