@@ -43,7 +43,7 @@ en:
           <td>{{ task.version }}</td>
           <td>{{ new Date(task.date) }}</td>
           <td>{{ (task.options && task.options.area) || '' }}</td>
-          <td>{{ task.tileImported }}</td>
+          <td>{{ task.tileImported }} / {{ task.tileCount }}</td>
           <td>{{ task.importedSize/1000 }} KB</td>
         </tr>
       </tbody>

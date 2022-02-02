@@ -17,7 +17,7 @@ en:
       <v-icon
         class="mx-1"
         v-bind="attrs"
-        v-on="{...dialog,...tooltip}"
+        v-on="dialog"
         v-text="'mdi-pencil'"
       />
       <!-- </template>
