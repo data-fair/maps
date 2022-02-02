@@ -16,11 +16,11 @@ app.use(require('./middlewares/public-url'))
 app.use(sd.auth)
 // app.use()
 
-app.use('/api/tilesets', require('./middlewares/super-admin-except-get'), require('./routers/tilesets'))
+app.use('/api/tilesets', require('./routers/tilesets'))
 
-app.use('/api/fonts', require('./middlewares/super-admin-except-get'), require('./routers/fonts'))
-app.use('/api/styles', require('./middlewares/super-admin-except-get'), require('./routers/styles'))
-// app.use('/api/rendered-tiles', require('./middlewares/super-admin-except-get'), require('./routers/rendered-tiles'))
+app.use('/api/fonts', require('./routers/fonts'))
+app.use('/api/styles', require('./routers/styles'))
+// app.use('/api/rendered-tiles', require('./routers/rendered-tiles'))
 app.use('/api/render', require('./routers/render'))
 
 app.get('/api/api-docs.json', (req, res, next) => {

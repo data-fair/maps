@@ -3,11 +3,8 @@ const debug = require('debug')('renderer:render')
 const { nanoid } = require('nanoid')
 const prometheus = require('../prometheus')
 
-const events = new (require('events').EventEmitter)()
-
-module.exports = (pool) => ({
-  events,
-  async render(style, mapOptions, imageProperties, context = {}) {
+module.exports = ({ pool, events }) =>
+  async (style, mapOptions, imageProperties, context = {}) => {
     const renderId = nanoid()
     const imageBuffer = await pool.use((resource) => new Promise((resolve, reject) => {
       try {
@@ -73,5 +70,4 @@ module.exports = (pool) => ({
     })
     debug('image ready ', renderId)
     return { buffer, info }
-  },
-})
+  }

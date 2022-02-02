@@ -100,7 +100,7 @@ require('../api-docs').paths['/styles'].post = {
     },
   },
 }
-router.post('', upload, asyncWrap(async (req, res) => {
+router.post('', require('../middlewares/super-admin'), upload, asyncWrap(async (req, res) => {
   const _id = nanoid()
 
   if (req.headers['content-type'] === 'application/json') {
@@ -183,7 +183,7 @@ require('../api-docs').paths['/styles/{style}.json'].put = {
   },
 }
 
-router.put('/:style.json', asyncWrap(async (req, res) => {
+router.put('/:style.json', require('../middlewares/super-admin'), asyncWrap(async (req, res) => {
   const errors = maplibreStyle.validate(req.body)
   if (errors.length) { return res.status(400).send(errors) }
   const style = escapePublicUrl(req.body, req.publicBaseUrl)
@@ -215,7 +215,7 @@ require('../api-docs').paths['/styles/{style}'].put = {
   },
 }
 
-router.put('/:style', upload, asyncWrap(async (req, res) => {
+router.put('/:style', require('../middlewares/super-admin'), upload, asyncWrap(async (req, res) => {
   if (req.headers['content-type'].match('multipart/form-data')) {
     // styleZip(req, res, async (err) => {
     //   if (err) return res.status(500).send(err.message)
@@ -259,7 +259,7 @@ require('../api-docs').paths['/styles/{style}'].delete = {
   },
 }
 
-router.delete('/:style', asyncWrap(async (req, res) => {
+router.delete('/:style', require('../middlewares/super-admin'), asyncWrap(async (req, res) => {
   await req.app.get('db').collection('styles').deleteOne({ _id: req.params.style })
   res.sendStatus(204)
 }))
