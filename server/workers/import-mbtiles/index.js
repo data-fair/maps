@@ -125,7 +125,7 @@ const loop = async({ db }) => {
       }
     } catch (error) {
       console.error(error)
-      await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { status: 'error', error }, $unset: { lockDate: undefined } })
+      await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { status: 'error', errorMessage: error.message }, $unset: { lockDate: undefined } })
     } finally {
       clearInterval(keeplockInterval)
     }
