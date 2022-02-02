@@ -2,13 +2,10 @@ const mercator = new (require('@mapbox/sphericalmercator'))()
 const { VectorTile, VectorTileFeature } = require('@mapbox/vector-tile')
 const Protobuf = require('pbf')
 const zlib = require('zlib')
-const config = require('config')
 const semver = require('semver')
-const bboxUtils = require('../../utils/bbox')
 const turf = require('@turf/turf')
 
 const asyncWrap = require('../../utils/async-wrap')
-const { isArray } = require('util')
 
 const router = module.exports = require('express').Router({ mergeParams: true })
 
