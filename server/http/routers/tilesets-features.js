@@ -11,7 +11,7 @@ const router = module.exports = require('express').Router({ mergeParams: true })
 
 //
 
-require('../api-docs').paths['/tilesets/{tileset}/features/bulk'] = { post: {} }
+require('../api-docs').paths['/tilesets/{tileset}/features/properties_bulk'] = { post: {} }
 router.use(require('../params/tileset'))
 
 //
@@ -32,7 +32,7 @@ const bodySchema = {
     },
   },
 }
-require('../api-docs').paths['/tilesets/{tileset}/features/bulk'].post = {
+require('../api-docs').paths['/tilesets/{tileset}/features/properties_bulk'].post = {
   tags: ['Tilesets'],
   // summary: 'Get the preview of the tileset',
   parameters: [
