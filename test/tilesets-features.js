@@ -1,12 +1,13 @@
 const assert = require('assert')
 // const eventToPromise = require('event-to-promise')
 const { postMBTiles } = require('./utils/import-mbtiles')
-const points = [
-  [-2.4296131877192995, 47.32006795101543], // 1 feature: #landuse { class: 'residential' }
-  [-2.448908857273525, 47.30914711877363], // 1 feature: #park { class: 'site_ramsar',name: 'Marais salants de Guérande' }
-  [-2.483328704463426, 47.29815411535077], // 2 features: #park { class: 'site_ramsar',name: 'Marais salants de Guérande' } #water { class: 'ocean' }
-]
+
 describe('Tilesets features routes', () => {
+  const points = [
+    [-2.4296131877192995, 47.32006795101543], // 1 feature: #landuse { class: 'residential' }
+    [-2.448908857273525, 47.30914711877363], // 1 feature: #park { class: 'site_ramsar',name: 'Marais salants de Guérande' }
+    [-2.483328704463426, 47.29815411535077], // 2 features: #park { class: 'site_ramsar',name: 'Marais salants de Guérande' } #water { class: 'ocean' }
+  ]
   it('Should get feature properties of multiple points', async () => {
     const tileset = await postMBTiles('./test/resources/mbtiles/france-pays-de-la-loire-8-126-89.mbtiles')
     const features = (await global.ax.superadmin.post(`/api/tilesets/${tileset._id}/features/properties_bulk`, points)).data
@@ -34,5 +35,42 @@ describe('Tilesets features routes', () => {
     assert.equal(features[0]?.class, 'residential')
     assert.ok(!features[1])
     assert.ok(!features[2])
+  })
+
+  const polygons = [{
+    type: 'Feature',
+    properties: {},
+    geometry: {
+      type: 'Polygon',
+      coordinates: [
+        points,
+      ],
+    },
+  }, {
+    type: 'Feature',
+    properties: {},
+    geometry: {
+      type: 'Polygon',
+      coordinates: [
+        [
+          [-2.486600875854492, 47.309383428382155],
+          [-2.498359680175781, 47.298732381222464],
+          [-2.4866867065429688, 47.29244551035176],
+          [-2.4722671508789062, 47.29104832642957],
+          [-2.4573326110839844, 47.29553082741946],
+          [-2.45819091796875, 47.30455289150632],
+          [-2.468576431274414, 47.312409563914656],
+          [-2.486600875854492, 47.309383428382155],
+        ],
+      ],
+    },
+  }]
+  it('Should get feature properties of multiple polygons', async () => {
+    const tileset = await postMBTiles('./test/resources/mbtiles/france-pays-de-la-loire-8-126-89.mbtiles')
+    const features = (await global.ax.superadmin.post(`/api/tilesets/${tileset._id}/features/polygon_properties_bulk`, polygons)).data
+    assert.ok(features)
+    assert.equal(features.length, 2)
+    assert.equal(features[0].length, 3)
+    assert.equal(features[1].length, 2)
   })
 })
