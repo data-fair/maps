@@ -18,6 +18,8 @@ router.param('style', require('../params/style'))
 
 require('../api-docs').paths['/render/{style}/{width}x{height}.{format}'] = {
   get: {
+    summary: 'Render an area with a style',
+    description: 'Render an area with additionnal geometry from a point/bbox/geometry using a style',
     tags: ['Render'],
     parameters: [
       { $ref: '#/components/parameters/style' },

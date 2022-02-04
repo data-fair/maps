@@ -29,6 +29,7 @@ router.use('/:tileset/features', require('./tilesets-features'))
 require('../api-docs').paths['/tilesets'].get = {
   tags: ['Tilesets'],
   summary: 'List Tilesets',
+  description: 'Get a list of available tilesets',
   parameters: [
     { $ref: '#/components/parameters/size' },
     { $ref: '#/components/parameters/skip' },
@@ -88,7 +89,8 @@ router.get('', require('../middlewares/pagination')(), require('../middlewares/s
 
 require('../api-docs').paths['/tilesets'].post = {
   tags: ['Tilesets'],
-  summary: 'Create a Tileset from a mbtiles',
+  summary: 'Create a Tileset',
+  description: 'Create a Tileset with a random id from a mbtiles',
   parameters: [],
   requestBody: {
     content: {
@@ -195,6 +197,7 @@ router.get('/:tileset.json', asyncWrap(async (req, res) => {
 require('../api-docs').paths['/tilesets/{tileset}.json'].patch = {
   tags: ['Tilesets'],
   summary: 'Patch a TileJSON',
+  description: 'Patch the TileJSON of a tileset',
   parameters: [
     { $ref: '#/components/parameters/tileset' },
   ],
@@ -246,7 +249,8 @@ router.patch('/:tileset.json',
 
 require('../api-docs').paths['/tilesets/{tileset}'].put = {
   tags: ['Tilesets'],
-  summary: 'Create a Tileset with an id from a mbtiles',
+  summary: 'Create a Tileset with an id',
+  description: 'Create a Tileset with a given id from a mbtiles',
   parameters: [
     { $ref: '#/components/parameters/tileset' },
   ],
@@ -301,7 +305,8 @@ router.put('/:tileset', require('../middlewares/super-admin'), loadmbtiles, asyn
 
 require('../api-docs').paths['/tilesets/{tileset}'].patch = {
   tags: ['Tilesets'],
-  summary: 'Patch a Tileset with a mbtiles diff',
+  summary: 'Patch a Tileset',
+  description: 'Patch a Tileset with a mbtiles',
   parameters: [
     { $ref: '#/components/parameters/tileset' },
   ],
@@ -377,7 +382,8 @@ router.delete('/:tileset', require('../middlewares/super-admin'), asyncWrap(asyn
 
 require('../api-docs').paths['/tilesets/{tileset}/import-history'].get = {
   tags: ['Tilesets'],
-  summary: 'Get the importation history of the tileset',
+  summary: 'Get the importation history',
+  description: 'Get the importation history of the tileset',
   parameters: [
     { $ref: '#/components/parameters/tileset' },
     { $ref: '#/components/parameters/size' },

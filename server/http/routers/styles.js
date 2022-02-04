@@ -26,6 +26,8 @@ require('../api-docs').paths['/styles/{style}/sprite.png'] = { get: {} }
 
 require('../api-docs').paths['/styles'].get = {
   tags: ['Styles'],
+  summary: 'List available styles',
+  // description: '',
   parameters: [
     { $ref: '#/components/parameters/size' },
     { $ref: '#/components/parameters/skip' },
@@ -58,8 +60,9 @@ router.get('', require('../middlewares/pagination')(), require('../middlewares/s
 
 require('../api-docs').paths['/styles'].post = {
   tags: ['Styles'],
-  parameters: [
-  ],
+  summary: 'Post a new style',
+  description: 'Add a new style with a random id from a simple json object or multiple files (style.json, sprite.json, sprite.png)',
+  parameters: [],
   requestBody: {
     content: {
       'application/json': {},
@@ -135,6 +138,8 @@ router.post('', require('../middlewares/super-admin'), upload, asyncWrap(async (
 
 require('../api-docs').paths['/styles/{style}.json'].get = {
   tags: ['Styles'],
+  summary: 'Get a style',
+  description: '',
   parameters: [
     { $ref: '#/components/parameters/style' },
   ],
@@ -160,6 +165,8 @@ router.get('/:style.json', asyncWrap(async (req, res) => {
 
 require('../api-docs').paths['/styles/{style}.json'].put = {
   tags: ['Styles'],
+  summary: 'Add or Modify a style',
+  description: 'Add or Modify a style with an id from a json style',
   parameters: [
     { $ref: '#/components/parameters/style' },
   ],
@@ -197,6 +204,8 @@ router.put('/:style.json', require('../middlewares/super-admin'), asyncWrap(asyn
 
 require('../api-docs').paths['/styles/{style}'].put = {
   tags: ['Styles'],
+  summary: 'Add or Modify a style with sprites',
+  description: 'Add or Modify a style with an id from multiple files (style.json, sprite.json, sprite.png)',
   parameters: [
     { $ref: '#/components/parameters/style' },
   ],
@@ -246,6 +255,8 @@ router.put('/:style', require('../middlewares/super-admin'), upload, asyncWrap(a
 
 require('../api-docs').paths['/styles/{style}'].delete = {
   tags: ['Styles'],
+  summary: 'Delete a style',
+  // description: '',
   parameters: [
     { $ref: '#/components/parameters/style' },
   ],
@@ -270,6 +281,8 @@ router.delete('/:style', require('../middlewares/super-admin'), asyncWrap(async 
 
 require('../api-docs').paths['/styles/{style}/sprite.json'].get = {
   tags: ['Styles'],
+  summary: 'Get the sprite.json of a style',
+  // description: '',
   parameters: [
     { $ref: '#/components/parameters/style' },
   ],
@@ -295,6 +308,8 @@ router.get('/:style/sprite.json', (req, res) => {
 
 require('../api-docs').paths['/styles/{style}/sprite.png'].get = {
   tags: ['Styles'],
+  summary: 'Get the sprite.png of a style',
+  // description: '',
   parameters: [
     { $ref: '#/components/parameters/style' },
   ],

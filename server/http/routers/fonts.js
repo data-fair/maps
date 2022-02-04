@@ -16,6 +16,8 @@ require('../api-docs').paths['/fonts/{fontStack}/{range}.pbf'] = { get: {} }
 
 require('../api-docs').paths['/fonts'].get = {
   tags: ['Fonts'],
+  summary: 'List available fonts',
+  // description: '',
   parameters: [],
   responses: {
     200: {
@@ -35,6 +37,8 @@ router.get('', async (req, res) => {
 
 require('../api-docs').paths['/fonts/{fontStack}/{range}.pbf'].get = {
   tags: ['Fonts'],
+  summary: 'Get one or multiple fonts',
+  description: 'Get one or multiple fonts combined based on their names and range',
   parameters: [
     {
       name: 'fontStack',

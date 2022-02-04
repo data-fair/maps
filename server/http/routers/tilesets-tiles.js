@@ -26,6 +26,8 @@ router.param('y', require('../params/xyz').y)
 require('../api-docs').paths['/tilesets/{tileset}/tiles/{z}/{x}/{y}.{format}'] = {
   get: {
     tags: ['Tilesets'],
+    summary: 'Get a tile',
+    description: 'Get a tile from its XYZ coordinates',
     parameters: [
       { $ref: '#/components/parameters/tileset' },
       { $ref: '#/components/parameters/z' },
