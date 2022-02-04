@@ -35,7 +35,8 @@ const bodySchema = {
 }
 require('../api-docs').paths['/tilesets/{tileset}/features/properties_bulk'].post = {
   tags: ['Tilesets'],
-  // summary: 'Get the preview of the tileset',
+  summary: 'Get properties of points',
+  description: 'For each given point, get the properties of the first polygon containing it',
   parameters: [
     { $ref: '#/components/parameters/tileset' },
     { $ref: '#/components/parameters/sort' },
@@ -147,6 +148,8 @@ router.post('/properties_bulk', require('../middlewares/validate-json-body')(bod
 
 require('../api-docs').paths['/tilesets/{tileset}/features/polygon_properties_bulk'].post = {
   tags: ['Tilesets'],
+  summary: 'Get properties of Geojson Feature',
+  description: 'For each given Geojson Feature, get the list of properties of all features intersecting it',
   parameters: [
     { $ref: '#/components/parameters/tileset' },
     // { $ref: '#/components/parameters/sort' },
@@ -218,9 +221,10 @@ router.post('/polygon_properties_bulk', /* require('../middlewares/validate-json
       const maxPixelXY = mercator.px(bbox.slice(2, 4), _z)
       const minX = Math.floor(minPixelXY[0] / 256)
       const maxX = Math.floor(maxPixelXY[0] / 256)
-      const minY = Math.floor(minPixelXY[1] / 256)
-      const maxY = Math.floor(maxPixelXY[1] / 256)
-      const tileCount = (maxX - minX) * (maxY - minY) // TODO support area crossing lat=0 and lon=0
+      // inverse Y because Lng and Y are inversed
+      const minY = Math.floor(maxPixelXY[1] / 256)
+      const maxY = Math.floor(minPixelXY[1] / 256)
+      const tileCount = (maxX - minX + 1) * (maxY - minY + 1) // TODO support area crossing lat=0 and lon=0
       if (tileCount > 4) {
         _z--
         if (_z < tilejson.minzoom) return res.status(400).send('Feature too big')
