@@ -82,6 +82,15 @@ describe('Tilesets', () => {
     ).length, tileBretagne.features.length)
   })
 
+  it('Should upload a tileset and ignore some properties', async () => {
+    const tileset = await postMBTiles('./test/resources/mbtiles/france-pays-de-la-loire-8-126-89.mbtiles', 'pays-de-la-loire', ['name_int', 'name_de'])
+    const tile = (await global.ax.superadmin.get(`/api/tilesets/${tileset._id}/tiles/8/126/89.geojson`)).data
+    assert.ok(tile.features.find(f => !!f.properties.name))
+    assert.ok(tile.features.find(f => !!f.properties.name_en))
+    assert.ok(!tile.features.find(f => !!f.properties.name_it))
+    assert.ok(!tile.features.find(f => !!f.properties.name_de))
+  })
+
   it('Should generate a tileset preview', async() => {
     const tileset = await postMBTiles('./test/resources/mbtiles/zoom0.mbtiles')
     const preview = await global.ax.superadmin.get(`/api/tilesets/${tileset._id}/preview/100x100.png`)

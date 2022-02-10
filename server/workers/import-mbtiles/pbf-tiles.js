@@ -5,17 +5,21 @@ const zlib = require('zlib')
 const BSON = require('bson')
 
 // functions from https://github.com/koumoul-dev/openmaptiles-world/blob/master/lib/mbtiles.js
-const prepareVectorTile = (tileData, addProps) => {
+const prepareVectorTile = (tileData, addProps, excludeProps = []) => {
   const tile = new VectorTile(new Protobuf(zlib.gunzipSync(tileData)))
   for (const layer in tile.layers) {
     tile.layers[layer].features = []
     for (let i = 0; i < tile.layers[layer].length; i++) {
       const feature = tile.layers[layer].feature(i)
       Object.assign(feature.properties, addProps)
+      for (const excludeProp of excludeProps) {
+        delete feature.properties[excludeProp]
+      }
       tile.layers[layer].features.push(feature)
     }
     // monkey patch tile, so that vt-pbf will read the potentially altered .features array
     tile.layers[layer].feature = (i) => tile.layers[layer].features[i]
+
     Object.defineProperty(tile.layers[layer], 'length', {
       get: () => tile.layers[layer].features.length,
     })
@@ -90,6 +94,7 @@ const mergeTiles = (target, origin, area, timer) => {
 module.exports = {
   importTiles: async(db, importTask, baseQuery, tiles, timer) => {
     const area = importTask?.options?.area
+    const excludeProps = importTask?.options?.excludeProps || []
     for (const tile of tiles) {
       tile.tile_row = (1 << tile.zoom_level) - 1 - tile.tile_row
       tile.query = Object.assign({
@@ -115,12 +120,12 @@ module.exports = {
       let d
       if (!existingDocument) {
         insertedCount++
-        if (area) d = vectorTileAsPbfBuffer(prepareVectorTile(tile.tile_data, { area }))
+        if (area) d = vectorTileAsPbfBuffer(prepareVectorTile(tile.tile_data, { area }, excludeProps))
         else d = tile.tile_data
         timer.step('preparNewVectorTile')
       } else {
-        const newTile = prepareVectorTile(tile.tile_data, area ? { area } : {})
-        const oldTile = prepareVectorTile(existingDocument.d.buffer, { })
+        const newTile = prepareVectorTile(tile.tile_data, area ? { area } : {}, excludeProps)
+        const oldTile = prepareVectorTile(existingDocument.d.buffer, { }, excludeProps)
         timer.step('prepareVectorTile')
         mergeTiles(oldTile, newTile, area, timer)
         d = vectorTileAsPbfBuffer(oldTile)

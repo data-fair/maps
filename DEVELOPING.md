@@ -53,3 +53,8 @@ Server listening to [http://localhost:7400](http://localhost:7400)
 
     npm run test
     npm run test-cover
+
+You can also run tests from docker:
+
+    docker build -f test.Dockerfile --tag maps-test .
+    docker run --network host maps-test

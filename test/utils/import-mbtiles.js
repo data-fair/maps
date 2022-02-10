@@ -3,9 +3,12 @@ const FormData = require('form-data')
 const fs = require('fs')
 
 module.exports = {
-  postMBTiles: async(file, area) => {
+  postMBTiles: async(file, area, excludeProps = []) => {
     const formData = new FormData()
     formData.append('tileset.mbtiles', fs.createReadStream(file))
+    for (const excludeProp of excludeProps) {
+      formData.append('excludeProp', excludeProp)
+    }
     if (area) formData.append('area', area)
     let tileset = (await global.ax.superadmin.post('/api/tilesets', formData, { headers: formData.getHeaders() })).data
     await eventToPromise(global.app.workers.importMBTiles.events, `imported:${tileset._id}`)

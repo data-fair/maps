@@ -1,21 +1,23 @@
 const { nanoid } = require('nanoid')
 const pid = nanoid()
 
+const ttl = 300
+
 let interval
 exports.start = async db => {
   const locks = db.collection('locks')
   await locks.createIndex({ pid: 1 })
   try {
-    await locks.createIndex({ updatedAt: 1 }, { expireAfterSeconds: 300 })
+    await locks.createIndex({ updatedAt: 1 }, { expireAfterSeconds: ttl })
   } catch (err) {
     console.log('Failure to create TTL index. Probably because the value changed. Try to update it.')
-    db.command({ collMod: 'locks', index: { keyPattern: { updatedAt: 1 }, expireAfterSeconds: 300 } })
+    db.command({ collMod: 'locks', index: { keyPattern: { updatedAt: 1 }, expireAfterSeconds: ttl } })
   }
 
   // prolongate lock acquired by this process while it is still active
   interval = setInterval(() => {
     locks.updateMany({ pid }, { $currentDate: { updatedAt: true } })
-  }, (300 / 2) * 1000)
+  }, (ttl / 2) * 1000)
 }
 
 exports.stop = () => {

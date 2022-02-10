@@ -25,4 +25,4 @@ COPY contracts contracts
 COPY upgrade upgrade
 
 
-CMD npm run lint && npm run test-cover
+CMD npm run test-cover && npm run lint

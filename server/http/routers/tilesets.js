@@ -107,11 +107,16 @@ require('../api-docs').paths['/tilesets'].post = {
               description: 'Area used during merge, every geometry with the same "area" will be replaced by the new ones',
               type: 'string',
             },
+            excludeProp: {
+              description: 'Exclude a property from all features of the tileset',
+              type: 'string',
+            },
           },
         },
         encoding: {
           'tileset.mbtiles': { contentType: 'application/octet-stream' },
           area: { contentType: 'text/plain' },
+          excludeProp: { contentType: 'text/plain' },
         },
       },
     },
@@ -141,6 +146,10 @@ router.post('', require('../middlewares/super-admin'), loadmbtiles, asyncWrap(as
 
     const options = {}
     if (req.body.area) options.area = req.body.area
+    if (req.body.excludeProp) {
+      if (Array.isArray(req.body.excludeProp)) options.excludeProps = req.body.excludeProp
+      else options.excludeProps = [req.body.excludeProp]
+    }
     await importMBTiles({ db: req.app.get('db') }, {
       _id: tileset._id,
       tileset: tileset._id,
@@ -286,6 +295,10 @@ router.put('/:tileset', require('../middlewares/super-admin'), loadmbtiles, asyn
 
     const options = {}
     if (req.body.area) options.area = req.body.area
+    if (req.body.excludeProp) {
+      if (Array.isArray(req.body.excludeProp)) options.excludeProps = req.body.excludeProp
+      else options.excludeProps = [req.body.excludeProp]
+    }
     await importMBTiles({ db: req.app.get('db') }, {
       _id,
       tileset: _id,
@@ -334,6 +347,10 @@ router.patch('/:tileset', require('../middlewares/super-admin'), loadmbtiles, as
   try {
     const options = {}
     if (req.body.area) options.area = req.body.area
+    if (req.body.excludeProp) {
+      if (Array.isArray(req.body.excludeProp)) options.excludeProps = req.body.excludeProp
+      else options.excludeProps = [req.body.excludeProp]
+    }
     await importMBTiles({ db: req.app.get('db') }, {
       _id,
       tileset: req.params.tileset,
