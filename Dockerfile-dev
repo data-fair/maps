@@ -1,5 +1,8 @@
 FROM ghcr.io/koumoul-dev/docker-maplibre-gl-native:master
 
+# WARNING: dependencies install is duplicated with ./Dockerfile
+# keep these files synced
+
 RUN \
   apt-get -qq update\ 
   && apt-get install -y --no-install-recommends\
@@ -36,27 +39,11 @@ RUN mkdir /fonts &&\
   unzip -q fonts.zip -d /fonts &&\
   rm fonts.zip
 
-ENV NODE_ENV production
+ENV NODE_ENV development
 
 WORKDIR /webapp
 
-COPY package.json .
-COPY package-lock.json .
-RUN npm ci --production
+VOLUME /webapp
 
-COPY config config
-COPY contracts contracts
-COPY public public
-COPY nuxt.config.js .
-RUN npm run build
-
-COPY server server
-COPY scripts scripts
-COPY upgrade upgrade
-
-VOLUME /webapp/local
-VOLUME /webapp/mbtiles
-
-COPY docker-server.sh .
-ENTRYPOINT [ "bash" ]
-CMD ["/webapp/docker-server.sh"]
+ENTRYPOINT []
+CMD ["bash", "/webapp/docker-dev-server.sh"]

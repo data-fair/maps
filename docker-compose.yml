@@ -2,6 +2,9 @@ version: '3'
 services:
   mongo:
     image: mongo:4.2
+    profiles:
+      - dev
+      - test
     ports:
       - 27017:27017
     volumes:
@@ -9,11 +12,16 @@ services:
 
   openapi-viewer:
     image: koumoul/openapi-viewer:1
+    profiles:
+      - deps
     ports:
       - 5680:8080
 
   sd:
     image: koumoul/simple-directory:master
+    profiles:
+      - dev
+      - test
     network_mode: host
     environment:
       - ADMINS=["superadmin@test.com","banchereau.tom@gmail.com","alban.mouton@koumoul.com"]
@@ -27,6 +35,32 @@ services:
       - ./test/resources/users.json:/webapp/data/users.json
       - ./test/resources/organizations.json:/webapp/data/organizations.json
 
-      
+  server:
+    build:
+      context: ./
+      dockerfile: Dockerfile-dev
+    profiles:
+      - dev
+    depends_on:
+      - mongo
+      - sd
+    network_mode: host
+    environment:
+      - DEBUG=workers:*,renderer:*
+    volumes:
+      - ./:/webapp
+
+  client:
+    build:
+      context: ./
+      dockerfile: Dockerfile-dev
+    profiles:
+      - dev
+    network_mode: host
+    volumes:
+      - ./:/webapp
+    entrypoint: ["node"]
+    command: ["/webapp/node_modules/.bin/nuxt"]
+
 volumes:
   mongo-data:

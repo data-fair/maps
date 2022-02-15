@@ -4,7 +4,7 @@ set -e
 
 echo "Download water data from https://osmdata.openstreetmap.de"
 
-wget --no-check-certificate -nv -O ./local/water-polygons-split-4326.zip\
+wget --no-check-certificate -nv -N -O ./local/water-polygons-split-4326.zip\
   https://osmdata.openstreetmap.de/download/water-polygons-split-4326.zip
 
 echo "Unzip data"

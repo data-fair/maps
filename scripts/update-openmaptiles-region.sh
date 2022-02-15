@@ -11,21 +11,18 @@ echo "Import the OSM region $1"
 
 echo "Download OSM data from http://download.geofabrik.de/$1-latest.osm.pbf"
 
-wget\
-  --no-check-certificate\
-  -nv\
-  -O ./local/osm-data.osm.pbf\
+wget --no-check-certificate -nv -N -O ./local/osm-data.osm.pbf\
   http://download.geofabrik.de/$1-latest.osm.pbf
 
 echo "Use tilemaker to create vector tiles"
 
-tilemaker/tilemaker\
+/tilemaker/tilemaker\
   --store ./local/store\
   --threads 0\
   --input ./local/osm-data.osm.pbf\
   --output ./local/tiles.mbtiles\
-  --config tilemaker/resources/config-openmaptiles.json\
-  --process tilemaker/resources/process-openmaptiles.lua
+  --config /tilemaker/resources/config-openmaptiles.json\
+  --process /tilemaker/resources/process-openmaptiles.lua
 
 echo "Register an import task on your data-fair/maps instance"
 

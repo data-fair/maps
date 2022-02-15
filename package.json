@@ -13,15 +13,14 @@
     "url": "https://github.com/data-fair/maps/issues"
   },
   "main": "server/index.js",
-  "scripts": {
-    "test-cover": "nyc npm test",
+  "scripts": {    
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
     "report": "nyc report --reporter=html",
     "test": "NODE_ENV=test xvfb-run -a mocha --exit --bail --timeout 20000 test/",
+    "test-cover": "nyc npm test",
+    "test-docker": "docker build -f Dockerfile-test --tag maps-test . && docker run --network host maps-test",
     "lint": "eslint --ext js,vue --ignore-path .gitignore .",
     "lint-fix": "eslint --ext js,vue --ignore-path .gitignore --fix .",
-    "dev-server": "NODE_ENV=development DEBUG=workers:*,renderer:* xvfb-run -a nodemon --signal SIGTERM server",
-    "dev-client": "NODE_ENV=development nuxt",
     "build": "nuxt build",
     "start": "node server",
     "analyze": "nuxt build --analyze",
@@ -54,6 +53,8 @@
     "express": "^4.17.1",
     "generic-pool": "^3.8.2",
     "geojson-bounds": "^1.0.2",
+    "http-errors": "^2.0.0",
+    "http-proxy-middleware": "^2.0.1",
     "maplibre-gl": "^1.15.2",
     "maplibre-gl-inspect": "github:acalcutt/maplibre-gl-inspect",
     "memoizee": "^0.4.15",
@@ -85,7 +86,6 @@
     "eslint-plugin-no-only-tests": "^2.6.0",
     "eslint-plugin-vue": "^7.19.1",
     "form-data": "^4.0.0",
-    "http-proxy-middleware": "^2.0.1",
     "killable": "^1.0.1",
     "mocha": "^9.1.2",
     "nyc": "^15.1.0"

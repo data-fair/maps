@@ -25,7 +25,7 @@ module.exports = {
   mongoUrl: 'mongodb://localhost:27017/data-fair-maps-' + (process.env.NODE_ENV || 'development'),
   maplibrePool: 10,
   imageSizeLimit: 1000 * 1000,
-  fontsPath: './fonts',
+  fontsPath: '/fonts',
   prometheus: true,
   info: {
     termsOfService: 'https://koumoul.com/platform/term-of-service',

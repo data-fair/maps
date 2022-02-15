@@ -4,15 +4,15 @@ set -e
 
 echo "Download data from naturalearth"
 
-wget --no-check-certificate -nv -O ./local/ne_10m_antarctic_ice_shelves_polys.zip\
+wget --no-check-certificate -N -P ./local\
   https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/physical/ne_10m_antarctic_ice_shelves_polys.zip
-wget --no-check-certificate -nv -O ./local/ne_10m_glaciated_areas.zip\
+wget --no-check-certificate -N -P ./local\
   https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/physical/ne_10m_glaciated_areas.zip
-wget --no-check-certificate -nv -O ./local/ne_10m_urban_areas.zip\
+wget --no-check-certificate -N -P ./local\
   https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/cultural/ne_10m_urban_areas.zip
-unzip -q -d local ./local/ne_10m_antarctic_ice_shelves_polys.zip
-unzip -q -d local ./local/ne_10m_glaciated_areas.zip
-unzip -q -d local ./local/ne_10m_urban_areas.zip
+unzip -q -o -d local ./local/ne_10m_antarctic_ice_shelves_polys.zip
+unzip -q -o -d local ./local/ne_10m_glaciated_areas.zip
+unzip -q -o -d local ./local/ne_10m_urban_areas.zip
 
 echo "Transform shapefiles into geojson using ogr2ogr"
 
