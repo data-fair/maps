@@ -7,6 +7,20 @@ const { importMBTiles, createTilesetFromMBTiles } = require('../../utils/import-
 
 const loadmbtiles = multer({ storage: multer.diskStorage({ destination: './local/' }) }).single('tileset.mbtiles')
 
+const prepareImportOptions = (body) => {
+  const options = {}
+  if (body.area) options.area = body.area
+  if (body.excludeProp) {
+    if (Array.isArray(body.excludeProp)) options.excludeProps = body.excludeProp
+    else options.excludeProps = [body.excludeProp]
+  }
+  if (body.excludeLayer) {
+    if (Array.isArray(body.excludeLayer)) options.excludeLayers = body.excludeLayer
+    else options.excludeLayers = [body.excludeLayer]
+  }
+  return options
+}
+
 const router = module.exports = require('express').Router()
 
 //
@@ -117,6 +131,7 @@ require('../api-docs').paths['/tilesets'].post = {
           'tileset.mbtiles': { contentType: 'application/octet-stream' },
           area: { contentType: 'text/plain' },
           excludeProp: { contentType: 'text/plain' },
+          exludeLayer: { contentType: 'text/plain' },
         },
       },
     },
@@ -144,12 +159,7 @@ router.post('', require('../middlewares/super-admin'), loadmbtiles, asyncWrap(as
   try {
     const tileset = await createTilesetFromMBTiles({ db: req.app.get('db') }, { filename })
 
-    const options = {}
-    if (req.body.area) options.area = req.body.area
-    if (req.body.excludeProp) {
-      if (Array.isArray(req.body.excludeProp)) options.excludeProps = req.body.excludeProp
-      else options.excludeProps = [req.body.excludeProp]
-    }
+    const options = prepareImportOptions(req.body)
     await importMBTiles({ db: req.app.get('db') }, {
       _id: tileset._id,
       tileset: tileset._id,
@@ -293,12 +303,7 @@ router.put('/:tileset', require('../middlewares/super-admin'), loadmbtiles, asyn
 
     const tileset = await createTilesetFromMBTiles({ db: req.app.get('db') }, { _id, filename })
 
-    const options = {}
-    if (req.body.area) options.area = req.body.area
-    if (req.body.excludeProp) {
-      if (Array.isArray(req.body.excludeProp)) options.excludeProps = req.body.excludeProp
-      else options.excludeProps = [req.body.excludeProp]
-    }
+    const options = prepareImportOptions(req.body)
     await importMBTiles({ db: req.app.get('db') }, {
       _id,
       tileset: _id,
@@ -345,12 +350,7 @@ router.patch('/:tileset', require('../middlewares/super-admin'), loadmbtiles, as
   const _id = nanoid()
   const filename = req.file.path
   try {
-    const options = {}
-    if (req.body.area) options.area = req.body.area
-    if (req.body.excludeProp) {
-      if (Array.isArray(req.body.excludeProp)) options.excludeProps = req.body.excludeProp
-      else options.excludeProps = [req.body.excludeProp]
-    }
+    const options = prepareImportOptions(req.body)
     await importMBTiles({ db: req.app.get('db') }, {
       _id,
       tileset: req.params.tileset,

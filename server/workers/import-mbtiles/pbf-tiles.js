@@ -5,9 +5,13 @@ const zlib = require('zlib')
 const BSON = require('bson')
 
 // functions from https://github.com/koumoul-dev/openmaptiles-world/blob/master/lib/mbtiles.js
-const prepareVectorTile = (tileData, addProps, excludeProps = []) => {
+const prepareVectorTile = (tileData, addProps, excludeProps = [], excludeLayers = []) => {
   const tile = new VectorTile(new Protobuf(zlib.gunzipSync(tileData)))
   for (const layer in tile.layers) {
+    if (excludeLayers.includes(layer)) {
+      delete tile.layers[layer]
+      continue
+    }
     tile.layers[layer].features = []
     for (let i = 0; i < tile.layers[layer].length; i++) {
       const feature = tile.layers[layer].feature(i)
@@ -95,6 +99,7 @@ module.exports = {
   importTiles: async(db, importTask, baseQuery, tiles, timer) => {
     const area = importTask?.options?.area
     const excludeProps = importTask?.options?.excludeProps || []
+    const excludeLayers = importTask?.options?.excludeLayers || []
     for (const tile of tiles) {
       tile.tile_row = (1 << tile.zoom_level) - 1 - tile.tile_row
       tile.query = Object.assign({
@@ -120,12 +125,12 @@ module.exports = {
       let d
       if (!existingDocument) {
         insertedCount++
-        if (area) d = vectorTileAsPbfBuffer(prepareVectorTile(tile.tile_data, { area }, excludeProps))
-        else d = tile.tile_data
+        if (area) d = vectorTileAsPbfBuffer(prepareVectorTile(tile.tile_data, { area }, excludeProps, excludeLayers))
+        else d = vectorTileAsPbfBuffer(prepareVectorTile(tile.tile_data, {}, excludeProps, excludeLayers))
         timer.step('preparNewVectorTile')
       } else {
-        const newTile = prepareVectorTile(tile.tile_data, area ? { area } : {}, excludeProps)
-        const oldTile = prepareVectorTile(existingDocument.d.buffer, { }, excludeProps)
+        const newTile = prepareVectorTile(tile.tile_data, area ? { area } : {}, excludeProps, excludeLayers)
+        const oldTile = prepareVectorTile(existingDocument.d.buffer, { }, excludeProps, excludeLayers)
         timer.step('prepareVectorTile')
         mergeTiles(oldTile, newTile, area, timer)
         d = vectorTileAsPbfBuffer(oldTile)

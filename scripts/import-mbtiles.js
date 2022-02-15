@@ -11,6 +11,7 @@ program
   .addOption(new Option('-f, --file <file>', 'path to the mbtiles file').makeOptionMandatory(true))
   .addOption(new Option('--area <area>', 'area used for merge operations'))
   .addOption(new Option('--exclude-prop <property...>', 'exclude a property from all features in the tileset'))
+  .addOption(new Option('--exclude-layer <layer...>', 'exclude a layer'))
   // .addOption(new Option('--name <name>', ''))
   // .addOption(new Option('--description <description>', ''))
   .action(async(options) => {
@@ -51,6 +52,7 @@ program
           area: options.area,
           method: options.insertMethod,
           exludeProps: options.excludeProp,
+          exludeLayers: options.excludeLayer,
         },
       })
       console.log('ok')
