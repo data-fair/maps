@@ -1,4 +1,4 @@
-FROM ghcr.io/koumoul-dev/docker-maplibre-gl-native:master
+FROM ghcr.io/koumoul-dev/docker-maplibre-gl-native:v0.1.0
 
 RUN \
   apt-get -qq update\ 
