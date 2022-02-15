@@ -4,7 +4,8 @@ set -e
 
 echo "Download water data from https://osmdata.openstreetmap.de"
 
-wget --no-check-certificate -nv -O ./local/water-polygons-split-4326.zip  https://osmdata.openstreetmap.de/download/water-polygons-split-4326.zip
+wget --no-check-certificate -nv -O ./local/water-polygons-split-4326.zip\
+  https://osmdata.openstreetmap.de/download/water-polygons-split-4326.zip
 
 echo "Unzip data"
 
@@ -16,7 +17,9 @@ ogr2ogr -f GeoJSONSeq local/water_polygons.ndjson local/water-polygons-split-432
 
 echo "Add ocean class to all features using ndjson-map"
 
-cat local/water_polygons.ndjson | node node_modules/.bin/ndjson-map 'd.properties.class="ocean",d' > local/water_polygons.geojson
+cat local/water_polygons.ndjson\
+  | node node_modules/.bin/ndjson-map 'd.properties.class="ocean",d'\
+  > local/water_polygons.geojson
 
 echo "Transform geojson into mbtiles using tippecanoe"
 
@@ -30,8 +33,8 @@ tippecanoe --output=local/ocean.mbtiles --force --drop-rate=0\
 echo "Register an import task on your data-fair/maps instance"
 
 node scripts/import-mbtiles.js\
-  --file local/ocean.mbtiles
-  --create
-  --tileset openmaptiles
-  --insert-method merge
+  --file local/ocean.mbtiles\
+  --create\
+  --tileset openmaptiles\
+  --insert-method merge\
   --area ocean
