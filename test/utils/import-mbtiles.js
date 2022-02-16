@@ -27,10 +27,11 @@ module.exports = {
     tileset = (await global.ax.superadmin.get(`/api/tilesets/${tileset._id}.json`)).data
     return tileset
   },
-  patchTileset: async(file, _id, area) => {
+  patchTileset: async(file, _id, area, insertMethod) => {
     const formData = new FormData()
     formData.append('tileset.mbtiles', fs.createReadStream(file))
     if (area) formData.append('area', area)
+    if (insertMethod) formData.append('insertMethod', insertMethod)
     await global.ax.superadmin.patch('/api/tilesets/' + _id, formData, { headers: formData.getHeaders() })
     await eventToPromise(global.app.workers.importMBTiles.events, `imported:${_id}`)
     const tileset = (await global.ax.superadmin.get(`/api/tilesets/${_id}.json`)).data

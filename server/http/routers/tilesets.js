@@ -162,6 +162,7 @@ router.post('', require('../middlewares/super-admin'), loadmbtiles, asyncWrap(as
     const tileset = await createTilesetFromMBTiles({ db: req.app.get('db') }, { filename }, {})
 
     const options = prepareImportOptions(req.body)
+    options.insertMethod = 'create'
     await importMBTiles({ db: req.app.get('db') }, {
       _id: tileset._id,
       tileset: tileset._id,
@@ -293,6 +294,7 @@ require('../api-docs').paths['/tilesets/{tileset}'].put = {
   },
 }
 
+// create but with a known id
 router.put('/:tileset', require('../middlewares/super-admin'), loadmbtiles, asyncWrap(async (req, res) => {
   const _id = req.params.tileset
   const existingTileset = await req.app.get('db').collection('tilesets').findOne({ _id })
@@ -306,6 +308,7 @@ router.put('/:tileset', require('../middlewares/super-admin'), loadmbtiles, asyn
     const tileset = await createTilesetFromMBTiles({ db: req.app.get('db') }, { _id, filename }, {})
 
     const options = prepareImportOptions(req.body)
+    options.insertMethod = 'create'
     await importMBTiles({ db: req.app.get('db') }, {
       _id,
       tileset: _id,
@@ -353,6 +356,7 @@ router.patch('/:tileset', require('../middlewares/super-admin'), loadmbtiles, as
   const filename = req.file.path
   try {
     const options = prepareImportOptions(req.body)
+    options.insertMethod = req.body.insertMethod || (req.body.area ? 'merge' : 'update')
     await importMBTiles({ db: req.app.get('db') }, {
       _id,
       tileset: req.params.tileset,

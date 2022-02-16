@@ -55,7 +55,7 @@ program
         tileset: tileset._id,
         filename: options.file,
         options: {
-          method: options.insertMethod || 'replace',
+          insertMethod: options.insertMethod || 'replace',
           excludeProps,
           excludeLayers,
         },

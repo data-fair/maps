@@ -44,7 +44,7 @@ en:
         <tr v-for="task in history" :key="task._id">
           <td><status-icon :value="task" /></td>
           <td>{{ task.version }}</td>
-          <td>{{ task.options && task.options.method }}</td>
+          <td>{{ task.options && task.options.insertMethod }}</td>
           <td>{{ task.date | date }}</td>
           <td>{{ (task.options && task.options.area) || '' }}</td>
           <td v-if="task.tileImported">

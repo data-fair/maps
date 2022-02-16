@@ -32,7 +32,7 @@ describe('Tilesets', () => {
     assert.ok(await global.ax.superadmin.get(`/api/tilesets/${tileset._id}/tiles/0/0/0.pbf`))
     assert.ok(!(await global.ax.superadmin.get(`/api/tilesets/${tileset._id}/tiles/1/0/0.pbf`)).data)
 
-    tileset = await patchTileset('./test/resources/mbtiles/zoom1.mbtiles', tileset._id)
+    tileset = await patchTileset('./test/resources/mbtiles/zoom1.mbtiles', tileset._id, null, 'merge')
     assert.equal(tileset.tileCount, 3)
     assert.equal(tileset.minzoom, 0)
     assert.equal(tileset.maxzoom, 1)

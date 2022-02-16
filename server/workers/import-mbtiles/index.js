@@ -46,10 +46,10 @@ const loop = async({ db }) => {
       let insertedTiles = importTask.insertedTiles || 0
       const ts = importTask.tileset
       const filename = `./local/${nanoid()}`
-      const { method } = importTask.options
+      const { insertMethod } = importTask.options
 
       const tileset = await db.collection('tilesets').findOne({ _id: ts })
-      const v = semver.inc(semver.valid(tileset.version) ? tileset.version : '0.0.0', method !== 'replace' ? 'minor' : 'major')
+      const v = semver.inc(semver.valid(tileset.version) ? tileset.version : '0.0.0', insertMethod !== 'replace' ? 'minor' : 'major')
       const major = semver.major(v)
       debug(`${skip > 0 ? 'resume' : 'start'} importation of ${ts} v${v}`)
       timer.step('readTilesetDB')
@@ -94,7 +94,7 @@ const loop = async({ db }) => {
         importedSize += insertedSize
 
         await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { tileImported: skip, insertedTiles, importedSize } })
-        if (method === 'merge') {
+        if (insertMethod === 'merge') {
           await db.collection('tilesets').updateOne({ _id: ts }, {
             $inc: { tileCount: insertedCount, filesize: insertedSize },
             $set: { lastModified: new Date() },
@@ -116,7 +116,7 @@ const loop = async({ db }) => {
         await fs.unlink(importTask.filename)
 
         const $set = { version: v, lastModified: new Date() }
-        if (method !== 'merge') {
+        if (insertMethod !== 'merge') {
           Object.assign($set, {
             tileCount: skip,
             filesize: importedSize,
@@ -132,7 +132,7 @@ const loop = async({ db }) => {
         await db.collection('tilesets').updateOne({ _id: ts }, { $set })
 
         // delete pervious version
-        if (method === 'replace') {
+        if (insertMethod === 'replace') {
           await db.collection('task').insertOne({ type: 'delete-tileset', status: 'pending', ts, version: tileset.version })
         }
 
