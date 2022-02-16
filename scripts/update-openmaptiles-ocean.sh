@@ -4,12 +4,12 @@ set -e
 
 echo "Download water data from https://osmdata.openstreetmap.de"
 
-wget --no-check-certificate -nv -N -O ./local/water-polygons-split-4326.zip\
+wget --no-check-certificate -N -P ./local\
   https://osmdata.openstreetmap.de/download/water-polygons-split-4326.zip
 
 echo "Unzip data"
 
-unzip -q -d local ./local/water-polygons-split-4326.zip
+unzip -q -d ./local ./local/water-polygons-split-4326.zip
 
 echo "Transform shapefiles into geojson using ogr2ogr"
 
@@ -23,12 +23,15 @@ cat local/water_polygons.ndjson\
 
 echo "Transform geojson into mbtiles using tippecanoe"
 
-tippecanoe --output=local/ocean.mbtiles --force --drop-rate=0\
+tippecanoe\
+  --output=local/ocean.mbtiles\
+  --force\
+  --drop-rate=0\
   --named-layer='{"file":"local/water_polygons.geojson","layer":"water"}'\
-  --coalesce\
-  --simplification 4\
   --exclude x\
-  --exclude y
+  --exclude y\
+  --coalesce\
+  --simplification 4
 
 echo "Register an import task on your data-fair/maps instance"
 

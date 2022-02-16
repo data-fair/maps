@@ -10,7 +10,7 @@ describe('Tilesets features routes', () => {
     [-2.483328704463426, 47.29815411535077], // 2 features: #park { class: 'site_ramsar',name: 'Marais salants de Guérande' } #water { class: 'ocean' }
   ]
 
-  it.only('Should get features based on intersection', async () => {
+  it.skip('Should get features based on intersection', async () => {
     const tileset = await postMBTiles('./test/resources/mbtiles/france-pays-de-la-loire-8-126-89.mbtiles')
     const features = (await global.ax.superadmin.get(`/api/tilesets/${tileset._id}/features`, {
       params: {

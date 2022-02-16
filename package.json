@@ -13,18 +13,13 @@
     "url": "https://github.com/data-fair/maps/issues"
   },
   "main": "server/index.js",
-  "scripts": {    
-    "coveralls": "nyc report --reporter=text-lcov | coveralls",
-    "report": "nyc report --reporter=html",
-    "test": "NODE_ENV=test xvfb-run -a mocha --exit --bail --timeout 20000 test/",
-    "test-cover": "nyc npm test",
-    "test-docker": "docker build -f Dockerfile-test --tag maps-test . && docker run --network host maps-test",
+  "scripts": {
+    "dev": "docker-compose --profile dev up",
+    "test": "docker build -f Dockerfile-test --tag maps-test . && docker run --network host maps-test",
     "lint": "eslint --ext js,vue --ignore-path .gitignore .",
     "lint-fix": "eslint --ext js,vue --ignore-path .gitignore --fix .",
     "build": "nuxt build",
-    "start": "node server",
-    "analyze": "nuxt build --analyze",
-    "upgrade": "node upgrade"
+    "analyze": "nuxt build --analyze"
   },
   "dependencies": {
     "@koumoul/nuxt-config-inject": "^0.4.10",
@@ -48,6 +43,7 @@
     "commander": "^8.3.0",
     "config": "^3.3.6",
     "cookie-universal-nuxt": "^2.1.5",
+    "dayjs": "^1.10.7",
     "debug": "^4.3.2",
     "event-to-promise": "^0.8.0",
     "express": "^4.17.1",

@@ -9,6 +9,7 @@ services:
       - 27017:27017
     volumes:
       - mongo-data:/data/db
+    command: mongod --quiet --logpath /dev/null 
 
   openapi-viewer:
     image: koumoul/openapi-viewer:1

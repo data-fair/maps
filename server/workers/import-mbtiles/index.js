@@ -58,12 +58,12 @@ const loop = async({ db }) => {
       timer.step('cpMbtiles')
 
       const mbtiles = await asyncMBTiles(filename)
-      const info = await mbtiles.getInfo()
+
       await mbtiles.close()
       timer.step('getMBTilesInfo')
 
       let importTiles = defaultTiles.importTiles
-      if (info.format === 'pbf') {
+      if (importTask.tilejson.format === 'pbf') {
         importTiles = pbfTiles.importTiles
       }
 
@@ -94,7 +94,7 @@ const loop = async({ db }) => {
         importedSize += insertedSize
 
         await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { tileImported: skip, insertedTiles, importedSize } })
-        if (method !== 'replace') {
+        if (method === 'merge') {
           await db.collection('tilesets').updateOne({ _id: ts }, {
             $inc: { tileCount: insertedCount, filesize: insertedSize },
             $set: { lastModified: new Date() },
@@ -102,7 +102,7 @@ const loop = async({ db }) => {
         }
         debug(`importation of ${ts} v${v} : ${skip} tiles processed, ${insertedCount} tile inserted, ${insertedSize / 1000}KB added`)
         timer.step('updateWorkingTileset')
-        debug('timer', timer)
+        debug('timer', timer.times)
       }
       iterator.return()
       sql.close()
@@ -116,10 +116,25 @@ const loop = async({ db }) => {
         await fs.unlink(importTask.filename)
 
         const $set = { version: v, lastModified: new Date() }
-        if (method === 'replace') Object.assign($set, { tileCount: skip, filesize: importedSize, name: info.name, description: info.description, minzoom: info.minzoom, maxzoom: info.maxzoom, center: info.center, bounds: info.bounds, vector_layers: info.vector_layers })
+        if (method !== 'merge') {
+          Object.assign($set, {
+            tileCount: skip,
+            filesize: importedSize,
+            name: importTask.tilejson.name,
+            description: importTask.tilejson.description,
+            minzoom: importTask.tilejson.minzoom,
+            maxzoom: importTask.tilejson.maxzoom,
+            center: importTask.tilejson.center,
+            bounds: importTask.tilejson.bounds,
+            vector_layers: importTask.tilejson.vector_layers,
+          })
+        }
         await db.collection('tilesets').updateOne({ _id: ts }, { $set })
 
-        if (method === 'replace') await db.collection('task').insertOne({ type: 'delete-tileset', status: 'pending', ts, version: tileset.version })
+        // delete pervious version
+        if (method === 'replace') {
+          await db.collection('task').insertOne({ type: 'delete-tileset', status: 'pending', ts, version: tileset.version })
+        }
 
         await db.collection('import-tilesets').updateOne({ _id: importTask._id, status: 'working' }, { $set: { status: 'done', tileImported: skip, importedSize, version: v }, $unset: { lockDate: undefined } })
         events.emit(`imported:${ts}`)

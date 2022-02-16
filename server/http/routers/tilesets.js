@@ -10,10 +10,12 @@ const loadmbtiles = multer({ storage: multer.diskStorage({ destination: './local
 const prepareImportOptions = (body) => {
   const options = {}
   if (body.area) options.area = body.area
+  options.excludeProps = []
   if (body.excludeProp) {
     if (Array.isArray(body.excludeProp)) options.excludeProps = body.excludeProp
     else options.excludeProps = [body.excludeProp]
   }
+  options.excludeLayers = []
   if (body.excludeLayer) {
     if (Array.isArray(body.excludeLayer)) options.excludeLayers = body.excludeLayer
     else options.excludeLayers = [body.excludeLayer]
@@ -131,7 +133,7 @@ require('../api-docs').paths['/tilesets'].post = {
           'tileset.mbtiles': { contentType: 'application/octet-stream' },
           area: { contentType: 'text/plain' },
           excludeProp: { contentType: 'text/plain' },
-          exludeLayer: { contentType: 'text/plain' },
+          excludeLayer: { contentType: 'text/plain' },
         },
       },
     },
@@ -157,7 +159,7 @@ require('../api-docs').paths['/tilesets'].post = {
 router.post('', require('../middlewares/super-admin'), loadmbtiles, asyncWrap(async (req, res) => {
   const filename = req.file.path
   try {
-    const tileset = await createTilesetFromMBTiles({ db: req.app.get('db') }, { filename })
+    const tileset = await createTilesetFromMBTiles({ db: req.app.get('db') }, { filename }, {})
 
     const options = prepareImportOptions(req.body)
     await importMBTiles({ db: req.app.get('db') }, {
@@ -301,7 +303,7 @@ router.put('/:tileset', require('../middlewares/super-admin'), loadmbtiles, asyn
       return res.status(400).send('This tileset already exist')
     }
 
-    const tileset = await createTilesetFromMBTiles({ db: req.app.get('db') }, { _id, filename })
+    const tileset = await createTilesetFromMBTiles({ db: req.app.get('db') }, { _id, filename }, {})
 
     const options = prepareImportOptions(req.body)
     await importMBTiles({ db: req.app.get('db') }, {

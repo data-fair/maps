@@ -64,7 +64,6 @@ en:
             <v-card outlined>
               <v-tabs
                 vertical
-                style="height:70vh"
                 class="tileset-inspect-tabs"
               >
                 <v-tab

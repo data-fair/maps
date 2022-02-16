@@ -11,7 +11,7 @@ echo "Import the OSM region $1"
 
 echo "Download OSM data from http://download.geofabrik.de/$1-latest.osm.pbf"
 
-wget --no-check-certificate -nv -N -O ./local/osm-data.osm.pbf\
+wget --no-check-certificate -O ./local/osm-data.osm.pbf\
   http://download.geofabrik.de/$1-latest.osm.pbf
 
 echo "Use tilemaker to create vector tiles"

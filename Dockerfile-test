@@ -23,4 +23,4 @@ COPY contracts contracts
 COPY upgrade upgrade
 
 
-CMD npm run test-cover && npm run lint
+CMD ./node_modules/.bin/nyc xvfb-run -a ./node_modules/.bin/mocha --exit --bail --timeout 20000 test/&& npm run lint

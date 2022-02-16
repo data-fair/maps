@@ -36,6 +36,7 @@ module.exports = {
   loading: { color: '#1e88e5' }, // Customize the progress bar color
   plugins: [
     { src: '~plugins/session' },
+    { src: '~plugins/dayjs' },
     { src: '@/plugins/vue-clipboard2', ssr: false },
     // { src: '~plugins/global-components' },
     // { src: '~plugins/ws', ssr: false },

@@ -26,7 +26,7 @@ program
           if (!options.insertMethod) throw new Error('the given tileset exist but no insertion methods has been specified')
           // merge/replace
         } else {
-          options.insertMethod = 'replace'
+          options.insertMethod = 'create'
           if (!options.create) {
             if (options.tileset) throw new Error('the given tileset does not exist, use "--create" to create it from the given mbtiles')
             else throw new Error('no tileset has been specified, use "--create" to create a new tileset or/and "--tileset <tileset>" to specify a tileset id')
@@ -38,24 +38,33 @@ program
         process.exit(-1)
       }
 
+      const excludeProps = options.excludeProp || []
+      const excludeLayers = options.excludeLayer || []
+
       if (!tileset) {
         console.log('Creating tileset ... ')
-        tileset = await createTilesetFromMBTiles({ db }, { _id: options.tileset, filename: options.file })
+        tileset = await createTilesetFromMBTiles(
+          { db },
+          { _id: options.tileset, filename: options.file },
+          { excludeProps, excludeLayers },
+        )
         console.log('ok')
       }
 
-      console.log('Create import task ... ')
-      await importMBTiles({ db }, {
+      const task = {
         tileset: tileset._id,
         filename: options.file,
         options: {
-          area: options.area,
-          method: options.insertMethod,
-          exludeProps: options.excludeProp,
-          exludeLayers: options.excludeLayer,
+          method: options.insertMethod || 'replace',
+          excludeProps,
+          excludeLayers,
         },
-      })
-      console.log('ok')
+      }
+      if (options.area) task.options.area = options.area
+
+      console.log('Create import task ... ')
+      await importMBTiles({ db }, task)
+      console.log('ok', task)
       await require('../server/mongodb').stop()
       process.exit()
     } catch (error) {

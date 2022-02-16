@@ -20,7 +20,7 @@ ogr2ogr -f GeoJSONSeq local/ne_10m_antarctic_ice_shelves_polys.ndjson local/ne_1
 ogr2ogr -f GeoJSONSeq local/ne_10m_glaciated_areas.ndjson local/ne_10m_glaciated_areas.shp
 ogr2ogr -f GeoJSONSeq local/ne_10m_urban_areas.ndjson local/ne_10m_urban_areas.shp
 
-echo "Add ocean classes to all features using ndjson-map"
+echo "Add classes to all features using ndjson-map"
 
 cat local/ne_10m_antarctic_ice_shelves_polys.ndjson\
   | node node_modules/.bin/ndjson-map 'd.properties.class="ice",d.properties.subclass="glacier",d'\
@@ -34,7 +34,10 @@ cat local/ne_10m_urban_areas.ndjson\
 
 echo "Transform geojson into mbtiles using tippecanoe"
 
-tippecanoe --output=local/landcover.mbtiles --force --drop-rate=0\
+tippecanoe\
+  --output=local/landcover.mbtiles\
+  --force\
+  --drop-rate=0\
   --named-layer='{"file":"local/ne_10m_antarctic_ice_shelves_polys.geojson","layer":"landcover"}'\
   --named-layer='{"file":"local/ne_10m_glaciated_areas.geojson","layer":"landcover"}'\
   --named-layer='{"file":"local/ne_10m_urban_areas.geojson","layer":"landuse"}'\

@@ -15,8 +15,7 @@ Having all required dependencies locally is hard, this is why the recommended se
 
 ## Run development servers
 
-    docker-compose --profile dev build
-    docker-compose --profile dev up
+    npm run dev
 
 Open your browser at [http://localhost:7400](http://localhost:7400)
 
