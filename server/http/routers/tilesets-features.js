@@ -18,28 +18,56 @@ require('../api-docs').paths['/tilesets/{tileset}/features'] = {
     tags: ['Tilesets'],
     summary: 'Get features',
     description: 'Features are extracted from the tiles',
+    parameters: [
+      { $ref: '#/components/parameters/tileset' },
+      {
+        name: 'layer',
+        in: 'query',
+        description: 'The layer of the features',
+        required: true,
+        schema: {
+          type: 'string',
+        },
+      },
+      {
+        name: 'intersect-wkb',
+        in: 'query',
+        description: 'A geometry in WKB format to use as a filter',
+        required: true,
+        schema: {
+          type: 'string',
+        },
+      },
+    ],
+    responses: {
+      200: {
+        description: 'A mapped array containing property object for each point',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                count: {
+                  type: 'number',
+                  description: 'Total number of matching features',
+                },
+                results: {
+                  type: 'array',
+                  description: 'List of features',
+                  // items: {
+                  //   $ref: '#/components/schemas/',
+                  // },
+                },
+              },
+            },
+          },
+        },
+      },
+      404: {
+        description: 'The tileset does not exist',
+      },
+    },
   },
-  parameters: [
-    { $ref: '#/components/parameters/tileset' },
-    {
-      name: 'layer',
-      in: 'query',
-      description: 'The layer of the features',
-      required: true,
-      schema: {
-        type: 'string',
-      },
-    },
-    {
-      name: 'intersect-wkb',
-      in: 'query',
-      description: 'A geometry in WKB format to use as a filter',
-      required: true,
-      schema: {
-        type: 'string',
-      },
-    },
-  ],
 }
 
 // from a geometry deduce the tiles that are relevant to perform an intersection search
@@ -117,7 +145,7 @@ router.get('/', asyncWrap(async (req, res, next) => {
   for (const feature of features) {
     if (turf.booleanIntersects(intersectGeojson, feature)) results.push(feature)
   }
-  res.send({ results })
+  res.send({ results, count: features.length })
 }))
 
 // TODO: the following routes will be used to support extensions from data-fair
