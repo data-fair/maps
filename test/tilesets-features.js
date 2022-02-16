@@ -10,9 +10,9 @@ describe('Tilesets features routes', () => {
     [-2.483328704463426, 47.29815411535077], // 2 features: #park { class: 'site_ramsar',name: 'Marais salants de Guérande' } #water { class: 'ocean' }
   ]
 
-  it.skip('Should get features based on intersection', async () => {
+  it('Should get features based on intersection', async () => {
     const tileset = await postMBTiles('./test/resources/mbtiles/france-pays-de-la-loire-8-126-89.mbtiles')
-    const features = (await global.ax.superadmin.get(`/api/tilesets/${tileset._id}/features`, {
+    let features = (await global.ax.superadmin.get(`/api/tilesets/${tileset._id}/features`, {
       params: {
         'intersect-wkb': wkx.Geometry.parseGeoJSON({ type: 'Point', coordinates: points[0] }).toWkb().toString('base64url'),
         layer: 'landuse',
@@ -21,13 +21,21 @@ describe('Tilesets features routes', () => {
     assert.equal(features.length, 1)
     assert.equal(features[0].properties.class, 'residential')
 
-    const features2 = (await global.ax.superadmin.get(`/api/tilesets/${tileset._id}/features`, {
+    features = (await global.ax.superadmin.get(`/api/tilesets/${tileset._id}/features`, {
       params: {
-        'intersect-wkb': wkx.Geometry.parseGeoJSON({ type: 'LineString', coordinates: [points[1], points[2]] }).toWkb().toString('base64url'),
-        layer: 'landuse',
+        'intersect-wkb': wkx.Geometry.parseGeoJSON({ type: 'Point', coordinates: points[0] }).toWkb().toString('base64url'),
+        layer: 'park',
       },
     })).data.results
-    assert.equal(features2.length, 2)
+    assert.equal(features.length, 0)
+
+    features = (await global.ax.superadmin.get(`/api/tilesets/${tileset._id}/features`, {
+      params: {
+        'intersect-wkb': wkx.Geometry.parseGeoJSON({ type: 'LineString', coordinates: [points[1], points[2]] }).toWkb().toString('base64url'),
+        layer: 'park',
+      },
+    })).data.results
+    assert.equal(features.length, 1)
   })
 
   /* it('Should get feature properties of multiple points', async () => {

@@ -1,6 +1,7 @@
 <i18n lang="yaml">
 fr:
   title: Historique d'importation
+  table-header-mode: Mode
   table-header-date: Date
   table-header-area: Zone
   table-header-tile-imported: Tuiles importées
@@ -8,6 +9,7 @@ fr:
   table-header-size: Taille des données importées
 en:
   title: Importation history
+  table-header-mode: Mode
   table-header-date: Date
   table-header-area: Area
   table-header-tile-imported: Imported tiles
@@ -45,7 +47,9 @@ en:
           <td>{{ task.options && task.options.method }}</td>
           <td>{{ task.date | date }}</td>
           <td>{{ (task.options && task.options.area) || '' }}</td>
-          <td>{{ task.tileImported.toLocaleString() }} / {{ task.tileCount.toLocaleString() }}</td>
+          <td v-if="task.tileImported">
+            {{ task.tileImported.toLocaleString() }} / {{ task.tileCount.toLocaleString() }}
+          </td>
           <td>{{ task.importedSize/1000 }} KB</td>
         </tr>
       </tbody>
